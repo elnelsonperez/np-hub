@@ -4,7 +4,7 @@ const appModule = {
     start : 10,
     end : 14,
     line : 1,
-    scrolling:false,
+    scrolling: false,
 
     view (level) {
         let res = "";
