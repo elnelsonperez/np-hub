@@ -1,25 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b8414f7a-9f0f-4798-9b33-36d9f58275ab" name="Default" comment="ada">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/core/module.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/modules/boot/moduleLoader.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/modules/boot/npHeader.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/functions.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test" afterPath="" />
+    <list default="true" id="b8414f7a-9f0f-4798-9b33-36d9f58275ab" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/temporalModules.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.js" afterPath="$PROJECT_DIR$/app/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/core/line.js" afterPath="$PROJECT_DIR$/app/core/line.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/modules/default/battery.js" afterPath="$PROJECT_DIR$/app/modules/default/battery.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/modules/default/clock.js" afterPath="$PROJECT_DIR$/app/modules/default/clock.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/modules/default/message.js" afterPath="$PROJECT_DIR$/app/modules/default/message.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/modules/default/signal.js" afterPath="$PROJECT_DIR$/app/modules/default/signal.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.js" afterPath="$PROJECT_DIR$/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/gprs.js" afterPath="$PROJECT_DIR$/lib/gprs.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/lcd.js" afterPath="$PROJECT_DIR$/lib/lcd.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/serial.js" afterPath="$PROJECT_DIR$/lib/serial.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.js" afterPath="$PROJECT_DIR$/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test2.js" afterPath="$PROJECT_DIR$/test2.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -42,8 +27,20 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="83" column="30" lean-forward="true" selection-start-line="83" selection-start-column="30" selection-end-line="83" selection-end-column="30" />
+            <state relative-caret-position="448">
+              <caret line="87" column="0" lean-forward="false" selection-start-line="87" selection-start-column="0" selection-end-line="87" selection-end-column="0" />
+              <folding>
+                <element signature="e#2439#2704#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="temporalModules.txt" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/temporalModules.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="502">
+              <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -71,11 +68,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="moduleLoader.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="moduleLoader.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/modules/boot/moduleLoader.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="344">
-              <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+            <state relative-caret-position="318">
+              <caret line="19" column="0" lean-forward="false" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -94,8 +91,8 @@
       <file leaf-file-name="npHeader.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/modules/boot/npHeader.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="16" column="24" lean-forward="true" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
+            <state relative-caret-position="208">
+              <caret line="8" column="25" lean-forward="true" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -154,11 +151,12 @@
         <option value="$PROJECT_DIR$/app/modules/boot/npHeader.js" />
         <option value="$PROJECT_DIR$/lib/serial.js" />
         <option value="$PROJECT_DIR$/lib/gprs.js" />
-        <option value="$PROJECT_DIR$/app/modules/boot/moduleLoader.js" />
         <option value="$PROJECT_DIR$/index.js" />
         <option value="$PROJECT_DIR$/app/core/module.js" />
         <option value="$PROJECT_DIR$/app/core/line.js" />
+        <option value="$PROJECT_DIR$/app/modules/boot/moduleLoader.js" />
         <option value="$PROJECT_DIR$/app/app.js" />
+        <option value="$PROJECT_DIR$/temporalModules.txt" />
       </list>
     </option>
   </component>
@@ -236,35 +234,6 @@
             <path>
               <item name="nppms" type="b2602c69:ProjectViewProjectNode" />
               <item name="nppms" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="nppms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nppms" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="app" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="nppms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nppms" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="app" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="core" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="nppms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nppms" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="app" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="modules" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="nppms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nppms" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="app" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="modules" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="boot" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="nppms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nppms" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="lib" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
           </expand>
           <select />
@@ -387,12 +356,20 @@
       <workItem from="1502931268017" duration="145000" />
       <workItem from="1502931430297" duration="796000" />
       <workItem from="1502933300386" duration="3030000" />
-      <workItem from="1502981061966" duration="8125000" />
+      <workItem from="1502981061966" duration="10089000" />
     </task>
+    <task id="LOCAL-00001" summary="Module">
+      <created>1502994809406</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1502994809406</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="53487000" />
+    <option name="totallyTimeSpent" value="55451000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="30" width="1920" height="1050" extended-state="6" />
@@ -429,7 +406,8 @@
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="ada" />
-    <option name="LAST_COMMIT_MESSAGE" value="ada" />
+    <MESSAGE value="Module" />
+    <option name="LAST_COMMIT_MESSAGE" value="Module" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -766,14 +744,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/modules/boot/npHeader.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="16" column="24" lean-forward="true" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="104">
@@ -792,14 +762,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/core/module.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="494">
-          <caret line="19" column="35" lean-forward="true" selection-start-line="19" selection-start-column="35" selection-end-line="19" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/core/line.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="312">
@@ -808,18 +770,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/app.js">
+    <entry file="file://$PROJECT_DIR$/app/modules/boot/npHeader.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="83" column="30" lean-forward="true" selection-start-line="83" selection-start-column="30" selection-end-line="83" selection-end-column="30" />
+        <state relative-caret-position="208">
+          <caret line="8" column="25" lean-forward="true" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/core/module.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="494">
+          <caret line="19" column="35" lean-forward="true" selection-start-line="19" selection-start-column="35" selection-end-line="19" selection-end-column="35" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/modules/boot/moduleLoader.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="344">
-          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+        <state relative-caret-position="318">
+          <caret line="19" column="0" lean-forward="false" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="87" column="0" lean-forward="false" selection-start-line="87" selection-start-column="0" selection-end-line="87" selection-end-column="0" />
+          <folding>
+            <element signature="e#2439#2704#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/temporalModules.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="502">
+          <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
           <folding />
         </state>
       </provider>

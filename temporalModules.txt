@@ -1,0 +1,50 @@
+this.getTemporalModulesForLines = () =>  {
+        if (this.temporalModules.length > 0) {
+            const lines = {}
+            for (module of this.temporalModules) {
+                if (!lines[module.line]) {
+                    lines[module.line] = [];
+                }
+                lines[module.line].push(module);
+            }
+
+            //TODO Actually show temporal module
+
+
+            //Reset temporal modules
+            this.temporalModules = [];
+
+            let result = {};
+            //Return which lines to pause
+            Object.keys(lines).forEach(function (key) {
+                return  result[key] = true;
+            })
+            return result;
+
+        }
+        return {}
+    }
+
+
+        this.temporalModuleSet = (module, time) => {
+            this.temporalModules.push({module,time})
+        }
+
+
+    this.applicationLoop = ()  => {
+        this.timer =  setInterval(() => {
+            const ignore = this.getTemporalModulesForLines();
+            const contents = {};
+
+            for (let i = 1; i<=4;i++) { //Get Parsed Lines
+                if (!ignore[i]) {
+                    contents[i] = this.screen['line'+i].getProcessedLine()
+                }
+            }
+
+            for (let [line, content] of contents) { //Actually print them
+                this.printSingleLine(content, line);
+            }
+
+        }, 450)
+    }

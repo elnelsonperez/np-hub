@@ -6,11 +6,11 @@ const GprsManager =  require('./../lib/gprs').GprsManager;
 
 module.exports.Application = app;
 app = function () {
-    this.screen= null
-    this.  lcd= null
-    this. modules= []
-    this. timer= null
-    this. injectable= {}
+    this.screen = null
+    this.lcd = null
+    this.modules = []
+    this.timer = null
+    this.injectable = {}
 
     this.initialize = () => {
         this.setDefaultApplicationProperties();
@@ -86,45 +86,28 @@ app = function () {
         this.modules.push(module)
     }
 
+    this.printSingleLine  = (line, number) => {
+        if (!this.screen['line'+number].scrolling)
+            this.lcd.println(line,1);
+        else if (!this.screen['line'+number].scrollingStarted) {
+            this.lcd.printlnScroll(line,number);
+            this.screen['line'+number].scrollingStarted = true;
+        }
+    }
+
     this.applicationLoop = ()  => {
         this.timer =  setInterval(() => {
-            const line1 = this.screen.line1.getProcessedLine();
-            const line2 = this.screen.line2.getProcessedLine();
-            const line3 = this.screen.line3.getProcessedLine();
-            const line4 = this.screen.line4.getProcessedLine();
+            const contents = {};
 
-            if (!this.screen.line1.scrolling)
-                this.lcd.println(line1,1);
-            else if (!this.screen.line1.scrollingStarted) {
-                this.lcd.printlnScroll(line1,1);
-                this.screen.line1.scrollingStarted = true;
+            for (let i = 1; i<=4;i++) { //Get Parsed Lines
+                contents[i] = this.screen['line'+i].getProcessedLine()
             }
 
-
-            if (!this.screen.line2.scrolling)
-                this.lcd.println(line2,2);
-            else if (!this.screen.line2.scrollingStarted) {
-                this.lcd.printlnScroll(line2,2);
-                this.screen.line2.scrollingStarted = true;
+            for (let [line, content] of contents) { //Actually print them
+                this.printSingleLine(content, line);
             }
 
-
-            if (!this.screen.line3.scrolling)
-                this.lcd.println(line3,3);
-            else if (!this.screen.line3.scrollingStarted) {
-                this.screen.line3.scrollingStarted = true;
-                this.lcd.printlnScroll(line3,3);
-            }
-
-
-            if (!this.screen.line4.scrolling)
-                this.lcd.println(line4,4);
-            else if (!this.screen.line4.scrollingStarted) {
-                this.screen.line4.scrollingStarted = true;
-                this.lcd.printlnScroll(line4,4);
-            }
-
-        },450)
+        }, 450)
     }
 
     this.printBootingMessage = () => {
