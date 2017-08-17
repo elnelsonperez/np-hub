@@ -12,13 +12,15 @@ const appModule = new ApplicationModule (
 
 );
 
-appModule.prototype.initialize = function () {
+appModule.prototype.initialize = async function () {
 
     this.GprsManager.on('message', (msg) => {
         this.data.msg = msg;
     })
 
-    this.GprsManager.initialize()
+    await this.GprsManager.initialize()
+    this.data.msg = "Initialized"
+
 }
 
 appModule.prototype.view = function (msg) {
@@ -29,7 +31,7 @@ appModule.prototype.view = function (msg) {
 }
 
 appModule.prototype.controller = function () {
-    return this.view('Cargando Modulos')
+    return this.view('Cargando Modulos');
 }
 
 module.exports = appModule;

@@ -2,7 +2,7 @@ const util = require('util')
 const events = require('events')
 util.inherits(GprsManager,events.EventEmitter)
 
-const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = false, inject = [], data = {}}) {
+const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = false, inject = [], data = {}, updateInterval = 1}) {
     events.EventEmitter.call(this)
 
     this.name  = name
@@ -12,6 +12,17 @@ const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = fa
     this.scrolling = scrolling
     this.inject = inject;
     this.data = data;
+    this.updateInterval = updateInterval;
+    this._updateCounter = 0 ;
+}
+
+appModule.prototype.shouldUpdate  = function () {
+    this._updateCounter++;
+    if (this._updateCounter === this.updateInterval) {
+        this._updateCounter = 0;
+        return true;
+    }
+    return false;
 }
 
 appModule.prototype.changeStartEndLine = function ({start = this.start, end = this.end, line = this.line}) {
