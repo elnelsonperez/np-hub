@@ -2,16 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b8414f7a-9f0f-4798-9b33-36d9f58275ab" name="Default" comment="ada">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/gprs.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/serial.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test2.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/.bin/cake" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/.bin/coffee" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/i2c-bus/build/Release/i2c.node" afterPath="$PROJECT_DIR$/node_modules/i2c-bus/build/Release/i2c.node" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/i2c-bus/build/Release/obj.target/i2c.node" afterPath="$PROJECT_DIR$/node_modules/i2c-bus/build/Release/obj.target/i2c.node" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/sleep/build/Release/node_sleep.node" afterPath="$PROJECT_DIR$/node_modules/sleep/build/Release/node_sleep.node" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/sleep/build/Release/obj.target/node_sleep.node" afterPath="$PROJECT_DIR$/node_modules/sleep/build/Release/obj.target/node_sleep.node" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/np.iml" afterPath="$PROJECT_DIR$/.idea/np.iml" />
@@ -26,14 +23,14 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/modules/default/message.js" afterPath="$PROJECT_DIR$/app/modules/default/message.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/modules/default/signal.js" afterPath="$PROJECT_DIR$/app/modules/default/signal.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.js" afterPath="$PROJECT_DIR$/index.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/gprs.js" afterPath="$PROJECT_DIR$/lib/gprs.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/lcd.js" afterPath="$PROJECT_DIR$/lib/lcd.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/serial.js" afterPath="$PROJECT_DIR$/lib/serial.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/i2c-bus/test/run-tests" afterPath="$PROJECT_DIR$/node_modules/i2c-bus/test/run-tests" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/nan/tools/1to2.js" afterPath="$PROJECT_DIR$/node_modules/nan/tools/1to2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/sleep/README.md" afterPath="$PROJECT_DIR$/node_modules/sleep/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/sleep/index.js" afterPath="$PROJECT_DIR$/node_modules/sleep/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/sleep/package.json" afterPath="$PROJECT_DIR$/node_modules/sleep/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/sleep/test.js" afterPath="$PROJECT_DIR$/node_modules/sleep/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test" afterPath="$PROJECT_DIR$/test" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.js" afterPath="$PROJECT_DIR$/test.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test2.js" afterPath="$PROJECT_DIR$/test2.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -47,7 +44,7 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test.js">
           <provider selected="true" editor-type-id="text-editor">
@@ -58,11 +55,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="gprs.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="gprs.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/gprs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="63" column="21" lean-forward="true" selection-start-line="63" selection-start-column="21" selection-end-line="63" selection-end-column="21" />
+            <state relative-caret-position="286">
+              <caret line="70" column="36" lean-forward="false" selection-start-line="70" selection-start-column="36" selection-end-line="70" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="serial.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/lib/serial.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="176">
+              <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -100,8 +107,8 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/test2.js" />
         <option value="$PROJECT_DIR$/test.js" />
-        <option value="$PROJECT_DIR$/lib/serial.js" />
         <option value="$PROJECT_DIR$/lib/gprs.js" />
+        <option value="$PROJECT_DIR$/lib/serial.js" />
       </list>
     </option>
   </component>
@@ -329,23 +336,23 @@
       <workItem from="1502920094110" duration="3177000" />
       <workItem from="1502923610889" duration="7449000" />
       <workItem from="1502931268017" duration="145000" />
-      <workItem from="1502931430297" duration="314000" />
+      <workItem from="1502931430297" duration="796000" />
+      <workItem from="1502933300386" duration="699000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="41850000" />
+    <option name="totallyTimeSpent" value="43031000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12341326" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25841185" sideWeight="0.50564176" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" show_stripe_button="true" weight="0.36473754" sideWeight="0.49435824" order="7" side_tool="false" content_ui="tabs" x="1440" y="0" width="1280" height="984" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -378,6 +385,22 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="968">
+          <caret line="44" column="0" lean-forward="false" selection-start-line="44" selection-start-column="0" selection-end-line="51" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/gprs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/test.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="880">
@@ -619,15 +642,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/serial.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="75" column="32" lean-forward="false" selection-start-line="75" selection-start-column="32" selection-end-line="75" selection-end-column="69" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -641,8 +655,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/gprs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="63" column="21" lean-forward="true" selection-start-line="63" selection-start-column="21" selection-end-line="63" selection-end-column="21" />
+        <state relative-caret-position="286">
+          <caret line="70" column="36" lean-forward="false" selection-start-line="70" selection-start-column="36" selection-end-line="70" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/serial.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
           <folding />
         </state>
       </provider>
