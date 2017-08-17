@@ -1,6 +1,7 @@
 
 
-const app = require('./app/app');
+const Application = require('./app/app').Application;
+app = new Application();
 app.initialize();
 
 // lcd.clear();

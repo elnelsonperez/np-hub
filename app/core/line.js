@@ -19,6 +19,15 @@ module.exports = function () {
 
     };
 
+    this.removeWriter = function (module) {
+        for(let i = 0; i < this.writers.length; i++) {
+            if(this.writers[i].module.name === module.name) {
+                data.splice(i, 1);
+                break;
+            }
+        }
+    };
+
     this.getProcessedLine = function () {
 
         if (this.scrolling) {

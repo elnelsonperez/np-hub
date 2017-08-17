@@ -1,22 +1,18 @@
 
-const appModule = {
-    name : 'whatever',
-    start : 0,
-    end : 20,
-    line : 3,
-    scrolling: true,
+const ApplicationModule  = require('../../core/module').ApplicationModule
 
-    view (a) {
+const appModule = new ApplicationModule (
+    {
+        name : 'message',
+        start : 0,
+        end : 20,
+        line : 3,
+        scrolling: true
+    }
+);
 
-        return a;
-    },
-
-    controller () {
-        return "Mensaje de prueba";
-    },
-
-
-
+appModule.prototype.view = function () {
+    return "Mensaje de prueba";
 };
 
 module.exports = appModule;
