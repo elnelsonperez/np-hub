@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lcdi2c": "^1.0.6"
+    "lcdi2c": "^1.0.6",
+    "serialport": "^5.0.0"
   }
 }

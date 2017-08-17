@@ -1,0 +1,21 @@
+    console.log(await serialManager.send('AT',null,true));
+        console.log(await serialManager.send('AT+CMEE=2',null,true));
+
+        console.log(await serialManager.send('AT+CPIN?',null,true));
+        console.log( await serialManager.send('AT+CREG?',null,true));
+        console.log( await serialManager.send('AT+CGATT?',null,true));
+        console.log( await serialManager.send('AT+CIPSTATUS',null,true));
+        console.log( await serialManager.send('AT+CIPMUX=0',null,true));
+        console.log( await serialManager.send('AT+CIICR',null,true));
+        console.log(await serialManager.send('AT+SAPBR=3,1,"Contype","GPRS"',null,true));
+        console.log(await serialManager.send('AT+SAPBR=3,1,"APN","internet.ideasclaro.com.do"',null,true));
+        console.log(await serialManager.send('AT+SAPBR=1,1',null,true));
+        console.log(await serialManager.send('AT+SAPBR=2,1',null,true));
+        console.log(await serialManager.send('AT+HTTPINIT',null,true));
+        console.log(await serialManager.send('AT+HTTPPARA="CID",1',null,true));
+        console.log(await serialManager.send('AT+HTTPPARA="URL","http://httpbin.org/ip"',null,true));
+        console.log(await serialManager.send('AT+HTTPACTION=0',null,true));
+
+
+
+
