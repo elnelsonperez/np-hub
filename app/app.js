@@ -1,4 +1,5 @@
 const line = require('./core/line.js');
+const getSerial = require('./../lib/systeminfo').getSerial()
 const fs = require('fs');
 const Lcdlib = require('../lib/lcd');
 const serialManager = require('./../lib/serial').SerialManager;
@@ -10,15 +11,18 @@ app = function () {
     this.modules = []
     this.timer = null
     this.injectable = {}
+    this.publicProperties = {
+        serial : null
+    }
 
     this.initialize = () => {
+        this.publicProperties.serial = getSerial();
         this.setDefaultApplicationProperties();
         this.lcd = new Lcdlib.LcdController( 1, 0x3f, 20, 4 );
         this.lcd.customChar();
         const SerialManager = new serialManager(true);
         this.injectable.SerialManager = SerialManager;
         this.injectable.GprsManager = new GprsManager(SerialManager);
-
         this.printBootingMessage();
 
         //load modules
@@ -66,6 +70,8 @@ app = function () {
                             module[moduleName] = this.injectable[moduleName];
                         }
                     }
+
+                    module.publicProperties = this.publicProperties
 
                     if (module.initialize) {
                         module.initialize()
