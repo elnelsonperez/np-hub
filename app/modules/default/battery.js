@@ -11,7 +11,6 @@ const appModule = new ApplicationModule (
 );
 
 appModule.view = function (level) {
-    console.log(level)
     let res = "";
     if (level === 1) {
         res = '\x07\x00';

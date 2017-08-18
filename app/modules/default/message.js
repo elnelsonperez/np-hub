@@ -7,12 +7,12 @@ const appModule = new ApplicationModule (
         start : 0,
         end : 20,
         line : 3,
-        scrolling: true
+        scrolling: false
     }
 );
 
-appModule.prototype.view = function () {
-    return "Mensaje de prueba";
+appModule.view = function () {
+    return "Prueba cambio screen";
 };
 
 module.exports = appModule;

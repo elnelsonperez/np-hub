@@ -10,15 +10,15 @@ const appModule = new ApplicationModule (
     }
 );
 
-appModule.prototype.view = function (time) {
+appModule.view = function (time) {
     return "\x03"+ time;
 };
 
-appModule.prototype.controller = function () {
+appModule.controller = function () {
    return this.view(this.getTime());
  };
 
-appModule.prototype.getTime = function () {
+appModule.getTime = function () {
     let date = new Date();
     let hours = date.getHours();
     let  minutes = date.getMinutes();

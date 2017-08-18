@@ -9,6 +9,8 @@ module.exports = function () {
 
         if (module.scrolling)
             this.scrolling = true;
+        else
+            this.scrolling = false;
 
         this.writers.push({
                 start: module.start,
@@ -18,6 +20,7 @@ module.exports = function () {
             })
 
     };
+
 
     this.removeWriter = function (module) {
         for(let i = 0; i < this.writers.length; i++) {

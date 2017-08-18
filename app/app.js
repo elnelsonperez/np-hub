@@ -4,7 +4,6 @@ const Lcdlib = require('../lib/lcd');
 const serialManager = require('./../lib/serial').SerialManager;
 const GprsManager =  require('./../lib/gprs').GprsManager;
 
-module.exports.Application = app;
 app = function () {
     this.screen = null
     this.lcd = null
@@ -14,25 +13,32 @@ app = function () {
 
     this.initialize = () => {
         this.setDefaultApplicationProperties();
+        this.lcd = new Lcdlib.LcdController( 1, 0x3f, 20, 4 );
+        this.lcd.customChar();
         const SerialManager = new serialManager(true);
         this.injectable.SerialManager = SerialManager;
         this.injectable.GprsManager = new GprsManager(SerialManager);
-        this.lcd.customChar();
+
         this.printBootingMessage();
 
         //load modules
-        this.loadModules(__dirname+'/modules/boot');
+        this.loadModules(__dirname+'/modules/default');
         this.applicationLoop()
     }
 
     this.switchModuleDomain =  (folder) => {
         if (this.timer)
-            windows.clearInterval(this.timer);
+            clearInterval(this.timer);
 
         this.setDefaultApplicationProperties();
 
+        for (let module of this.modules) {
+            module.removeAllListeners()
+        }
+
         //load modules
-        this.loadModules('./modules/'+folder);
+        this.loadModules(__dirname+'/modules/'+folder);
+        // this.lcd.stopScroll() //Only one scroll at a time.
         this.applicationLoop()
     }
 
@@ -43,7 +49,6 @@ app = function () {
             line3: new line(),
             line4: new line()
         };
-        this.lcd = new Lcdlib.LcdController( 1, 0x3f, 20, 4 );
         this.modules = [];
     }
 
@@ -65,6 +70,7 @@ app = function () {
                     if (module.initialize) {
                         module.initialize()
                     }
+
                     module.on('changeLine', this.changeModuleLine)
                 }
 
@@ -88,7 +94,7 @@ app = function () {
 
     this.printSingleLine  = (line, number) => {
         if (!this.screen['line'+number].scrolling)
-            this.lcd.println(line,1);
+            this.lcd.println(line, number);
         else if (!this.screen['line'+number].scrollingStarted) {
             this.lcd.printlnScroll(line,number);
             this.screen['line'+number].scrollingStarted = true;
@@ -96,16 +102,14 @@ app = function () {
     }
 
     this.applicationLoop = ()  => {
-        this.timer =  setInterval(() => {
+        this.timer = setInterval(() => {
             const contents = {};
-
             for (let i = 1; i<=4;i++) { //Get Parsed Lines
                 contents[i] = this.screen['line'+i].getProcessedLine()
             }
-
-            for (let [line, content] of contents) { //Actually print them
-                this.printSingleLine(content, line);
-            }
+            Object.keys(contents).forEach((key) => {
+                this.printSingleLine(contents[key], key);
+            })
 
         }, 450)
     }
@@ -116,3 +120,4 @@ app = function () {
     }
 
 };
+module.exports.Application = app;

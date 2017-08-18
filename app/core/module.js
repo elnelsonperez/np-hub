@@ -1,9 +1,8 @@
 const util = require('util')
-const events = require('events')
-util.inherits(GprsManager,events.EventEmitter)
+const EventEmitter = require('events').EventEmitter
 
 const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = false, inject = [], data = {}, updateInterval = 1}) {
-    events.EventEmitter.call(this)
+    EventEmitter.call(this)
 
     this.name  = name
     this.start  = start
@@ -15,6 +14,8 @@ const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = fa
     this.updateInterval = updateInterval;
     this._updateCounter = 0 ;
 }
+
+util.inherits(appModule, EventEmitter)
 
 appModule.prototype.shouldUpdate  = function () {
     this._updateCounter++;

@@ -10,8 +10,8 @@ const appModule = new ApplicationModule (
     }
 );
 
-appModule.prototype.view = function () {
-    return '\x04 NP  PMS \x05';
+appModule.view = function () {
+    return '     \x04 NP PMS \x05';
 }
 
 module.exports = appModule;
