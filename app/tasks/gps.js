@@ -9,7 +9,6 @@ const GpsTask = new Task (
             rawLocations: []
         }
     }
-
 );
 
 GpsTask.pushOrRejectLocation  = function(location) {
@@ -50,17 +49,9 @@ GpsTask.distanceBetween =  function (lat1, lon1, lat2, lon2) {
     return 12742000 * Math.asin(Math.sqrt(a));
 }
 
-GpsTask.getLastLocationsFromQueue = function (amount = 10) {
-    const result = [];
-    const queue = this.data.locationsQueue;
-    if (!this.data.locationsQueue.isEmpty()) {
-        const long = queue.getLength();
-        if (long >= amount) {
-            for(let i=0;i<amount;i++ ) {
-                result.push(queue.dequeue())
-            }
-        }
-    }
+GpsTask.getNextLocations = function (amount = 10) {
+   const result = this.data.selectedElements.slice(0,amount)
+    this.data.selectedElements = result;
     return result;
 }
 
