@@ -15,28 +15,70 @@ const GpsTask = new Task (
 GpsTask.initialize = function () {
     //TODO Initialize serial reader and parser
 
+    //Mock
+    this.data.rawLocations = [{
+        lat: 19.452874,
+        lng:  -70.695408,
+        date: '2017-25-05 06:25:50'
+    },
+        {
+            lat: 19.452745,
+            lng:  -70.695408,
+            date: '2017-25-05 06:25:50'
+        },
+        {
+            lat: 19.432874,
+            lng:  -70.695408,
+            date: '2017-25-05 06:25:50'
+        },
+        {
+            lat: 19.452874,
+            lng:  -70.695408,
+            date: '2017-25-05 06:25:50'
+        },
+        {
+            lat: 19.452874,
+            lng:  -70.695408,
+            date: '2017-25-05 06:25:50'
+        },
+        {
+            lat: 19.452874,
+            lng:  -70.695408,
+            date: '2017-25-05 06:25:50'
+        },
+        {
+            lat: 19.452874,
+            lng:  -70.695408,
+            date: '2017-25-05 06:25:50'
+        },
+        {
+            lat: 19.452874,
+            lng:  -70.695408,
+            date: '2017-25-05 06:25:50'
+        },
+    ];
 }
 
 GpsTask.run = function () {
     if (this.data.rawLocations.length > 0) {
         for (let i=0;i<this.data.rawLocations.length; i++) {
-            this.pushOrRejectLocation(this.rawLocations.shift())
+            this.pushOrRejectLocation(this.data.rawLocations.shift())
         }
     }
 }
 
 GpsTask.pushOrRejectLocation  = function(location) {
     const selectedLocations = this.data.selectedLocations;
-    if (selectedLocations > 0) {
+    if (selectedLocations.length > 0) {
         const prevloc = selectedLocations[selectedLocations.length - 1]
         const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
         if (distance > 7) { // 7 meters
            selectedLocations.push(location);
-            this.emit('newLocation',this.selectedLocations.length)
+            this.emit('newLocation',selectedLocations.length)
         }
     } else {
         selectedLocations.push(location)
-        this.emit('newLocation',this.selectedLocations.length)
+        this.emit('newLocation',selectedLocations.length)
     }
 }
 
@@ -53,8 +95,8 @@ GpsTask.getNextLocations = async function (amount = 10) { //
     return new Promise((res, rej) => {
         this.on('newLocation', (length) => {
             if (length >= amount) {
-                const result = this.data.selectedElements.slice(0, amount)
-                this.data.selectedElements = result;
+                const result = this.data.selectedLocations.slice(0, amount -1)
+                this.data.selectedLocations = result;
                 res(result)
             }
         })
@@ -77,4 +119,4 @@ GpsTask.getAverageDistanceBetweenPoints = function (locations) {
     return  results.reduce((a, b) => a + b) / results.length;
 }
 
-modulo.exports = GpsTask;
+module.exports = GpsTask;
