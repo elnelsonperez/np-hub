@@ -1,6 +1,15 @@
 const gps = require('./app/tasks/gps');
 gps.initialize()
-gps.getNextLocations(5).then(function (data) {
+gps.run()
+
+gps.getNextLocations(2).then(function (data) {
     console.log(data)
 })
-gps.run()
+
+gps.getNextLocations(2).then(function (data) {
+    console.log(data)
+})
+
+
+
+

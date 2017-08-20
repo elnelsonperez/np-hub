@@ -65,6 +65,7 @@ GpsTask.run = function () {
             this.pushOrRejectLocation(this.data.rawLocations.shift())
         }
     }
+
 }
 
 GpsTask.pushOrRejectLocation  = function(location) {
@@ -93,13 +94,23 @@ GpsTask.distanceBetween =  function (lat1, lon1, lat2, lon2) {
 
 GpsTask.getNextLocations = async function (amount = 10) { //
     return new Promise((res, rej) => {
-        this.on('newLocation', (length) => {
-            if (length >= amount) {
-                const result = this.data.selectedLocations.slice(0, amount -1)
-                this.data.selectedLocations = result;
-                res(result)
-            }
-        })
+
+        const returnResult = () =>  {
+            const result = this.data.selectedLocations.splice(0, amount )
+            res(result)
+        }
+
+        if (this.data.selectedLocations.length >= amount) {
+            returnResult()
+        } else {
+
+            this.on('newLocation', (length) => {
+                if (length >= amount) {
+                    returnResult()
+                }
+            })
+        }
+
     })
 }
 

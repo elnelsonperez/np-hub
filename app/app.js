@@ -1,5 +1,5 @@
 const line = require('./core/line.js');
-const getSerial = require('./../lib/systeminfo').getSerial()
+const getSerial = require('./../lib/systeminfo').getSerial
 const fs = require('fs');
 const Lcdlib = require('../lib/lcd');
 const serialManager = require('./../lib/serial').SerialManager;
@@ -19,19 +19,21 @@ app = function () {
     this.initialize = () => {
         this.publicProperties.serial = getSerial();
         this.setDefaultApplicationProperties();
+
         this.lcd = new Lcdlib.LcdController( 1, 0x3f, 20, 4 );
         this.lcd.customChar();
+
         const SerialManager = new serialManager(true);
         //TODO change serialmanager to sequentialserialmanager
         this.injectable.SerialManager = SerialManager;
         this.injectable.GprsManager = new GprsManager(SerialManager);
+
         this.printBootingMessage();
-
-
-        this.loadTasks(__dirname+'/tasks');
-        this.runTasks ();
+        //
+        // this.loadTasks(__dirname+'/tasks');
+        // this.runTasks ();
         //load modules
-        this.loadModules(__dirname+'/modules/default');
+        this.loadModules(__dirname+'/modules/boot');
         this.applicationLoop()
     }
 
@@ -39,9 +41,11 @@ app = function () {
         for (let task of this.tasks) {
             if (task.autoload) {
                 task.run();
+
                 if (task.every) {
                     setInterval(task.run, task.every)
                 }
+
             }
         }
     }
@@ -125,7 +129,7 @@ app = function () {
         module.start = args.start;
         module.end = args.end;
         this.screen['line' + module.line].setWriter(module);
-        this.modules.push(module)
+        // this.modules.push(module)
     }
 
     this.printSingleLine  = (line, number) => {
