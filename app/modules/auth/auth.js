@@ -2,27 +2,25 @@ const ApplicationModule  = require('../../core/module').ApplicationModule
 
 const appModule = new ApplicationModule (
     {
-        name : 'moduleLoader',
+        name : 'auth',
         start : 0,
         end : 19,
         line : 3,
-        scrolling: false,
-        inject: ['GprsManager']
+        scrolling: false
     }
-
 );
 
 appModule.initialize = async function () {
 
-    this.GprsManager.on('failed', (msg) => {
-        this.data.msg = msg;
-    })
+    // this.GprsManager.on('failed', (msg) => {
+    //     this.data.msg = msg;
+    // })
+    //
+    // await this.GprsManager.initialize()
+    //
+    // this.data.msg = "Modulos Listos"
 
-    await this.GprsManager.initialize()
-
-    this.data.msg = "Modulos Listos"
-
-    this.appEvent.emit('boot.ready')
+    this.appEvent.emit('auth.ready')
 
 }
 
@@ -34,7 +32,7 @@ appModule.view = function (msg) {
 }
 
 appModule.controller = function () {
-    return this.view('Cargando Modulos');
+    return this.view('---');
 }
 
 module.exports = appModule;

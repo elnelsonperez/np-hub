@@ -2,8 +2,9 @@ const line = require('./core/line.js');
 const getSerial = require('./../lib/systeminfo').getSerial
 const fs = require('fs');
 const Lcdlib = require('../lib/lcd');
-const serialManager = require('./../lib/serial').SerialManager;
+const SequentialSerialManager = require('./../lib/serial').SequentialSerialManager;
 const GprsManager =  require('./../lib/gprs').GprsManager;
+const EventEmitter = require('events').EventEmitter
 
 app = function () {
     this.screen = null
@@ -16,24 +17,25 @@ app = function () {
         serial : null
     }
 
-    this.initialize = () => {
+    this.appEvent = new EventEmitter()
+
+    this.initialize = (defaultModule = 'boot') => {
         this.publicProperties.serial = getSerial();
         this.setDefaultApplicationProperties();
 
         this.lcd = new Lcdlib.LcdController( 1, 0x3f, 20, 4 );
         this.lcd.customChar();
 
-        const SerialManager = new serialManager(true);
-        //TODO change serialmanager to sequentialserialmanager
-        this.injectable.SerialManager = SerialManager;
-        this.injectable.GprsManager = new GprsManager(SerialManager);
+        const SequentialSerialManager = new SequentialSerialManager(true);
+        this.injectable.SequentialSerialManager = SequentialSerialManager;
+        this.injectable.GprsManager = new GprsManager(SequentialSerialManager);
 
         this.printBootingMessage();
         //
         // this.loadTasks(__dirname+'/tasks');
         // this.runTasks ();
         //load modules
-        this.loadModules(__dirname+'/modules/boot');
+        this.loadModules(__dirname+'/modules/'+defaultModule);
         this.applicationLoop()
     }
 
@@ -105,6 +107,7 @@ app = function () {
                     }
 
                     module.publicProperties = this.publicProperties
+                    module.appEvent = this.appEvent;
 
                     if (module.initialize) {
                         module.initialize()
@@ -160,4 +163,5 @@ app = function () {
     }
 
 };
+
 module.exports.Application = app;

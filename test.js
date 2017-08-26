@@ -1,5 +1,5 @@
-const serialManager = require('./lib/serial').serialManager;
-const sm = new serialManager(true);
+const SequentialSerialManager = require('./lib/serial').SequentialSerialManager;
+const sm = new SequentialSerialManager(true);
 
 const gprs =  require('./lib/gprs').GprsManager;
 const manager = new gprs(sm);

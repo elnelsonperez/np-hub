@@ -2,17 +2,14 @@ const Application = require('./app/app').Application;
 app = new Application();
 app.initialize();
 
-let val = 0;
-// setInterval(function () {
-//     if (val === 0) {
-//         app.switchModuleDomain('boot')
-//         val = 1;
-//     }
-//     else {
-//         app.switchModuleDomain('default')
-//         val = 0;
-//     }
-// }, 4000)
+app.appEvent.on('boot.ready', function () {
+    app.switchModuleDomain('auth')
+})
+
+app.appEvent.on('auth.ready', function () {
+    app.switchModuleDomain('default')
+})
+
 
 
 

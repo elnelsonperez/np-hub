@@ -94,7 +94,6 @@ GpsTask.distanceBetween =  function (lat1, lon1, lat2, lon2) {
 
 GpsTask.getNextLocations = async function (amount = 10) { //
     return new Promise((res, rej) => {
-
         const returnResult = () =>  {
             const result = this.data.selectedLocations.splice(0, amount )
             res(result)
@@ -103,14 +102,12 @@ GpsTask.getNextLocations = async function (amount = 10) { //
         if (this.data.selectedLocations.length >= amount) {
             returnResult()
         } else {
-
             this.on('newLocation', (length) => {
                 if (length >= amount) {
                     returnResult()
                 }
             })
         }
-
     })
 }
 
