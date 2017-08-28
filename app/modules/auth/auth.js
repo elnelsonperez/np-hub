@@ -6,22 +6,18 @@ const appModule = new ApplicationModule (
         start : 0,
         end : 19,
         line : 3,
-        scrolling: false
+        scrolling: false,
+        inject: ['IbuttonReader', 'GprsManager']
     }
 );
 
-appModule.initialize = async function () {
 
-    // this.GprsManager.on('failed', (msg) => {
-    //     this.data.msg = msg;
-    // })
-    //
-    // await this.GprsManager.initialize()
-    //
-    // this.data.msg = "Modulos Listos"
+appModule.initialize = function () {
+  if (!this.publicProperties.users) {
+    this.GprsManager.httpGet('http://nppms.us/api/getAsignedUsers/'+this.publicProperties.serial).then(function (res) {
 
-    this.appEvent.emit('auth.ready')
-
+    }).catch(e => console.log(e))
+  }
 }
 
 appModule.view = function (msg) {
@@ -32,7 +28,14 @@ appModule.view = function (msg) {
 }
 
 appModule.controller = function () {
-    return this.view('---');
+
+  this.IbuttonReader.read().then(function (id) {
+    this.publicProperties.
+  }).catch(e => console.log(e))
+
+  this.appEvent.emit('auth.ready')
+  return this.view('---');
+
 }
 
 module.exports = appModule;

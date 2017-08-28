@@ -5,7 +5,7 @@ const Lcdlib = require('../lib/lcd');
 const SequentialSerialManager = require('./../lib/serial').SequentialSerialManager;
 const GprsManager =  require('./../lib/gprs').GprsManager;
 const EventEmitter = require('events').EventEmitter
-
+const IbuttonReader = require('./../lib/ibutton').IbuttonReader
 app = function () {
     this.screen = null
     this.lcd = null
@@ -14,11 +14,11 @@ app = function () {
     this.timer = null
     this.injectable = {}
     this.publicProperties = {
-        serial : null
+        serial : null,
+        users: null
     }
 
     this.appEvent = new EventEmitter()
-
     this.initialize = (defaultModule = 'boot') => {
         this.publicProperties.serial = getSerial();
         this.setDefaultApplicationProperties();
@@ -29,7 +29,7 @@ app = function () {
         const SequentialSerialManager = new SequentialSerialManager(true);
         this.injectable.SequentialSerialManager = SequentialSerialManager;
         this.injectable.GprsManager = new GprsManager(SequentialSerialManager);
-
+        this.injectable.IbuttonReader = new IbuttonReader();
         this.printBootingMessage();
         //
         // this.loadTasks(__dirname+'/tasks');

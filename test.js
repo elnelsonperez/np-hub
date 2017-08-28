@@ -11,6 +11,5 @@ manager.initialize().then(() => {
         }
     })
 
-
 });
 
