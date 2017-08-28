@@ -3,7 +3,7 @@ module.exports = function () {
     this.data = {};
     this.writers = [];
     this.scrolling = false;
-    this.scrollingStarted = null;
+    this.lastProcessedLine = null;
 
     this.setWriter = function (module) {
 
@@ -60,7 +60,8 @@ module.exports = function () {
                 result += " ";
         }
 
-        return result;
+        this.lastProcessedLine = result;
+        return this.lastProcessedLine;
     };
 
 };

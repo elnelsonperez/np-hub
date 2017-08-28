@@ -69,11 +69,13 @@ app = function () {
         if (this.timer)
             clearInterval(this.timer);
 
+        this.lcd.stopScroll()
         this.setDefaultApplicationProperties();
 
         for (let module of Object.keys(this.modules)) {
             this.modules[module].removeAllListeners()
         }
+
 
         //load modules
         this.loadModules(__dirname+'/modules/'+folder);
@@ -144,9 +146,12 @@ app = function () {
     this.printSingleLine  = (line, number) => {
         if (!this.screen['line'+number].scrolling)
             this.lcd.println(line, number);
-        else if (!this.screen['line'+number].scrollingStarted) {
-            this.lcd.printlnScroll(line,number);
-            this.screen['line'+number].scrollingStarted = true;
+        else {
+            if (line !== this.screen['line'+number].lastProcessedLine) {
+              this.lcd.stopScroll(number)
+              this.lcd.printlnScroll(line,number);
+            }
+
         }
     }
 

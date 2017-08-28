@@ -16,7 +16,7 @@ appModule.initialize = function () {
 
   if (!this.publicProperties.users) {
     this.data.msg = 'Obteniendo usuarios'
-    this.GprsManager.httpGet('http://nppms.us/api/getAsignedUsers/'+this.publicProperties.serial).then( (res) => {
+    this.GprsManager.httpGet('http://nppms.us/api/getAsignedUsers/'+encodeURIComponent(this.publicProperties.serial)).then( (res) => {
       if (res.code === '200') {
         this.publicProperties.users = res;
       } else {
