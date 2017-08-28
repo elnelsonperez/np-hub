@@ -10,7 +10,7 @@ app = function () {
     this.screen = null
     this.lcd = null
     this.modules = {}
-    this.tasks = []
+    this.tasks = {}
     this.timer = null
     this.injectable = {}
     this.publicProperties = {
@@ -40,12 +40,11 @@ app = function () {
     }
 
     this.runTasks = function () {
-        for (let task of this.tasks) {
-            if (task.autoload) {
-                task.run();
-
-                if (task.every) {
-                    setInterval(task.run, task.every)
+        for (let task of Object.keys(this.tasks)) {
+            if (this.tasks[task].autoload) {
+              this.tasks[task].run();
+                if (this.tasks[task].every) {
+                    setInterval(this.tasks[task].run, this.tasks[task].every)
                 }
 
             }
@@ -60,7 +59,7 @@ app = function () {
                 if (task.initialize) {
                     task.initialize()
                 }
-                this.tasks.push(task)
+                this.tasks[task.name] = task;
             }
         });
     }
