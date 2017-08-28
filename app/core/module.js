@@ -1,9 +1,8 @@
 const util = require('util')
 const EventEmitter = require('events').EventEmitter
 
-const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = false, inject = [], data = {}, updateInterval = 1}) {
+const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = false, inject = [], data = {}, updateInterval = 1, dependsOn = []}) {
     EventEmitter.call(this)
-
     this.name  = name
     this.start  = start
     this.end  = end
@@ -12,7 +11,9 @@ const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = fa
     this.inject = inject;
     this.data = data;
     this.updateInterval = updateInterval;
-    this._updateCounter = 0 ;
+    this._updateCounter = 0;
+    this.parentModules = {};
+    this.dependsOn = dependsOn
 }
 
 util.inherits(appModule, EventEmitter)

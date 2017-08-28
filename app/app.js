@@ -9,7 +9,7 @@ const IbuttonReader = require('./../lib/ibutton').IbuttonReader
 app = function () {
     this.screen = null
     this.lcd = null
-    this.modules = []
+    this.modules = {}
     this.tasks = []
     this.timer = null
     this.injectable = {}
@@ -71,8 +71,8 @@ app = function () {
 
         this.setDefaultApplicationProperties();
 
-        for (let module of this.modules) {
-            module.removeAllListeners()
+        for (let module of Object.keys(this.modules)) {
+            this.modules[module].removeAllListeners()
         }
 
         //load modules
@@ -88,7 +88,7 @@ app = function () {
             line3: new line(),
             line4: new line()
         };
-        this.modules = [];
+        this.modules = {};
     }
 
     this.loadModules = (dir, clearModules = false) => {
@@ -100,11 +100,17 @@ app = function () {
                 const module = require(dir+'/'+file);
 
                 if (module) {
-                    for (let moduleName of module.inject) {
-                        if (this.injectable[moduleName]) {
-                            module[moduleName] = this.injectable[moduleName];
+                    for (let injectable of module.inject) {
+                        if (this.injectable[injectable]) {
+                            module[injectable] = this.injectable[injectable];
                         }
                     }
+
+                  for (let moduleName of module.dependsOn) {
+                    if (this.modules[moduleName]) {
+                      module.parentModules[moduleName] = this.modules[moduleName].data;
+                    } else throw new Error('Module dependency cannot be met for '+moduleName+' in '+module.name)
+                  }
 
                     module.publicProperties = this.publicProperties
                     module.appEvent = this.appEvent;
@@ -115,7 +121,7 @@ app = function () {
 
                     module.on('changeLine', this.changeModuleLine)
                     this.screen['line' + module.line].setWriter(module);
-                    this.modules.push(module)
+                    this.modules[module.name] = module;
                 }
 
 
