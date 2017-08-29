@@ -18,11 +18,11 @@ appModule.initialize = async function () {
         this.data.msg = msg;
     })
 
-    await this.GprsManager.initialize()
-
-    this.data.msg = "Modulos Listos"
-
-    this.appEvent.emit('boot.ready')
+    try {
+        await this.GprsManager.initialize()
+        this.data.msg = "Modulos Listos"
+        this.appEvent.emit('boot.ready')
+    }catch (e) {console.log(e)}
 
 }
 

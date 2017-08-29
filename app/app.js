@@ -9,8 +9,8 @@ const IbuttonReader = require('./../lib/ibutton').IbuttonReader
 app = function () {
     this.screen = null
     this.lcd = null
-    this.modules = {}
-    this.tasks = {}
+    this.modules = []
+    this.tasks = []
     this.timer = null
     this.injectable = {}
     this.publicProperties = {
@@ -19,6 +19,7 @@ app = function () {
     }
 
     this.appEvent = new EventEmitter()
+
     this.initialize = (defaultModule = 'boot') => {
         this.publicProperties.serial = getSerial();
         this.setDefaultApplicationProperties();
@@ -26,10 +27,10 @@ app = function () {
         this.lcd = new Lcdlib.LcdController( 1, 0x3f, 20, 4 );
         this.lcd.customChar();
 
-        const SequentialSerialManager = new SequentialSerialManager(true);
-        this.injectable.SequentialSerialManager = SequentialSerialManager;
-        this.injectable.GprsManager = new GprsManager(SequentialSerialManager);
-        this.injectable.IbuttonReader = new IbuttonReader();
+        const Seq = new SequentialSerialManager(true);
+        this.injectable.SequentialSerialManager = Seq;
+        this.injectable.GprsManager = new GprsManager(Seq);
+        this.injectable.IbuttonReader = new IbuttonReader({});
         this.printBootingMessage();
         //
         // this.loadTasks(__dirname+'/tasks');
@@ -74,7 +75,6 @@ app = function () {
         for (let module of Object.keys(this.modules)) {
             this.modules[module].removeAllListeners()
         }
-
 
         //load modules
         this.loadModules(__dirname+'/modules/'+folder);
@@ -146,7 +146,7 @@ app = function () {
         if (!this.screen['line'+number].scrolling)
             this.lcd.println(line, number);
         else {
-            if (line !== this.screen['line'+number].lastProcessedLine) {
+            if (this.screen['line'+number].changed)  {
               this.lcd.stopScroll(number)
               this.lcd.printlnScroll(line,number);
             }
@@ -160,6 +160,7 @@ app = function () {
             for (let i = 1; i<=4;i++) { //Get Parsed Lines
                 contents[i] = this.screen['line'+i].getProcessedLine()
             }
+
             Object.keys(contents).forEach((key) => {
                 this.printSingleLine(contents[key], key);
             })

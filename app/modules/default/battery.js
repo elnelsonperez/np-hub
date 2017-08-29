@@ -24,12 +24,9 @@ appModule.view = function (level) {
     return res;
 }
 
-appModule.test = function () {
-    return Math.floor((Math.random() * 3) + 1);
-}
 
 appModule.controller = function () {
-    return this.view(this.test());
+    return this.view(3);
 }
 
 module.exports = appModule;

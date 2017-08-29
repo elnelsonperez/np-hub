@@ -3,7 +3,8 @@ module.exports = function () {
     this.data = {};
     this.writers = [];
     this.scrolling = false;
-    this.lastProcessedLine = null;
+    this._lastProcessedLine = null;
+    this.changed = false;
 
     this.setWriter = function (module) {
 
@@ -34,7 +35,14 @@ module.exports = function () {
     this.getProcessedLine = function () {
 
         if (this.scrolling) {
-            return this.writers[0].module.controller();
+            let result = this.writers[0].module.controller();
+            if (this._lastProcessedLine !== result) {
+                this.changed = true;
+                this._lastProcessedLine = result;
+            }else {
+                this.changed = false;
+            }
+            return result;
         }
 
         for (let wr of this.writers) {
@@ -60,8 +68,14 @@ module.exports = function () {
                 result += " ";
         }
 
-        this.lastProcessedLine = result;
-        return this.lastProcessedLine;
+        if (this._lastProcessedLine !== result) {
+            this.changed = true;
+            this._lastProcessedLine = result;
+        } else {
+            this.changed = false;
+        }
+
+        return result;
     };
 
 };

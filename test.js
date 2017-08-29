@@ -1,15 +1,9 @@
 const SequentialSerialManager = require('./lib/serial').SequentialSerialManager;
-const sm = new SequentialSerialManager(true);
+const sm = new SequentialSerialManager(false);
 
 const gprs =  require('./lib/gprs').GprsManager;
 const manager = new gprs(sm);
 manager.initialize().then(() => {
-
-    manager.hasInternet().then(val => {
-        if (val) {
-            manager.httpGet('http://httpbin.org/uuid').then(val => console.log(val))
-        }
-    })
-
+    manager.getSignalStrength().then(val => console.log(val)).catch(e => console.log(e))
 });
 

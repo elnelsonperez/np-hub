@@ -11,7 +11,8 @@ const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = fa
     this.inject = inject;
     this.data = data;
     this.updateInterval = updateInterval;
-    this._updateCounter = 0;
+    this._updateCounter = 0 ;
+    this._initialUpdate = false;
     this.parentModules = {};
     this.dependsOn = dependsOn
 }
@@ -19,6 +20,10 @@ const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = fa
 util.inherits(appModule, EventEmitter)
 
 appModule.prototype.shouldUpdate  = function () {
+    if (!this._initialUpdate) {
+        this._initialUpdate = true;
+        return true;
+    }
     this._updateCounter++;
     if (this._updateCounter === this.updateInterval) {
         this._updateCounter = 0;

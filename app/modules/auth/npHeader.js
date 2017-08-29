@@ -11,7 +11,7 @@ const appModule = new ApplicationModule (
 );
 
 appModule.view = function () {
-    return '     \x04 NP PMS \x05';
+    return '\x04 NP PMS \x05';
 }
 
 module.exports = appModule;
