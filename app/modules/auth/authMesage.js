@@ -2,7 +2,7 @@ const ApplicationModule  = require('../../core/module').ApplicationModule
 
 const appModule = new ApplicationModule (
     {
-      name : 'npHeader',
+      name : 'authMessage',
       start : 0,
       end : 19,
       line : 4,

@@ -36,6 +36,11 @@ module.exports = function () {
 
         if (this.scrolling) {
             let result = this.writers[0].module.controller();
+            if (result.length < 20) {
+                for (let i = 0; i < 20 - result.length;i ++) {
+                    result+=" ";
+                }
+            }
             if (this._lastProcessedLine !== result) {
                 this.changed = true;
                 this._lastProcessedLine = result;
@@ -67,6 +72,7 @@ module.exports = function () {
             else
                 result += " ";
         }
+
 
         if (this._lastProcessedLine !== result) {
             this.changed = true;
