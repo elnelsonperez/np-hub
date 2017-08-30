@@ -13,9 +13,15 @@ app = function () {
     this.tasks = []
     this.timer = null
     this.injectable = {}
+    this.screenConfigs = null;
     this.publicProperties = {
         serial : null,
-        users: null
+        auth: {
+          users: [],
+          config: {
+              requireAll: false
+          }
+        }
     }
 
     this.appEvent = new EventEmitter()
@@ -89,6 +95,7 @@ app = function () {
             line3: new line(),
             line4: new line()
         };
+        this.screenConfigs = null;
         this.modules = {};
     }
 
@@ -99,34 +106,36 @@ app = function () {
         try {
             fs.readdirSync(dir).forEach(file => {
                 const module = require(dir+'/'+file);
-
-                if (module) {
-                    for (let injectable of module.inject) {
-                        if (this.injectable[injectable]) {
-                            module[injectable] = this.injectable[injectable];
+                if (file === 'config.js') {
+                    this.screenConfigs = module;
+                } else {
+                    if (module) {
+                        for (let injectable of module.inject) {
+                            if (this.injectable[injectable]) {
+                                module[injectable] = this.injectable[injectable];
+                            }
                         }
+
+                        for (let moduleName of module.dependsOn) {
+                            if (this.modules[moduleName]) {
+                                module.parentModules[moduleName] = this.modules[moduleName].data;
+                            } else throw new Error('Module dependency cannot be met for '+moduleName+' in '+module.name)
+                        }
+
+                        module.publicProperties = this.publicProperties
+                        module.appEvent = this.appEvent;
+
+                        if (module.initialize) {
+                            module.initialize()
+                        }
+
+                        module.on('changeLine', this.changeModuleLine)
+                        this.screen['line' + module.line].setWriter(module);
+                        this.modules[module.name] = module;
                     }
-
-                  for (let moduleName of module.dependsOn) {
-                    if (this.modules[moduleName]) {
-                      module.parentModules[moduleName] = this.modules[moduleName].data;
-                    } else throw new Error('Module dependency cannot be met for '+moduleName+' in '+module.name)
-                  }
-
-                    module.publicProperties = this.publicProperties
-                    module.appEvent = this.appEvent;
-
-                    if (module.initialize) {
-                        module.initialize()
-                    }
-
-                    module.on('changeLine', this.changeModuleLine)
-                    this.screen['line' + module.line].setWriter(module);
-                    this.modules[module.name] = module;
                 }
-
-
             });
+
         } catch (e) {
             console.log(e)
             //TODO Print error in LCD
@@ -143,8 +152,14 @@ app = function () {
     }
 
     this.printSingleLine  = (line, number) => {
-        if (!this.screen['line'+number].scrolling)
-            this.lcd.println(line, number);
+        if (!this.screen['line'+number].scrolling){
+            if (this.screenConfigs && this.screenConfigs.linesNotCentered &&
+                this.screenConfigs.linesNotCentered.includes(parseInt(number))) {
+                this.lcd.println(line, number, false);
+            } else {
+                this.lcd.println(line, number, true);
+            }
+        }
         else {
             if (this.screen['line'+number].changed)  {
               this.lcd.stopScroll(number)

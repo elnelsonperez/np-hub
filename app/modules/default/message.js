@@ -5,9 +5,9 @@ const appModule = new ApplicationModule (
     {
         name : 'message',
         start : 0,
-        end : 20,
+        end : 19,
         line : 3,
-        scrolling: false
+        scrolling: true
     }
 );
 
