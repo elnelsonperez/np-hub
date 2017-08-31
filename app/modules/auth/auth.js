@@ -21,28 +21,10 @@ appModule.initialize = function () {
         'http://nppms.us/api/getAsignedUsers/'+this.publicProperties.serial).then( (res) => {
           console.log(res)
       if (res.code === '200') {
-        this.publicProperties.users = res;
+        this.publicProperties.users = res.content;
       } else {
         this.data.msg = 'Error al obtener usuarios asignados'
       }
-
-      //
-      // this.publicProperties.auth.users = [
-      //   {
-      //     id: 25,
-      //     name: 'Jose Maria',
-      //     ibutton: '01-00000174dd83',
-      //     authenticated: false
-      //   },
-      //   {
-      //     id: 25,
-      //     name: 'Nelson Lewis',
-      //     ibutton: '01-0000016be680',
-      //     authenticated: false
-      //   },
-      // ];
-      //
-
 
       const showUseIbuttonMessage = () => {
         this.data.msg = '\x04Utilice su IButton'
@@ -111,6 +93,24 @@ appModule.initialize = function () {
   }
 
 }
+
+//
+// this.publicProperties.auth.users = [
+//   {
+//     id: 25,
+//     name: 'Jose Maria',
+//     ibutton: '01-00000174dd83',
+//     authenticated: false
+//   },
+//   {
+//     id: 25,
+//     name: 'Nelson Lewis',
+//     ibutton: '01-0000016be680',
+//     authenticated: false
+//   },
+// ];
+//
+
 
 appModule.view = function () {
   return '\x04 NP PMS \x05'

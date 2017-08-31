@@ -3,9 +3,6 @@
 //
 // lcd.printlnScroll('Hello How are my good man')
 
-const ib = require('./lib/ibutton').IbuttonReader
+const getSerial = require('./lib/systeminfo').getSerial
 
-reader = new ib({});
-reader.read().then(function (val) {
-    console.log('returned:',val)
-}).catch(err => console.log(err))
+console.log(getSerial())

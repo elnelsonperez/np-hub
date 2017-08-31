@@ -6,6 +6,7 @@ const SequentialSerialManager = require('./../lib/serial').SequentialSerialManag
 const GprsManager =  require('./../lib/gprs').GprsManager;
 const EventEmitter = require('events').EventEmitter
 const IbuttonReader = require('./../lib/ibutton').IbuttonReader
+
 app = function () {
     this.screen = null
     this.lcd = null
