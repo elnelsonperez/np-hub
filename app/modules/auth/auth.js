@@ -18,7 +18,7 @@ appModule.initialize = function () {
 
 
     this.GprsManager.httpGet(
-        'http://nppms.us/api/getAsignedUsers/'+this.publicProperties.serial).then( (res) => {
+        'http://nppms.us/api/getAsignedUsers/'+this.publicProperties.serial,null,30000).then( (res) => {
       if (res.code === '200') {
         this.publicProperties.auth.users = res.content;
 
