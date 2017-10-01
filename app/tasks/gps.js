@@ -29,12 +29,14 @@ GpsTask.initializeGpsReader = function () {
 
     parser.on('data', function(data) {
         gps.update(data);
+
     });
 
     const gps = new GPS;
 
 
     gps.on('GLL', (parsed) => {
+        console.log(parsed);
         if (parsed.valid === true && parsed.status === "active") {
             const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
 
@@ -43,6 +45,7 @@ GpsTask.initializeGpsReader = function () {
                 lat: parsed.lat,
                 lng: parsed.lon
             }
+            console.log(data);
             this.data.rawLocations.push(data);
         }
     });
