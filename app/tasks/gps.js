@@ -1,62 +1,58 @@
 const Task  = require('./../core/task').Task
 const FixedQueue = require('./../../lib/Queue').FixedQueue
+const SerialPort = require('serialport');
+const GPS = require('gps');
+const dateFormat = require('dateformat');
 
 const GpsTask = new Task (
     {
         name: 'GpsTask',
         data: {
-            selectedLocations: [],
+            selectedLocations: new FixedQueue(100),
             rawLocations: new FixedQueue(100)
         },
         every: 5000
     }
 );
 
-GpsTask.initialize = function () {
-    //TODO Initialize serial reader and parser
 
-    //Mock
-    this.data.rawLocations = [{
-        lat: 19.452874,
-        lng:  -70.695408,
-        date: '2017-25-05 06:25:50'
-    },
-        {
-            lat: 19.452745,
-            lng:  -70.695408,
-            date: '2017-25-05 06:25:50'
-        },
-        {
-            lat: 19.432874,
-            lng:  -70.695408,
-            date: '2017-25-05 06:25:50'
-        },
-        {
-            lat: 19.452874,
-            lng:  -70.695408,
-            date: '2017-25-05 06:25:50'
-        },
-        {
-            lat: 19.452874,
-            lng:  -70.695408,
-            date: '2017-25-05 06:25:50'
-        },
-        {
-            lat: 19.452874,
-            lng:  -70.695408,
-            date: '2017-25-05 06:25:50'
-        },
-        {
-            lat: 19.452874,
-            lng:  -70.695408,
-            date: '2017-25-05 06:25:50'
-        },
-        {
-            lat: 19.452874,
-            lng:  -70.695408,
-            date: '2017-25-05 06:25:50'
-        },
-    ];
+GpsTask.initializeGpsReader = function () {
+    const file = '/dev/ttyUSB0';
+    const parsers = SerialPort.parsers;
+    const parser = new parsers.Readline({
+        delimiter: '\r\n'
+    });
+    const port = new SerialPort(file, {
+        baudRate: 9600
+    });
+    port.pipe(parser);
+
+    parser.on('data', function(data) {
+        gps.update(data);
+    });
+
+    const gps = new GPS;
+
+
+    gps.on('GLL', (parsed) => {
+        if (parsed.valid === true && parsed.status === "active") {
+            const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
+
+            const data = {
+                time:time,
+                lat: parsed.lat,
+                lng: parsed.lon
+            }
+            this.data.rawLocations.push(data);
+        }
+    });
+
+
+}
+
+
+GpsTask.initialize = function () {
+    this.initializeGpsReader();
 }
 
 GpsTask.run = function () {
@@ -65,7 +61,6 @@ GpsTask.run = function () {
             this.pushOrRejectLocation(this.data.rawLocations.shift())
         }
     }
-
 }
 
 GpsTask.pushOrRejectLocation  = function(location) {
@@ -73,7 +68,7 @@ GpsTask.pushOrRejectLocation  = function(location) {
     if (selectedLocations.length > 0) {
         const prevloc = selectedLocations[selectedLocations.length - 1]
         const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
-        if (distance > 7) { // 7 meters
+        if (distance > 10) { // 10 meters
            selectedLocations.push(location);
             this.emit('newLocation',selectedLocations.length)
         }
@@ -98,7 +93,6 @@ GpsTask.getNextLocations = async function (amount = 10) { //
             const result = this.data.selectedLocations.splice(0, amount )
             res(result)
         }
-
         if (this.data.selectedLocations.length >= amount) {
             returnResult()
         } else {

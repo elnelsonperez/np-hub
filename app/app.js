@@ -39,22 +39,24 @@ app = function () {
         this.injectable.GprsManager = new GprsManager(Seq);
         this.injectable.IbuttonReader = new IbuttonReader({});
         this.printBootingMessage();
-        //
-        // this.loadTasks(__dirname+'/tasks');
-        // this.runTasks ();
+
+        this.loadTasks(__dirname+'/tasks');
+
         //load modules
         this.loadModules(__dirname+'/modules/'+defaultModule);
+
+        this.runTasks();
+
         this.applicationLoop()
     }
 
     this.runTasks = function () {
-        for (let task of Object.keys(this.tasks)) {
-            if (this.tasks[task].autoload) {
-              this.tasks[task].run();
-                if (this.tasks[task].every) {
-                    setInterval(this.tasks[task].run, this.tasks[task].every)
+        for (let task of Object.keys(this.tasks)) { //Para cada task
+            if (this.tasks[task].autoload) { //Si el task quiere cargarse automaticamente
+              this.tasks[task].run(); //Correr el task la primera vez
+                if (this.tasks[task].every) { //Si el task tiene un "every"
+                    setInterval(this.tasks[task].run.bind(this.tasks[task]), this.tasks[task].every) //Correr cada "every" milisegundos
                 }
-
             }
         }
     }
