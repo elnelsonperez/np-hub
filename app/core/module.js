@@ -4,6 +4,7 @@ const EventEmitter = require('events').EventEmitter
 const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = false, inject = [], data = {}, updateInterval = 1, dependsOn = []}) {
     EventEmitter.call(this)
     this.name  = name
+    this.ready = true;
     this.start  = start
     this.end  = end
     this.line = line

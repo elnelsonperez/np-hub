@@ -7,12 +7,12 @@ const appModule = new ApplicationModule (
         start : 0,
         end : 19,
         line : 3,
-        scrolling: true
+        scrolling: false
     }
 );
 
 appModule.view = function () {
-    return "Prueba cambio screen";
+    return "Prueba GPS Location";
 };
 
 module.exports = appModule;

@@ -114,8 +114,14 @@ app = function () {
                 } else {
                     if (module) {
                         for (let injectable of module.inject) {
-                            if (this.injectable[injectable]) {
+                            if (injectable.type && injectable.type === "task") {
+                              if (injectable.name && this.tasks[injectable.name]) {
+                                module[injectable.name] = this.tasks[injectable.name];
+                              }
+                            } else {
+                              if (this.injectable[injectable]) {
                                 module[injectable] = this.injectable[injectable];
+                              }
                             }
                         }
 
@@ -183,7 +189,7 @@ app = function () {
                 this.printSingleLine(contents[key], key);
             })
 
-        }, 450)
+        }, 500)
     }
 
     this.printBootingMessage = () => {

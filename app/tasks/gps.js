@@ -9,7 +9,8 @@ const GpsTask = new Task (
         name: 'GpsTask',
         data: {
             selectedLocations: new FixedQueue(100),
-            rawLocations: new FixedQueue(100)
+            rawLocations: new FixedQueue(100),
+            onNewLocationListenerInitialized: false
         },
         every: 5000
     }
@@ -36,16 +37,13 @@ GpsTask.initializeGpsReader = function () {
 
 
     gps.on('GLL', (parsed) => {
-        console.log(parsed);
-        if (parsed.valid === true && parsed.status === "active") {
+        if (parsed.valid === true && parsed.status === "active" && parsed.lat !== null && parsed.lon !== null) {
             const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
-
             const data = {
                 time:time,
                 lat: parsed.lat,
                 lng: parsed.lon
             }
-            console.log(data);
             this.data.rawLocations.push(data);
         }
     });
@@ -90,22 +88,27 @@ GpsTask.distanceBetween =  function (lat1, lon1, lat2, lon2) {
     return 12742000 * Math.asin(Math.sqrt(a));
 }
 
-GpsTask.getNextLocations = async function (amount = 10) { //
-    return new Promise((res, rej) => {
-        const returnResult = () =>  {
-            const result = this.data.selectedLocations.splice(0, amount )
-            res(result)
+GpsTask.getNextLocations = async function (amount = 1) { //
+  return new Promise((res, rej) => {
+    const returnResult = () =>  {
+      const result = this.data.selectedLocations.splice(0, amount)
+      if (result.length > 0) {
+        res(result)
+      }
+    }
+    if (this.data.selectedLocations.length >= amount) {
+      returnResult()
+    } else {
+        if (this.data.onNewLocationListenerInitialized === false) {
+          this.on('newLocation', (length) => {
+            if (length >= amount) {
+              returnResult()
+            }
+          })
+          this.data.onNewLocationListenerInitialized = true;
         }
-        if (this.data.selectedLocations.length >= amount) {
-            returnResult()
-        } else {
-            this.on('newLocation', (length) => {
-                if (length >= amount) {
-                    returnResult()
-                }
-            })
-        }
-    })
+    }
+  })
 }
 
 GpsTask.getAverageDistanceBetweenPoints = function (locations) {
