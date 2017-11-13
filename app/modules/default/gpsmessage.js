@@ -20,7 +20,6 @@ const appModule = new ApplicationModule (
 
 appModule.controller = function () {
   if (this.ready === true) {
-    console.log('called next locations');
     this.ready = false;
    this.GpsTask.getNextLocations().then( (val) => {
       this.data.location = val[0];
