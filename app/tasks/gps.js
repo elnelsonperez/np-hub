@@ -28,23 +28,23 @@ GpsTask.initializeGpsReader = function () {
     });
     port.pipe(parser);
 
+    const gps = new GPS;
+
     parser.on('data', function(data) {
         gps.update(data);
 
     });
 
-    const gps = new GPS;
-
 
     gps.on('GLL', (parsed) => {
         if (parsed.valid === true && parsed.status === "active" && parsed.lat !== null && parsed.lon !== null) {
             const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
+
             const data = {
                 time:time,
                 lat: parsed.lat,
                 lng: parsed.lon
             }
-
             this.data.rawLocations.push(data);
         }
     });

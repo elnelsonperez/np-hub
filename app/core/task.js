@@ -1,14 +1,15 @@
 const util = require('util')
 const EventEmitter = require('events').EventEmitter
 
-const task = function ({task, name, every = 5000, data, autoload = true,injectable=[]}) {
+const task = function ({ name, every = 5000, data, ready = true,inject =[], autoload = true, siblingTasks = {}}) {
     EventEmitter.call(this)
-    this.task = task;
     this.name = name;
+    this.ready = ready;
     this.every = every;
     this.data = data;
     this.autoload = autoload;
-    this.injectable = injectable;
+    this.siblingTasks = siblingTasks;
+    this.inject = inject;
 }
 
 util.inherits(task, EventEmitter)

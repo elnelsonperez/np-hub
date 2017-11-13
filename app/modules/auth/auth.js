@@ -47,7 +47,7 @@ appModule.initialize = function () {
                   this.data.authenticated.push(user)
 
                   if (this.data.authenticated.length === this.publicProperties.auth.users.length) {
-                    this.appEvent.emit('auth.ready')
+                    this.publicProperties.app.emit('auth.ready')
                   } else {
                     setTimeout(showUseIbuttonMessage,1500)
                     waitForAuth();

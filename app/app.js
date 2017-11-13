@@ -22,12 +22,14 @@ app = function () {
           config: {
               requireAll: false
           }
-        }
+        },
+        appEvent: null
     }
 
-    this.appEvent = new EventEmitter()
+
 
     this.initialize = (defaultModule = 'boot') => {
+        this.publicProperties.appEvent = new EventEmitter()
         this.publicProperties.serial = getSerial();
         this.setDefaultApplicationProperties();
 
@@ -53,11 +55,16 @@ app = function () {
     this.runTasks = function () {
         for (let task of Object.keys(this.tasks)) { //Para cada task
             if (this.tasks[task].autoload) { //Si el task quiere cargarse automaticamente
-              this.tasks[task].run(); //Correr el task la primera vez
-                if (this.tasks[task].every) { //Si el task tiene un "every"
-                    setInterval(this.tasks[task].run.bind(this.tasks[task]), this.tasks[task].every) //Correr cada "every" milisegundos
-                }
+                this.tasks[task].run(); //Correr el task la primera vez
             }
+            if (this.tasks[task].every) { //Si el task tiene un "every"
+                setInterval(() => {
+                 if (this.tasks[task].ready === true) {
+                    this.tasks[task].run.bind(this.tasks[task])()
+                    }
+                }, this.tasks[task].every) //Correr cada "every" milisegundos
+            }
+
         }
     }
 
@@ -69,6 +76,13 @@ app = function () {
                 if (task.initialize) {
                     task.initialize()
                 }
+                for (let injectable of task.inject) {
+                        if (this.injectable[injectable]) {
+                            task[injectable] = this.injectable[injectable];
+                    }
+                }
+
+                task.siblingTasks = this.tasks;
                 this.tasks[task.name] = task;
             }
         });
@@ -132,7 +146,6 @@ app = function () {
                         }
 
                         module.publicProperties = this.publicProperties
-                        module.appEvent = this.appEvent;
 
                         if (module.initialize) {
                             module.initialize()

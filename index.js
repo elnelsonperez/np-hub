@@ -6,11 +6,12 @@ process.on('unhandledRejection', (reason, p) => {
     console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
 
+
 // app.appEvent.on('boot.ready', function () {
 //     app.switchModuleDomain('auth')
 // })
 
-app.appEvent.on('boot.ready', function () {
+app.publicProperties.appEvent.on('boot.ready', function () {
     setTimeout(() => {
         app.switchModuleDomain('default')
     },1500)

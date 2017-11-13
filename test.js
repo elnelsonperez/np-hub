@@ -4,6 +4,12 @@ const sm = new SequentialSerialManager(false);
 const gprs =  require('./lib/gprs').GprsManager;
 const manager = new gprs(sm);
 manager.initialize().then(() => {
-    manager.getSignalStrength().then(val => console.log(val)).catch(e => console.log(e))
+    res =  manager.httpPost('http://nppms.us/api/locations/new/'+require('./lib/systeminfo').getSerial(),
+        {
+            locations: 'Hello'
+        }
+    ).then((res) => {
+        console.log(res)
+    })
 });
 
