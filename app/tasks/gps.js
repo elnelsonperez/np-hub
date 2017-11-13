@@ -44,6 +44,7 @@ GpsTask.initializeGpsReader = function () {
                 lat: parsed.lat,
                 lng: parsed.lon
             }
+
             this.data.rawLocations.push(data);
         }
     });
@@ -69,7 +70,7 @@ GpsTask.pushOrRejectLocation  = function(location) {
     if (selectedLocations.length > 0) {
         const prevloc = selectedLocations[selectedLocations.length - 1]
         const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
-        if (distance > 10) { // 10 meters
+        if (distance > 1) { // 10 meters
            selectedLocations.push(location);
             this.emit('newLocation',selectedLocations.length)
         }

@@ -9,7 +9,7 @@ const appModule = new ApplicationModule (
         line : 1,
         scrolling: false,
         inject: ['GprsManager'],
-        updateInterval : 5
+        updateInterval : 15
     }
 );
 
