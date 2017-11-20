@@ -32,11 +32,14 @@ GpsTask.initializeGpsReader = function () {
 
     parser.on('data', function(data) {
         gps.update(data);
-
     });
 
 
     gps.on('GLL', (parsed) => {
+        // console.log({
+        //     lat: parsed.lat,
+        //     lng: parsed.lon
+        // })
         if (parsed.valid === true && parsed.status === "active" && parsed.lat !== null && parsed.lon !== null) {
             const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
 
@@ -70,7 +73,7 @@ GpsTask.pushOrRejectLocation  = function(location) {
     if (selectedLocations.length > 0) {
         const prevloc = selectedLocations[selectedLocations.length - 1]
         const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
-        if (distance > 1) { // 10 meters
+        if (distance > 2) { // 10 meters
            selectedLocations.push(location);
             this.emit('newLocation',selectedLocations.length)
         }
@@ -123,7 +126,7 @@ GpsTask.getAverageDistanceBetweenPoints = function (locations) {
         }
     }
     results = arr.filter(function(el) {
-        return el.length && el==+el;
+        return el.length;
     });
     return  results.reduce((a, b) => a + b) / results.length;
 }

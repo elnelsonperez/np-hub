@@ -9,7 +9,6 @@ const appModule = new ApplicationModule (
       line : 4,
       scrolling: true,
       data: {
-        location: null,
          count: 0
       },
         inject: [
@@ -26,14 +25,13 @@ appModule.controller = function () {
     this.ready = false;
     this.GpsSenderTask.on('locationSent', (res) => {
         this.data.count++;
-        console.log('eventoccured',res)
     })
   }
   return this.view();
 };
 appModule.view = function () {
-  if (this.data.location === null) {
-    return "..."
+  if (this.data.count === 0) {
+    return "Obteniendo..."
   } else {
       return "Locs Enviadas: "+this.data.count
   }
