@@ -14,7 +14,7 @@ const appModule = new ApplicationModule (
 
 appModule.initialize = async function () {
 
-    this.GprsManager.on('failed', (msg) => {
+    this.GprsManager.on('message', (msg) => {
         this.data.msg = msg;
     })
 

@@ -12,6 +12,8 @@ const GpsSenderTask = new Task (
 );
 
 GpsSenderTask.run = function () {
+    this.emit('locationSent',1);
+    console.log('EVENT EMITTED --------------------------------')
     if (this.ready === true) {
         this.ready = false;
         this.siblingTasks.GpsTask.getNextLocations(1).then((locs) => {
@@ -20,11 +22,8 @@ GpsSenderTask.run = function () {
                     locations:locs
                 }
             ).then((res) => {
-               console.log(this.appEvent)
-               this.publicProperties.appEvent.emit('locationSent');
-               console.log(res)
+               this.emit('locationSent',res);
            })
-
             this.ready = true;
         })
     }

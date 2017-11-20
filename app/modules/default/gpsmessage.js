@@ -11,15 +11,22 @@ const appModule = new ApplicationModule (
       data: {
         location: null,
          count: 0
-      }
+      },
+        inject: [
+            {
+                type: 'task',
+             name: 'GpsSenderTask'
+            }
+        ]
     }
 );
 
 appModule.controller = function () {
   if (this.ready === true) {
     this.ready = false;
-    this.publicProperties.appEvent.on('locationSent', () => {
+    this.GpsSenderTask.on('locationSent', (res) => {
         this.data.count++;
+        console.log('eventoccured',res)
     })
   }
   return this.view();
