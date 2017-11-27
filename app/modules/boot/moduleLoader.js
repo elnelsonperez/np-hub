@@ -1,5 +1,5 @@
 const ApplicationModule  = require('../../core/module').ApplicationModule
-
+const delay = require('../../../lib/functions').delay;
 const appModule = new ApplicationModule (
     {
         name : 'moduleLoader',
@@ -18,12 +18,19 @@ appModule.initialize = async function () {
         this.data.msg = msg;
     })
 
-    try {
-        await this.GprsManager.initialize()
-        this.data.msg = "Modulos Listos"
-        this.publicProperties.appEvent.emit('boot.ready')
-    }catch (e) {console.log(e)}
+    let done = false;
+    while (done === false) {
+        try {
+            res = await this.GprsManager.initialize()
+            done = res;
+            if (done === false)
+                this.data.msg = "Fail. Reintentando"
+           await delay(1800);
+        }catch (e) {console.log(e)}
+    }
 
+    this.data.msg = "Modulos Listos"
+    this.publicProperties.appEvent.emit('boot.ready')
 }
 
 appModule.view = function (msg) {
