@@ -21,8 +21,8 @@ GpsSenderTask.run = function () {
                         locations: locs
                     }
                 ).then((res) => {
-                    if (res.code === 200)
-                        this.emit('locationSent',res);
+                    if (parseInt(res.code) === 200)
+                        this.emit('locationSent', res);
                 })
                 this.ready = true;
             })

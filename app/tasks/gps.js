@@ -73,7 +73,7 @@ GpsTask.pushOrRejectLocation  = function(location) {
     if (selectedLocations.length > 0) {
         const prevloc = selectedLocations[selectedLocations.length - 1]
         const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
-        if (distance > 2) { // 10 meters
+        if (distance > 4) { // 10 meters
            selectedLocations.push(location);
             this.emit('newLocation',selectedLocations.length)
         }
