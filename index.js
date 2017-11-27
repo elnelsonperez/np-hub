@@ -11,6 +11,7 @@ process.on('unhandledRejection', (reason, p) => {
 //     app.switchModuleDomain('auth')
 // })
 
+
 app.publicProperties.appEvent.on('boot.ready', function () {
     setTimeout(() => {
         app.switchModuleDomain('default')
@@ -18,6 +19,10 @@ app.publicProperties.appEvent.on('boot.ready', function () {
 
 })
 
-
-
+process.on('SIGINT', function() {
+    console.log('======================\nReceived shut down signal\n========================\n')
+    app.injectable.GprsManager.turnOff().then(() => {
+            process.exit();
+    })
+});
 
