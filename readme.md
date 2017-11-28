@@ -12,6 +12,8 @@ Este proyecto esta hecho para correrse en una Raspberry PI 3.
 Es necesario tener instalado Node.js v8 en adelante y NPM, que viene incluido con Node.
 Los esquemas de circuito relevantes con los que funciona esta proyecto son los siguientes.
 
+>To do
+
 ##Arquitectura del software
 La ideas principales fueron las siguientes:
 * Que cada recuadro, o grupo de recuadros por linea de la pantalla de 20x4 que utiliza el 
@@ -20,7 +22,6 @@ Estos bloques de codigo que procesan algo y escupen un output en forma de texto 
 y la pantalla se compondra por varios de ellos.
 * Habran tareas que deberan realizarse continuamente (como la recoleccion de localizaciones GPS)
 que no necesitan tener una salida directa a la pantalla. Estos tipos 
-de *background processes*seran llamados**Tasks**.
+de *background processes* seran llamados **Tasks**.
 
->To do
 
