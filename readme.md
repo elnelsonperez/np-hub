@@ -60,13 +60,46 @@ basta con cargar los modulos de un directorio adyacente.
 
 La carpeta *tasks* contiene todos los procesos de fondo que va a correr en la aplicacion. 
 
+##Crear nuevos modulos de la pantalla
+Es tan sencillo como crear un nuevo directorio en la carpeta `modules` y extender el objeto `appModule`.
+Por ejemplo un modulo para mostrar el nivel de bateria en la esquina superior izquierda de la pantalla:
+
+```javascript
+const ApplicationModule  = require('../../core/module').ApplicationModule
+
+const appModule = new ApplicationModule (
+    {
+        name : 'battery',
+        start : 0,
+        end : 4,
+        line : 1
+    }
+);
+
+//This is the function that the Line object calls to get the string to print.
+appModule.controller = function () {
+//Here you would somehow fetch the battery level.
+    return this.outputView(3); //Constant battery level for demo.
+}
+
+appModule.outputView = function (level) {
+    let res = ""
+    if (level === 1) {
+        res = 'Bat 1'
+    }
+    if (level === 2) {
+        res = 'Bat 2'
+    }
+    if (level === 3) {
+        res = 'Bat 3'
+    }
+    return res;
+}
+
+module.exports = appModule;
+```
 ##So, how in the WORLD do I even run this? - Como correrlo.
 1. Necesitas tener los componentes armados arriba en la configuracion presentada.
 2. `git clone ` the repository.
 3. `npm install` or `yarn` para instalar las dependencias.
 4. Correr con `node index.js`.
-
-
-
-
-

@@ -11,7 +11,6 @@ process.on('unhandledRejection', (reason, p) => {
 //     app.switchModuleDomain('auth')
 // })
 
-
 app.publicProperties.appEvent.on('boot.ready', function () {
     setTimeout(() => {
         app.switchModuleDomain('default')

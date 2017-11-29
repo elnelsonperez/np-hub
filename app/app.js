@@ -148,6 +148,12 @@ app = function () {
                             }
                         }
 
+                        for (let moduleName of module.dependsOn) {
+                            if (this.modules[moduleName]) {
+                                module.parentModules[moduleName] = this.modules[moduleName].data;
+                            } else throw new Error('Module dependency cannot be met for '+moduleName+' in '+module.name)
+                        }
+
                         module.publicProperties = this.publicProperties
 
                         if (module.initialize) {
