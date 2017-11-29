@@ -16,6 +16,7 @@ Los esquemas de circuito relevantes con los que funciona esta proyecto son los s
 
 ##Arquitectura del software
 La ideas principales son las siguientes:
+
 * Cada recuadro, o grupo de recuadros por linea de la pantalla de 20x4 que utiliza el 
 proyecto, es un string retornado de algun bloque de codigo que se ejecuta cada cierto tiempo.
 Estos bloques de codigo que procesan algo y escupen un output en forma de texto seran llamados **Modulos**,
