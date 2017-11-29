@@ -31,7 +31,7 @@ al ser llamado, ejectuta todos los modulos pertenecientes a esa linea y retorna 
 pantalla por la libreria que controla la LCD.
 
 * Es responsabilidad del Modulo indicar en que espacio de la pantalla quiere que este su output, 
-y es responsabilidad del objeto Line de ejecutar cada modulo que halla solicitado estar en esa linea.
+y es responsabilidad del objeto Line de ejecutar cada modulo que haya solicitado estar en esa linea.
 
 * Cada modulo tiene la posibilidad de escuchar eventos de otros modulos que hayan sido cargados.
 Esto crea una red de modulos no acoplados, pero comunicados unos con otros, que agrega flexibilidad al sistema.
