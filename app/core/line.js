@@ -1,11 +1,15 @@
+/**
+ * This object represents a line in the screen
+ */
 
 module.exports = function () {
-    this.data = {};
-    this.writers = [];
-    this.scrolling = false;
-    this._lastProcessedLine = null;
+    this.data = {}; //Actual line data
+    this.writers = []; //Array of line writers/modules
+    this.scrolling = false; //Is this line currently scrolling?
+    this._lastProcessedLine = null; //Detect if text being displayed has changed
     this.changed = false;
 
+    //A line writer is just a more convenient way to represent a module in this context.
     this.setWriter = function (module) {
 
         if (module.scrolling)
@@ -22,7 +26,10 @@ module.exports = function () {
 
     };
 
-
+    /**
+     * Remove line writer by name
+     * @param {string} module 
+     */
     this.removeWriter = function (module) {
         for(let i = 0; i < this.writers.length; i++) {
             if(this.writers[i].module.name === module.name) {
@@ -32,6 +39,10 @@ module.exports = function () {
         }
     };
 
+    /**
+     * Function that runs each module of this line, collects a combined output, and returns it.
+     * @returns {string}
+     */
     this.getProcessedLine = function () {
 
         if (this.scrolling) {

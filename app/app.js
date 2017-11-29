@@ -8,15 +8,15 @@ const EventEmitter = require('events').EventEmitter
 const IbuttonReader = require('./../lib/ibutton').IbuttonReader
 
 app = function () {
-    this.screen = null
-    this.lcd = null
-    this.modules = []
-    this.tasks = []
+    this.screen = null //4 Line objects basically
+    this.lcd = null //Lcd library
+    this.modules = [] //Module list
+    this.tasks = [] //Task list
     this.timer = null
-    this.injectable = {}
+    this.injectable = {} //Which libraries are injectable to modules or tasks
     this.screenConfigs = null;
-    this.publicProperties = {
-        serial : null,
+    this.publicProperties = { //These are available to all modules and tasks
+        serial : null, //Pi serial number
         auth: {
           users: [],
           config: {
@@ -25,8 +25,6 @@ app = function () {
         },
         appEvent: null
     }
-
-
 
     this.initialize = (defaultModule = 'boot') => {
         this.publicProperties.appEvent = new EventEmitter()
@@ -42,13 +40,16 @@ app = function () {
         this.injectable.IbuttonReader = new IbuttonReader({});
         this.printBootingMessage();
 
+        //Loads tasks
         this.loadTasks(__dirname+'/tasks');
 
-        //load modules
+        //loads modules
         this.loadModules(__dirname+'/modules/'+defaultModule);
 
+        //Stats tu run tasks
         this.runTasks();
 
+        //Aplication loop
         this.applicationLoop()
     }
 
@@ -68,6 +69,10 @@ app = function () {
         }
     }
 
+    /**
+     * Loads and initializes tasks
+     * @param dir
+     */
     this.loadTasks = function (dir) {
         fs.readdirSync(dir).forEach(file => {
             const task = require(dir+'/'+file);
@@ -88,6 +93,10 @@ app = function () {
         });
     }
 
+    /**
+     * Changes directory of loaded modules. Changes screen
+     * @param folder
+     */
     this.switchModuleDomain =  (folder) => {
         if (this.timer)
             clearInterval(this.timer);
@@ -139,12 +148,6 @@ app = function () {
                             }
                         }
 
-                        for (let moduleName of module.dependsOn) {
-                            if (this.modules[moduleName]) {
-                                module.parentModules[moduleName] = this.modules[moduleName].data;
-                            } else throw new Error('Module dependency cannot be met for '+moduleName+' in '+module.name)
-                        }
-
                         module.publicProperties = this.publicProperties
 
                         if (module.initialize) {
@@ -160,7 +163,7 @@ app = function () {
 
         } catch (e) {
             console.log(e)
-            //TODO Print error in LCD
+            //TODO Handle this better
         }
     }
 
@@ -170,7 +173,6 @@ app = function () {
         module.start = args.start;
         module.end = args.end;
         this.screen['line' + module.line].setWriter(module);
-        // this.modules.push(module)
     }
 
     this.printSingleLine  = (line, number) => {
