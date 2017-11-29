@@ -15,13 +15,30 @@ Los esquemas de circuito relevantes con los que funciona esta proyecto son los s
 >To do
 
 ##Arquitectura del software
-La ideas principales fueron las siguientes:
-* Que cada recuadro, o grupo de recuadros por linea de la pantalla de 20x4 que utiliza el 
-proyecto, sea un string retornado de algun bloque de codigo que podria ejecutarse en cualquier momento.
-Estos bloques de codigo que procesan algo y escupen un output en forma de texto seran llamados**Modulos**,
+La ideas principales son las siguientes:
+* Cada recuadro, o grupo de recuadros por linea de la pantalla de 20x4 que utiliza el 
+proyecto, es un string retornado de algun bloque de codigo que se ejecuta cada cierto tiempo.
+Estos bloques de codigo que procesan algo y escupen un output en forma de texto seran llamados **Modulos**,
 y la pantalla se compondra por varios de ellos.
+
 * Habran tareas que deberan realizarse continuamente (como la recoleccion de localizaciones GPS)
 que no necesitan tener una salida directa a la pantalla. Estos tipos 
 de *background processes* seran llamados **Tasks**.
+
+##Estructura de directorios
+La carpeta *lib* contiene todos los archivos que funcionan como librerias para la aplicacion. 
+
+El directorio *storage* es para almacenamiento. Ya sea de la base de datos local o cualquier otro recurso que requiera
+ser almacenado.
+
+El directorio *app/* contiene los ficheros para las entidades principales, **Modulos**, **Tasks**, y **Lines**.
+
+La carpeta *modules* tiene subdirectorios que representan una pantalla. Para cambiar de pantalla en la aplicacion,
+basta con cargar los modulos de un directorio adyacente.
+
+La carpeta *tasks* contiene todos los procesos de fondo que van a correr en la aplicacion. 
+
+
+
 
 
