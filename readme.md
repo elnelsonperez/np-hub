@@ -20,12 +20,24 @@ La ideas principales son las siguientes:
 * Cada recuadro, o grupo de recuadros por linea de la pantalla de 20x4 que utiliza el 
 proyecto, es un string retornado de algun bloque de codigo que se ejecuta cada cierto tiempo.
 Estos bloques de codigo que procesan algo y escupen un output en forma de texto seran llamados **Modulos**,
-y la pantalla se compondra por varios de ellos.
+y la pantalla se compondra por varios de ellos. 
 
-* Habran tareas que deberan realizarse continuamente (como la recoleccion de localizaciones GPS)
+* Hay tareas que tienen que realizarse continuamente (como la recoleccion de localizaciones GPS)
 que no necesitan tener una salida directa a la pantalla. Estos tipos 
-de *background processes* seran llamados **Tasks**.
+de *background processes* son llamados **Tasks**.
 
+* La patalla 20x4 esta definida por cuatro objetos **Line**. Cada uno de ellos poseyendo un metodo que,
+al ser llamado, ejectuta todos los modulos pertenecientes a esa linea y retorna el string completo a renderizar en 
+pantalla por la libreria que controla la LCD.
+
+* Es responsabilidad del Modulo indicar en que espacio de la pantalla quiere que este su output, 
+y es responsabilidad del objeto Line de ejecutar cada modulo que halla solicitado estar en esa linea, 
+y escribir su output a la pantalla.
+  
+La aplicacion funciona siguiendo un paradigma que se asemeja al
+ [https://es.wikipedia.org/wiki/Inversi%C3%B3n_de_control](IoC). Un objeto llamado **Application** se encarga de cargar
+ las entidades que h
+ 
 ##Estructura de directorios
 La carpeta *lib* contiene todos los archivos que funcionan como librerias para la aplicacion. 
 
