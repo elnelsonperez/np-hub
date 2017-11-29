@@ -60,6 +60,12 @@ basta con cargar los modulos de un directorio adyacente.
 
 La carpeta *tasks* contiene todos los procesos de fondo que va a correr en la aplicacion. 
 
+##So, how in the WORLD do I even run this?
+1. Necesitas tener los componentes armados arriba en la configuracion presentada.
+2. `git clone ` the repository.
+3. `npm install` or `yarn`.
+4. Correr con `node index.js`.
+
 
 
 
