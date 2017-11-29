@@ -32,6 +32,9 @@ pantalla por la libreria que controla la LCD.
 
 * Es responsabilidad del Modulo indicar en que espacio de la pantalla quiere que este su output, 
 y es responsabilidad del objeto Line de ejecutar cada modulo que halla solicitado estar en esa linea.
+
+* Cada modulo tiene la posibilidad de escuchar eventos de otros modulos que hayan sido cargados.
+Esto crea una red de modulos no acoplados, pero comunicados unos con otros, que agrega flexibilidad al sistema.
   
 La aplicacion funciona siguiendo un paradigma que se asemeja al
  [IoC](https://es.wikipedia.org/wiki/Inversi%C3%B3n_de_control).
@@ -55,7 +58,7 @@ El directorio *app/* contiene los ficheros para las entidades principales, **Mod
 La carpeta *modules* tiene subdirectorios que representan una pantalla. Para cambiar de pantalla en la aplicacion,
 basta con cargar los modulos de un directorio adyacente.
 
-La carpeta *tasks* contiene todos los procesos de fondo que van a correr en la aplicacion. 
+La carpeta *tasks* contiene todos los procesos de fondo que va a correr en la aplicacion. 
 
 
 
