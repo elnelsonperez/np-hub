@@ -104,7 +104,7 @@ modulos del directorio 'demo' como pantalla por defecto, y cambiar pantallas con
 `Application.switchModuleDomain(name)`.
 
 ##Crear nuevos Tasks
-De la misma forma que los modulos, extendiendo el objeto base **Task**, y definiendo un metodo *run* que sera ejecutado por
+De la misma forma que los modulos, extendiendo el objeto base **Task**, y definiendo un metodo`run` que sera ejecutado por
 la aplicacion cada `Task.every` milisegundos.
 
 ```javascript
