@@ -26,7 +26,7 @@ y la pantalla se compondra por varios de ellos.
 que no necesitan tener una salida directa a la pantalla. Estos tipos 
 de *background processes* son llamados **Tasks**.
 
-* La patalla 20x4 esta definida por cuatro objetos **Line**. Cada uno de ellos poseyendo un metodo (*getProcessedLine*) que,
+* La pantalla 20x4 esta definida por cuatro objetos **Line**. Cada uno de ellos poseyendo un metodo (*getProcessedLine*) que,
 al ser llamado, ejectuta todos los modulos pertenecientes a esa linea y retorna el string completo a renderizar en 
 pantalla por la libreria que controla la LCD.
 
@@ -37,8 +37,12 @@ La aplicacion funciona siguiendo un paradigma que se asemeja al
  [IoC](https://es.wikipedia.org/wiki/Inversi%C3%B3n_de_control).
   Un objeto llamado **Application** se encarga de inicializar y/o cargar tasks, modulos y librerias al momento del boot.
   Deja las Tasks corriendo en el background y ejecuta un *application loop* mientras la aplicacion este viva.
+ 
   El application loop simplemente maneja el input del usuario para tomar las acciones pertinentes, y ejecuta la funcion 
   *getProccesedLine* para printear o "renderizar" cada output a cada linea de la pantalla con la libreria que maneja la LCD.
+ 
+ El objetivo de esta estrategie es crear una especie de *engine* que no necesite ser tocado en el desarrollo del proyecto,
+ y que todo pueda ser manejado agregando mas pantallas (directorios de Modulos) o Tasks segun se requieran nuevas funcionalidades.
  
 ##Estructura de directorios
 La carpeta *lib* contiene todos los archivos que funcionan como librerias para la aplicacion. 
