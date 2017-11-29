@@ -65,6 +65,7 @@ Es tan sencillo como crear un nuevo directorio en la carpeta `modules` y extende
 Por ejemplo un modulo para mostrar el nivel de bateria en la esquina superior izquierda de la pantalla:
 
 ```javascript
+//app/modules/demo/battery.js
 const ApplicationModule  = require('../../core/module').ApplicationModule
 
 const appModule = new ApplicationModule (
@@ -98,6 +99,11 @@ appModule.outputView = function (level) {
 
 module.exports = appModule;
 ```
+Luego, con `Application.initialize(demo)` podemos inicializar la aplicacion con los
+modulos del directorio 'demo' como pantalla por defecto, y cambiar pantallas con
+`Application.switchModuleDomain(name)`.
+
+
 ##So, how in the WORLD do I even run this? - Como correrlo.
 1. Necesitas tener los componentes armados arriba en la configuracion presentada.
 2. `git clone ` the repository.
