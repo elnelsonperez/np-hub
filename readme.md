@@ -60,7 +60,7 @@ basta con cargar los modulos de un directorio adyacente.
 
 La carpeta *tasks* contiene todos los procesos de fondo que va a correr en la aplicacion. 
 
-##Crear nuevos modulos de la pantalla
+##Crear nuevos Modulos de la pantalla
 Es tan sencillo como crear un nuevo directorio en la carpeta `modules` y extender el objeto `appModule`.
 Por ejemplo un modulo para mostrar el nivel de bateria en la esquina superior izquierda de la pantalla:
 
@@ -102,6 +102,28 @@ module.exports = appModule;
 Luego, con `Application.initialize(demo)` podemos inicializar la aplicacion con los
 modulos del directorio 'demo' como pantalla por defecto, y cambiar pantallas con
 `Application.switchModuleDomain(name)`.
+
+##Crear nuevos Tasks
+De la misma forma que los modulos, extendiendo el objeto base **Task**, y definiendo un metodo *run* que sera ejecutado por
+la aplicacion cada `Task.every` milisegundos.
+
+```javascript
+const Task  = require('./../core/task').Task
+
+const ConsoleLogger = new Task (
+    {
+        name: 'GpsSenderTask',
+        every: 10000, // Wil run every 10 seconds
+    }
+);
+
+GpsSenderTask.run = function () {
+    this.emit('ConsoleLoggerRan') //Anyone waiting for me to do something? Emit event.
+    console.log('Task has been ran.')
+}
+
+module.exports = GpsSenderTask;
+```
 
 
 ##So, how in the WORLD do I even run this? - Como correrlo.
