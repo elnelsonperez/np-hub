@@ -1,5 +1,5 @@
 
-const ApplicationModule  = require('../../core/module').ApplicationModule
+const ApplicationModule  = require('../../core/Module').ApplicationModule
 
 const appModule = new ApplicationModule (
     {

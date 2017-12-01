@@ -1,4 +1,4 @@
-const Task  = require('./../core/task').Task
+const Task  = require('../core/Task').Task
 
 const GpsSenderTask = new Task (
     {

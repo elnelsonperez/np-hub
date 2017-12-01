@@ -1,4 +1,4 @@
-const ApplicationModule  = require('../../core/module').ApplicationModule
+const ApplicationModule  = require('../../core/Module').ApplicationModule
 const delay = require('../../../lib/functions').delay;
 const appModule = new ApplicationModule (
     {

@@ -1,7 +1,7 @@
 const util = require('util')
 const EventEmitter = require('events').EventEmitter
 
-const task = function ({ name, every = 5000, data, ready = true,inject =[], autoload = true, siblingTasks = {}}) {
+const Task = function ({ name, every = 5000, data, ready = true,inject =[], autoload = true, siblingTasks = {}}) {
     EventEmitter.call(this)
     this.name = name;
     this.ready = ready; //Is this task ready to be re-ran
@@ -12,6 +12,6 @@ const task = function ({ name, every = 5000, data, ready = true,inject =[], auto
     this.inject = inject;
 }
 
-util.inherits(task, EventEmitter)
+util.inherits(Task, EventEmitter)
 
-module.exports.Task = task;
+module.exports.Task = Task;

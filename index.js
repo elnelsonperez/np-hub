@@ -1,4 +1,4 @@
-const Application = require('./app/app').Application;
+const Application = require('./app/App').Application;
 
 app = new Application();
 

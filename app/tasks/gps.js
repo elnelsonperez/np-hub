@@ -1,4 +1,4 @@
-const Task  = require('./../core/task').Task
+const Task  = require('../core/Task').Task
 const FixedQueue = require('./../../lib/Queue').FixedQueue
 const SerialPort = require('serialport');
 const GPS = require('gps');
