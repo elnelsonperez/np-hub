@@ -20,8 +20,9 @@ app = function () {
     this.injectable = {} //Which libraries are injectable to modules or tasks
     this.screenConfigs = null;
 
-    //TODO Deprecate props.
     this.props = { //These are available to all modules and tasks
+        appEvent: null,
+        input: null,
         serial : null, //Pi serial number
         auth: {
           users: [],
@@ -29,8 +30,6 @@ app = function () {
               requireAll: false
           }
         },
-        appEvent: null,
-        input: null
     }
 
     this.initialize = (defaultModule = 'boot') => {

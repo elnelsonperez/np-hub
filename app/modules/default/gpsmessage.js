@@ -6,14 +6,15 @@ const appModule = new ApplicationModule (
       name : 'gpsmessage',
       start : 0,
       end : 19,
-      line : 4,
+      line : 3,
       scrolling: true,
       data: {
-         count: 0
+         count: 0,
+          lastLocation: null
       },
         inject: [
             {
-                type: 'task',
+             type: 'task',
              name: 'GpsSenderTask'
             }
         ]
@@ -25,15 +26,16 @@ appModule.controller = function () {
     this.ready = false;
     this.GpsSenderTask.on('locationSent', (res) => {
         this.data.count++;
+        this.data.lastLocation = res;
     })
   }
   return this.view();
 };
 appModule.view = function () {
-  if (this.data.count === 0) {
+  if (this.data.lastLocation === null) {
     return "Obteniendo..."
   } else {
-      return "Locs Enviadas: "+this.data.count
+      return "Loc #"+this.data.lastLocation.id+' enviada';
   }
 };
 
