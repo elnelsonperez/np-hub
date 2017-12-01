@@ -20,10 +20,8 @@ app = function () {
     this.injectable = {} //Which libraries are injectable to modules or tasks
     this.screenConfigs = null;
 
-    this.input = null; //Input handler
-
-    //TODO Deprecate publicproperties.
-    this.publicProperties = { //These are available to all modules and tasks
+    //TODO Deprecate props.
+    this.props = { //These are available to all modules and tasks
         serial : null, //Pi serial number
         auth: {
           users: [],
@@ -31,12 +29,14 @@ app = function () {
               requireAll: false
           }
         },
-        appEvent: null
+        appEvent: null,
+        input: null
     }
 
     this.initialize = (defaultModule = 'boot') => {
-        this.publicProperties.appEvent = new EventEmitter()
-        this.publicProperties.serial = getSerial();
+        this.props.input = new InputHandler(INPUT_DELAY)
+        this.props.appEvent = new EventEmitter()
+        this.props.serial = getSerial();
         this.setDefaultApplicationProperties();
 
         this.lcd = new Lcdlib.LcdController( 1, 0x3f, 20, 4 );
@@ -56,9 +56,6 @@ app = function () {
 
         //Stats tu run tasks
         this.runTasks();
-
-        //Inputs
-        this.input = new InputHandler(INPUT_DELAY)
 
         //Aplication loop
         this.applicationLoop()
@@ -88,7 +85,7 @@ app = function () {
         fs.readdirSync(dir).forEach(file => {
             const task = require(dir+'/'+file);
             if (task) {
-                task.publicProperties = this.publicProperties
+                task.props = this.props
                 if (task.initialize) {
                     task.initialize()
                 }
@@ -165,7 +162,7 @@ app = function () {
                             } else throw new Error('Module dependency cannot be met for '+moduleName+' in '+module.name)
                         }
 
-                        module.publicProperties = this.publicProperties
+                        module.props = this.props
 
                         if (module.initialize) {
                             module.initialize()

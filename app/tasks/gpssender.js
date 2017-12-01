@@ -16,7 +16,7 @@ GpsSenderTask.run = function () {
             this.ready = false;
             this.siblingTasks.GpsTask.getNextLocations(1).then((locs) => {
                 console.log(locs)
-                res = this.GprsManager.httpPost('http://nppms.us/api/locations/new/'+this.publicProperties.serial,
+                res = this.GprsManager.httpPost('http://nppms.us/api/locations/new/'+this.props.serial,
                     {
                         locations: locs
                     }

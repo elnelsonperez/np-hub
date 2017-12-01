@@ -13,14 +13,14 @@ const appModule = new ApplicationModule (
 
 
 appModule.initialize = function () {
-  if (!this.publicProperties.users) {
+  if (!this.props.users) {
     this.data.msg = 'Obteniendo usuarios'
 
 
     this.GprsManager.httpGet(
-        'http://nppms.us/api/getAsignedUsers/'+this.publicProperties.serial,null,30000).then( (res) => {
+        'http://nppms.us/api/getAsignedUsers/'+this.props.serial,null,30000).then( (res) => {
       if (res.code === '200') {
-        this.publicProperties.auth.users = res.content;
+        this.props.auth.users = res.content;
 
         const showUseIbuttonMessage = () => {
           this.data.msg = '\x04Utilice su IButton'
@@ -32,12 +32,12 @@ appModule.initialize = function () {
         const waitForAuth = () => {
 
           this.IbuttonReader.read().then((val) => {
-            const user = this.publicProperties.auth.users.find(function (user) {
+            const user = this.props.auth.users.find(function (user) {
               return user.ibutton === val;
             })
 
             if (user) {
-              if (this.publicProperties.auth.config.requireAll) {
+              if (this.props.auth.config.requireAll) {
                 if (!this.data.authenticated.find(function (u) {
                       return u.ibutton === user.ibutton;
                     })
@@ -46,8 +46,8 @@ appModule.initialize = function () {
                   user.authenticated = true;
                   this.data.authenticated.push(user)
 
-                  if (this.data.authenticated.length === this.publicProperties.auth.users.length) {
-                    this.publicProperties.app.emit('auth.ready')
+                  if (this.data.authenticated.length === this.props.auth.users.length) {
+                    this.props.app.emit('auth.ready')
                   } else {
                     setTimeout(showUseIbuttonMessage,1500)
                     waitForAuth();

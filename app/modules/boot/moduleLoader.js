@@ -30,7 +30,7 @@ appModule.initialize = async function () {
     }
 
     this.data.msg = "Modulos Listos"
-    this.publicProperties.appEvent.emit('boot.ready')
+    this.props.appEvent.emit('boot.ready')
 }
 
 appModule.view = function (msg) {
