@@ -6,6 +6,10 @@ const SequentialSerialManager = require('./../lib/serial').SequentialSerialManag
 const GprsManager =  require('./../lib/gprs').GprsManager;
 const EventEmitter = require('events').EventEmitter
 const IbuttonReader = require('./../lib/ibutton').IbuttonReader
+const InputHandler = require('./../lib/InputHandler').InputHandler
+
+const SCREEN_REFRESH_DELAY = 500;
+const INPUT_DELAY = 150;
 
 app = function () {
     this.screen = null //4 Line objects basically
@@ -15,6 +19,10 @@ app = function () {
     this.timer = null
     this.injectable = {} //Which libraries are injectable to modules or tasks
     this.screenConfigs = null;
+
+    this.input = null; //Input handler
+
+    //TODO Deprecate publicproperties.
     this.publicProperties = { //These are available to all modules and tasks
         serial : null, //Pi serial number
         auth: {
@@ -48,6 +56,9 @@ app = function () {
 
         //Stats tu run tasks
         this.runTasks();
+
+        //Inputs
+        this.input = new InputHandler(INPUT_DELAY)
 
         //Aplication loop
         this.applicationLoop()
@@ -210,7 +221,11 @@ app = function () {
                 this.printSingleLine(contents[key], key);
             })
 
-        }, 500)
+        }, SCREEN_REFRESH_DELAY)
+
+        setInterval(() => {
+
+        }, INPUT_DELAY)
     }
 
     this.printBootingMessage = () => {
