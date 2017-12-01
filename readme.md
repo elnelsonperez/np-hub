@@ -19,8 +19,8 @@ La ideas principales son las siguientes:
 
 * Cada recuadro, o grupo de recuadros por linea de la pantalla de 20x4 que utiliza el 
 proyecto, es un string retornado de algun bloque de codigo que se ejecuta cada cierto tiempo.
-Estos bloques de codigo que procesan algo y escupen un output en forma de texto seran llamados **Modulos**,
-y la pantalla se compondra por varios de ellos. 
+Estos bloques de codigo que procesan  informaciones y la presentan como un output en forma de texto seran llamados **Modulos**,
+y la pantalla estará compuesta por varios de ellos. 
 
 * Hay tareas que tienen que realizarse continuamente (como la recoleccion de localizaciones GPS)
 que no necesitan tener una salida directa a la pantalla. Estos tipos 
@@ -31,7 +31,7 @@ al ser llamado, ejectuta todos los modulos pertenecientes a esa linea y retorna 
 pantalla por la libreria que controla la LCD.
 
 * Es responsabilidad del Modulo indicar en que espacio de la pantalla quiere que este su output, 
-y es responsabilidad del objeto Line de ejecutar cada modulo que halla solicitado estar en esa linea.
+y es responsabilidad del objeto Line de ejecutar cada modulo que haya solicitado estar en esa linea.
 
 * Cada modulo tiene la posibilidad de escuchar eventos de otros modulos que hayan sido cargados.
 Esto crea una red de modulos no acoplados, pero comunicados unos con otros, que agrega flexibilidad al sistema.
