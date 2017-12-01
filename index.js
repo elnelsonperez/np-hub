@@ -14,6 +14,18 @@ app.props.appEvent.on('boot.ready', function () {
     },1500)
 })
 
+app.props.input.on('INPUT:33:PRESSED', function () {
+    if (app.currentModuleDomain === 'auth') {
+        app.switchModuleDomain('default')
+    } else {
+        app.switchModuleDomain('auth')
+    }
+})
+
+app.props.appEvent.on('auth.noread', function () {
+    app.switchModuleDomain('default')
+})
+
 process.on('SIGINT', function() {
     console.log('======================\nReceived shut down signal\n========================\n')
     app.injectable.GprsManager.turnOff().then(() => {

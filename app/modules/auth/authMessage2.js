@@ -11,7 +11,7 @@ const appModule = new ApplicationModule (
 );
 
 appModule.view = function () {
-  return 'Autenticacion';
+  return 'Autenticacion Test';
 }
 
 module.exports = appModule;

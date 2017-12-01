@@ -19,6 +19,7 @@ app = function () {
     this.timer = null
     this.injectable = {} //Which libraries are injectable to modules or tasks
     this.screenConfigs = null;
+    this.currentModuleDomain = null;
 
     this.props = { //These are available to all modules and tasks
         appEvent: null,
@@ -33,6 +34,7 @@ app = function () {
     }
 
     this.initialize = (defaultModule = 'boot') => {
+        this.currentModuleDomain = defaultModule;
         this.props.input = new InputHandler(INPUT_DELAY)
         this.props.appEvent = new EventEmitter()
         this.props.serial = getSerial();
@@ -114,7 +116,7 @@ app = function () {
         for (let module of Object.keys(this.modules)) {
             this.modules[module].removeAllListeners()
         }
-
+        this.currentModuleDomain = folder;
         //load modules
         this.loadModules(__dirname+'/modules/'+folder);
         // this.lcd.stopScroll() //Only one scroll at a time.
