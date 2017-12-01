@@ -11,13 +11,15 @@ const InputHandler = require('./../lib/InputHandler').InputHandler
 const SCREEN_REFRESH_DELAY = 500;
 const INPUT_DELAY = 150;
 
-app = function () {
+Application = function () {
     this.screen = null //4 Line objects basically
     this.lcd = null //Lcd library
+    this.timer = null
+
     this.modules = [] //Module list
     this.tasks = [] //Task list
-    this.timer = null
     this.injectable = {} //Which libraries are injectable to modules or tasks
+
     this.screenConfigs = null;
     this.currentModuleDomain = null;
 
@@ -249,4 +251,4 @@ app = function () {
 
 };
 
-module.exports.Application = app;
+module.exports.Application = Application;
