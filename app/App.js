@@ -16,8 +16,8 @@ Application = function () {
     this.lcd = null //Lcd library
     this.timer = null
 
-    this.modules = [] //Module list
-    this.tasks = [] //Task list
+    this.modules = {} //Module list
+    this.tasks = {} //Task list
     this.injectable = {} //Which libraries are injectable to modules or tasks
 
     this.screenConfigs = null;
@@ -156,48 +156,47 @@ Application = function () {
         if (clearModules === true) {
             this.setDefaultApplicationProperties();
         }
-        try {
-            fs.readdirSync(dir).forEach(file => {
-                const module = require(dir+'/'+file);
-                if (file === 'config.js') {
-                    this.screenConfigs = module;
-                } else {
-                    if (module) {
-                        for (let injectable of module.inject) {
-                            if (injectable.type && injectable.type === "task") {
-                                if (injectable.name && this.tasks[injectable.name]) {
-                                    module[injectable.name] = this.tasks[injectable.name];
-                                }
-                            } else {
-                                if (this.injectable[injectable]) {
-                                    module[injectable] = this.injectable[injectable];
-                                }
+        fs.readdirSync(dir).forEach(file => {
+            const module = require(dir+'/'+file);
+            if (file === 'config.js') {
+                this.screenConfigs = module;
+            } else {
+                if (module) {
+                    for (let injectable of module.inject) {
+                        if (injectable.type && injectable.type === "task") {
+                            if (injectable.name && this.tasks[injectable.name]) {
+                                module[injectable.name] = this.tasks[injectable.name];
+                            }
+                        } else {
+                            if (this.injectable[injectable]) {
+                                module[injectable] = this.injectable[injectable];
                             }
                         }
-
-                        for (let moduleName of module.dependsOn) {
-                            if (this.modules[moduleName]) {
-                                module.parentModules[moduleName] = this.modules[moduleName].data;
-                            } else throw new Error('Module dependency cannot be met for '+moduleName+' in '+module.name)
-                        }
-
-                        module.props = this.props
-
-                        if (module.initialize) {
-                            module.initialize()
-                        }
-
-                        module.on('changeLine', this.changeModuleLine)
-                        this.screen['line' + module.line].setWriter(module);
-                        this.modules[module.name] = module;
                     }
-                }
-            });
 
-        } catch (e) {
-            console.log(e)
-            //TODO Handle this better
+                    module.props = this.props
+
+                    if (module.initialize) {
+                        module.initialize()
+                    }
+
+                    module.on('changeLine', this.changeModuleLine)
+                    this.screen['line' + module.line].setWriter(module);
+                    this.modules[module.name] = module;
+                }
+            }
+        });
+
+        for (let moduleName of Object.keys(this.modules)) {
+            let module = this.modules[moduleName];
+            for (let dependsOnModuleName of module.dependsOn) {
+                if (this.modules[dependsOnModuleName]) {
+                    module.parentModule = this.modules[dependsOnModuleName];
+                } else throw new Error('Module dependency cannot be met for '+dependsOnModuleName+' in '+this.modules[module].name)
+            }
         }
+
+
     }
 
     this.changeModuleLine = (module, args) => {

@@ -17,7 +17,8 @@ const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = fa
     this.updateInterval = updateInterval;
     this._updateCounter = 0 ;
     this._initialUpdate = false;
-    this.dependsOn = dependsOn
+    this.dependsOn = dependsOn;
+    this.parentModule = null;
 }
 
 util.inherits(appModule, EventEmitter)

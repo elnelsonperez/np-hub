@@ -9,9 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dateformat": "^3.0.2",
+    "gps": "^0.4.1",
     "lcdi2c": "^1.0.6",
     "rpi-gpio": "^0.9.1",
-    "serialport": "^5.0.0",
-    "sqlite3": "^3.1.9"
+    "serialport": "^5.0.0"
   }
 }

@@ -10,7 +10,7 @@ const appModule = new ApplicationModule (
       scrolling: true,
       data: {
          count: 0,
-          lastLocation: null
+         lastLocation: null
       },
         inject: [
             {
@@ -24,9 +24,11 @@ const appModule = new ApplicationModule (
 appModule.controller = function () {
   if (this.ready === true) {
     this.ready = false;
-    this.GpsSenderTask.on('locationSent', (res) => {
+    this.GpsSenderTask.on('locationSent', (locations) => {
         this.data.count++;
-        this.data.lastLocation = res;
+        this.data.lastLocations = locations;
+        console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        console.log(locations);
     })
   }
   return this.view();
