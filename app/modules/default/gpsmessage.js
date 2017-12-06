@@ -10,7 +10,7 @@ const appModule = new ApplicationModule (
       scrolling: false,
       data: {
          count: 0,
-         lastLocation: null
+         lastLocations: null
       },
         inject: [
             {
@@ -31,6 +31,7 @@ appModule.controller = function () {
   }
   return this.view();
 };
+
 appModule.view = function () {
   if (this.data.lastLocations === null) {
     return "Obteniendo..."

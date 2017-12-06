@@ -46,7 +46,7 @@ appModule.initialize = function () {
                                           return u.ibutton === user.ibutton;
                                       })
                                   ) {
-                                      this.data.msg = 'Bienvenido, '+user.name.split(' ')[0]
+                                      this.data.msg = 'Hola, '+user.name.split(' ')[0]
                                       user.authenticated = true;
                                       this.data.authenticated.push(user)
 
@@ -64,12 +64,12 @@ appModule.initialize = function () {
                                       waitForAuth();
                                   }
                               } else {
-                                  this.data.msg = 'Bienvenido, '+user.name.split(' ')[0]
+                                  this.data.msg = 'Hola, '+user.name.split(' ')[0]
                                   user.authenticated = true;
                                   this.data.authenticated.push(user)
                                   setTimeout( () => {
-                                      this.appEvent.emit('auth.ready')
-                                  },1500)
+                                      this.props.app.emit('auth.ready')
+                                  },3000)
                               }
 
                           } else {

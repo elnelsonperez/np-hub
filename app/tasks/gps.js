@@ -36,10 +36,6 @@ GpsTask.initializeGpsReader = function () {
 
 
     gps.on('GLL', (parsed) => {
-        // console.log({
-        //     lat: parsed.lat,
-        //     lng: parsed.lon
-        // })
         if (parsed.valid === true && parsed.status === "active" && parsed.lat !== null && parsed.lon !== null) {
             const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
 

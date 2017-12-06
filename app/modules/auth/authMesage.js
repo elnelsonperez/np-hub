@@ -7,13 +7,13 @@ const appModule = new ApplicationModule (
       end : 19,
       line : 4,
       scrolling: true,
-      dependsOn: ['auth']
+      dependsOn: 'auth'
     }
 );
 
 appModule.view = function () {
-  if (this.parentModules.auth.msg) {
-    return this.parentModules.auth.msg;
+  if (this.parentModule.data.msg) {
+    return this.parentModule.data.msg;
   } else
       return '';
 }

@@ -44,7 +44,8 @@ Application = function () {
                 pins: [
                     {
                         type: InputHandler.TYPE_PUSH_BUTTON,
-                        number: 33
+                        number: 33,
+                        name: 'showAuth'
                     }
                 ]
             }
@@ -189,13 +190,13 @@ Application = function () {
 
         for (let moduleName of Object.keys(this.modules)) {
             let module = this.modules[moduleName];
-            for (let dependsOnModuleName of module.dependsOn) {
-                if (this.modules[dependsOnModuleName]) {
-                    module.parentModule = this.modules[dependsOnModuleName];
-                } else throw new Error('Module dependency cannot be met for '+dependsOnModuleName+' in '+this.modules[module].name)
+            if(module.dependsOn) {
+                if (this.modules[module.dependsOn]) {
+                    module.parentModule = this.modules[module.dependsOn];
+                } else throw new Error('Module dependency cannot be met for '+module.dependsOn+' in '+this.modules[module].name)
+
             }
         }
-
 
     }
 

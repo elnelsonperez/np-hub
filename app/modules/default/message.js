@@ -8,13 +8,13 @@ const appModule = new ApplicationModule (
         end : 19,
         line : 4,
         scrolling: false,
-        dependsOn: ['gpsmessage']
+        dependsOn: 'gpsmessage'
     }
 );
 
 appModule.view = function () {
     if (this.parentModule.data.count === 0) {
-        return "Obteniendo..."
+        return "___"
     } else {
         return "Total Enviadas: "+this.parentModule.data.count
     }

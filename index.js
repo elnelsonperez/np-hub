@@ -10,11 +10,11 @@ process.on('unhandledRejection', (reason, p) => {
 
 app.props.appEvent.on('boot.ready', function () {
     setTimeout(() => {
-        app.switchModuleDomain('default')
+        app.switchModuleDomain('auth')
     },1500)
 })
 
-app.props.input.on('INPUT:33:PRESSED', function () {
+app.props.input.on('INPUT:showAuth:PRESSED', function () {
     if (app.currentModuleDomain === 'auth') {
         app.switchModuleDomain('default')
     } else {

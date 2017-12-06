@@ -4,7 +4,7 @@ const EventEmitter = require('events').EventEmitter
 /**
  * This object defines a screen Module
  */
-const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = false, inject = [], data = {}, updateInterval = 1, dependsOn = []}) {
+const appModule = function ({name, start = 0, end = 19, line = 1, scrolling = false, inject = [], data = {}, updateInterval = 1, dependsOn = null}) {
     EventEmitter.call(this) //Modules emit events.
     this.name  = name
     this.ready = true; //If ready = false, module controller method is not called
