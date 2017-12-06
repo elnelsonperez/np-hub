@@ -16,7 +16,7 @@ appModule.view = function () {
     if (this.parentModule.data.count === 0) {
         return "Obteniendo..."
     } else {
-        return "Locs Enviadas: "+this.parentModule.data.count
+        return "Total Enviadas: "+this.parentModule.data.count
     }
 };
 

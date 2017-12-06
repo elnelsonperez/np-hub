@@ -7,7 +7,7 @@ const appModule = new ApplicationModule (
       start : 0,
       end : 19,
       line : 3,
-      scrolling: true,
+      scrolling: false,
       data: {
          count: 0,
          lastLocation: null
@@ -27,17 +27,26 @@ appModule.controller = function () {
     this.GpsSenderTask.on('locationSent', (locations) => {
         this.data.count++;
         this.data.lastLocations = locations;
-        console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        console.log(locations);
     })
   }
   return this.view();
 };
 appModule.view = function () {
-  if (this.data.lastLocation === null) {
+  if (this.data.lastLocations === null) {
     return "Obteniendo..."
   } else {
-      return "Loc #"+this.data.lastLocation.id+' enviada';
+      if (Array.isArray(this.data.lastLocations)) {
+          cnt = this.data.lastLocations.reduce(function (ant,act) {
+              if (ant === "") {
+                  return ant+act.id;
+              } else {
+                  return ant+','+act.id;
+              }
+          },"");
+          return "Loc #"+cnt+' enviada';
+      } else {
+        return "Error Recibiendo";
+      }
   }
 };
 
