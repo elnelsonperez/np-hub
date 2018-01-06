@@ -47,10 +47,7 @@ GpsTask.initializeGpsReader = function () {
             this.data.rawLocations.push(data);
         }
     });
-
-
 }
-
 
 GpsTask.initialize = function () {
     this.initializeGpsReader();
@@ -69,7 +66,7 @@ GpsTask.pushOrRejectLocation  = function(location) {
     if (selectedLocations.length > 0) {
         const prevloc = selectedLocations[selectedLocations.length - 1]
         const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
-        if (distance > 4) { // 10 meters
+        if (distance > 5) { // 5 meters
            selectedLocations.push(location);
             this.emit('newLocation',selectedLocations.length)
         }
@@ -89,7 +86,7 @@ GpsTask.distanceBetween =  function (lat1, lon1, lat2, lon2) {
 }
 
 GpsTask.getNextLocations = async function (amount = 1) { //
-  return new Promise((res, rej) => {
+  return new Promise((res) => {
     const returnResult = () =>  {
       const result = this.data.selectedLocations.splice(0, amount)
       if (result.length > 0) {
@@ -109,22 +106,6 @@ GpsTask.getNextLocations = async function (amount = 1) { //
         }
     }
   })
-}
-
-GpsTask.getAverageDistanceBetweenPoints = function (locations) {
-    const length = locations.length;
-    let results = [];
-    if (length > 0) {
-        const limit = length & ~1
-        for (let i=0;i<limit-1;i++) {
-            const distance = this.distanceBetween(locations[i].lat,locations[i].lng,locations[i+1].lat,locations[i+1].lng)
-            this.results.push(distance)
-        }
-    }
-    results = arr.filter(function(el) {
-        return el.length;
-    });
-    return  results.reduce((a, b) => a + b) / results.length;
 }
 
 module.exports = GpsTask;

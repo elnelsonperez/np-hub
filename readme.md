@@ -65,7 +65,7 @@ Es tan sencillo como crear un nuevo directorio en la carpeta `modules` y extende
 Por ejemplo un modulo para mostrar el nivel de bateria en la esquina superior izquierda de la pantalla:
 
 ```javascript
-//app/modules/demo/battery.js
+batteryModule.jsule.js
 const ApplicationModule  = require('../../core/module').ApplicationModule
 
 const appModule = new ApplicationModule (

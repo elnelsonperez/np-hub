@@ -2,18 +2,16 @@ const ApplicationModule  = require('../../core/Module').ApplicationModule
 const delay = require('../../../lib/functions').delay;
 const appModule = new ApplicationModule (
     {
-        name : 'moduleLoader',
+        name : 'HardWareLoader',
         start : 0,
         end : 19,
         line : 3,
         scrolling: false,
         inject: ['GprsManager']
     }
-
 );
 
 appModule.initialize = async function () {
-
     this.GprsManager.on('message', (msg) => {
         this.data.msg = msg;
     })
@@ -30,7 +28,7 @@ appModule.initialize = async function () {
     }
 
     this.data.msg = "Modulos Listos"
-    this.props.appEvent.emit('boot.ready')
+    this.props.applicationEvent.emit('boot.ready')
 }
 
 appModule.view = function (msg) {

@@ -1,4 +1,4 @@
-const gps = require('./app/tasks/gps');
+const gps = require('../app/tasks/GpsTask');
 gps.initialize()
 
 setInterval(gps.run.bind(gps), 1000)
