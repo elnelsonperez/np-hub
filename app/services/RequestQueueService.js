@@ -4,15 +4,15 @@ const RequestQueueService = function () {
   this.table = "requests_queue"
   const db = Database.conn
   this.insertRequest = (
-      {url, method, type, payload, priority = RequestQueueService.PRIORITY_LOW, event_name = null}
+      {url, method, payload, priority = RequestQueueService.PRIORITY_LOW, event_name = null}
   ) => {
     return new Promise((res,rej) => {
       try {
         const stmt = db.prepare(
-            `INSERT INTO ${this.table}(url,method,type,payload,priority,event_name) 
-            VALUES (?,?,?,?,?,?)`, [url,method,type,payload,priority,event_name])
-        stmt.run(() => {
-          res(this.lastId)
+            `INSERT INTO ${this.table}(url,method,payload,priority,event_name) 
+            VALUES (?,?,?,?,?)`, [url,method,payload,priority,event_name])
+        stmt.run(function () {
+          res(this.lastID)
         })
       }
       catch (e) {
@@ -108,8 +108,8 @@ const RequestQueueService = function () {
     return new Promise((res,rej) => {
       try {
         db.run(
-            `UPDATE ${this.table} set status = ${status} WHERE id = ${id}`, () => {
-              res(this.lastId)
+            `UPDATE ${this.table} set status = ${status} WHERE id = ${id}`, function () {
+              res(this.lastID)
             })
       }
       catch (e) {

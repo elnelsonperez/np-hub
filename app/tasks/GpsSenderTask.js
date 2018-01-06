@@ -22,14 +22,6 @@ GpsSenderTask.run = function () {
         priority: RequestQueueService.PRIORITY_MEDIUM,
         event_name: eventName
       })
-
-      this.RequestProcessorService.on(eventName, qRes => {
-        if (qRes.res) {
-          if (parseInt(res.code) === 200)
-            this.emit(eventName, res.content);
-        }
-      })
-
       this.ready = true;
     })
 

@@ -29,13 +29,13 @@ const RequestProcessorService = function (RequestQueueService, GprsManager) {
         promise.then((res)=> {
           RequestQueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
           if (request.event_name) {
-            this.emit(request.event_name, {error: null, res: res})
+            this.emit(request.event_name, {error: null, res: res, id: request.id})
           }
           resolve()
         }).catch(e => {
           RequestQueueService.changeStatus(request.id, RequestQueueService.STATUS_FAILED)
           if (request.event_name) {
-            this.emit(request.event_name, {error: e, res: null})
+            this.emit(request.event_name, {error: e, res: null,id: request.id})
           }
           resolve()
         })
@@ -61,12 +61,12 @@ const RequestProcessorService = function (RequestQueueService, GprsManager) {
         promise.then((res) => {
           RequestQueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
           if (request.event_name) {
-            this.emit(request.event_name, {error: null, res: res})
+            this.emit(request.event_name, {error: null, res: res, id: request.id})
           }
           resolve()
         }).catch(e => {
           if (request.event_name) {
-            this.emit(request.event_name, {error: e, res: null})
+            this.emit(request.event_name, {error: e, res: null, id: request.id})
           }
           resolve()
         })
