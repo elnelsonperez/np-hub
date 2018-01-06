@@ -86,8 +86,6 @@ Application = function () {
     //Input
     this.props.input.monitorRegisteredPins()
 
-    this.injectable.BluetoothService.initialize()
-
     //Aplication loop
     this.applicationLoop()
   }

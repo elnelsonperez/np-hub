@@ -45,9 +45,5 @@ function isObject(obj) {
   return obj === Object(obj);
 }
 
-function capitalizeFirstLetter(string) {
-  return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
-}
-
 util.inherits(BluetoothService, EventEmitter)
 module.exports = BluetoothService;

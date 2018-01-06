@@ -22,9 +22,9 @@ const RequestProcessorService = function (RequestQueueService, GprsManager) {
 
         let promise = null;
         if (request.method === RequestQueueService.METHOD_GET) {
-          promise = GprsManager.httpGet(request.url, request.payload)
+          promise = GprsManager.httpGet(request.url,this.appendCreationDate(request.payload))
         } else if (request.method === RequestQueueService.METHOD_POST) {
-          promise = GprsManager.httpPost(request.url, request.payload)
+          promise = GprsManager.httpPost(request.url, this.appendCreationDate(request.payload))
         }
         promise.then((res)=> {
           RequestQueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
@@ -44,6 +44,12 @@ const RequestProcessorService = function (RequestQueueService, GprsManager) {
     })
   }
 
+  this.appendCreationDate = (payload) => {
+    const obj = payload;
+    obj.processed_on = + new Date()
+    return obj
+  }
+
   this.processNextFailedRequest = () => {
     return new Promise(resolve => {
       if (GprsManager.initialized) {
@@ -54,9 +60,9 @@ const RequestProcessorService = function (RequestQueueService, GprsManager) {
         }
         let promise = null;
         if (request.method === RequestQueueService.METHOD_GET) {
-          promise = GprsManager.httpGet(request.url, request.payload)
+          promise = GprsManager.httpGet(request.url, this.appendCreationDate(request.payload))
         } else if (request.method === RequestQueueService.METHOD_POST) {
-          promise = GprsManager.httpPost(request.url, request.payload)
+          promise = GprsManager.httpPost(request.url, this.appendCreationDate(request.payload))
         }
         promise.then((res) => {
           RequestQueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
