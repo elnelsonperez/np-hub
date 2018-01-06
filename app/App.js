@@ -9,6 +9,7 @@ const IbuttonReader = require('../lib/IbuttonReader').IbuttonReader
 const InputHandler = require('./../lib/InputHandler').InputHandler
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
+const BluetoothService = require("./services/BluetoothService/BluetoothService")
 
 const SCREEN_REFRESH_DELAY = 500;
 const INPUT_DELAY = 150;
@@ -65,6 +66,7 @@ Application = function () {
     this.injectable.SequentialSerialManager = Seq;
     this.injectable.GprsManager = new GprsManager(Seq);
     this.injectable.IbuttonReader = new IbuttonReader({});
+    this.injectable.BluetoothService = new BluetoothService()
     this.injectable.RequestQueueService = new RequestQueueService()
     this.injectable.RequestProcessorService = new RequestProcessorService(
         this.injectable.RequestQueueService,
@@ -81,7 +83,10 @@ Application = function () {
     //Stats to run tasks
     this.runTasks();
 
+    //Input
     this.props.input.monitorRegisteredPins()
+
+    this.injectable.BluetoothService.initialize()
 
     //Aplication loop
     this.applicationLoop()
