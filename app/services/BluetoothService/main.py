@@ -26,6 +26,7 @@ class bluetoothManager:
     }
     listenCounter = 0
     bluetoothctl = None
+    config = None
 
     def __init__(self):
         self.bluetoothctl = bluetoothctl.Bluetoothctl()
@@ -34,6 +35,8 @@ class bluetoothManager:
         thread.start_new_thread(self.read_input, ())
         self.output(Type.EVENT, "INITIALIZED")
         self.create_server()
+        if sys.argv[1]:
+            self.config = json.loads(sys.argv[1])
 
     def turn_on_auto_pair(self):
         self.bluetoothctl.make_discoverable()
@@ -85,10 +88,17 @@ class bluetoothManager:
     def wait_for_connections (self, server_sock):
         client_sock, client_info = server_sock.accept()
         mac_address = client_info[0]
-        self.output(Type.EVENT,"NEW_CONNECTION", json.dumps({"mac_address": mac_address}))
-        self.connections[mac_address] = {"client_sock": client_sock, "server_sock": server_sock}
-        thread.start_new_thread(self.read_from_client, (mac_address,))
-        #always keep a server up for new connections
+        # Mac address validation
+        if self.config \
+            and self.config.get('allowedMacAddreses') \
+            and mac_address not in self.config.get('allowedMacAddreses'):
+            client_sock.close()
+            server_sock.close()
+        else:
+            self.output(Type.EVENT,"NEW_CONNECTION", json.dumps({"mac_address": mac_address}))
+            self.connections[mac_address] = {"client_sock": client_sock, "server_sock": server_sock}
+            thread.start_new_thread(self.read_from_client, (mac_address,))
+            #always keep a server up for new connections
         self.create_server()
 
     def write_to_client (self, mac_address, payload):

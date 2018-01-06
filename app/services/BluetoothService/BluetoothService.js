@@ -3,9 +3,15 @@ const EventEmitter = require('events').EventEmitter
 const PythonShell = require('python-shell');
 const Parser = require ("./messageParser")
 
-const BluetoothService = function (debug = false) {
+const BluetoothService = function ({debug = false, config = null}) {
   this.initialize = () => {
-    this.shell = new PythonShell('main.py');
+    if (config) {
+      this.shell = new PythonShell('main.py', {
+        args: [JSON.stringify(config)]
+      });
+    } else {
+      this.shell = new PythonShell('main.py')
+    }
   }
 
   this.idCounter = 1;
