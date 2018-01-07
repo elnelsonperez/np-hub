@@ -1,7 +1,6 @@
 const Message = require("./pythonMessage")
 
 module.exports = function () {
-
   this.parse = (input) => {
     if (!input.includes("|")) {
       return null
@@ -12,5 +11,4 @@ module.exports = function () {
     const payload = msg[2];
     return new Message(type, name, payload)
   }
-
 }

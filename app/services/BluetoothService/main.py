@@ -31,12 +31,14 @@ class bluetoothManager:
     def __init__(self):
         self.bluetoothctl = bluetoothctl.Bluetoothctl()
         self.bluetoothctl.set_default_agent()
-        self.turn_on_auto_pair()
         thread.start_new_thread(self.read_input, ())
         self.output(Type.EVENT, "INITIALIZED")
         self.create_server()
         if sys.argv[1]:
             self.config = json.loads(sys.argv[1])
+        if self.config.get("autoPair") \
+            and self.config.get("autoPair") == True:
+            self.turn_on_auto_pair()
 
     def turn_on_auto_pair(self):
         self.bluetoothctl.make_discoverable()
@@ -50,6 +52,7 @@ class bluetoothManager:
             data = raw_input()
             if len(data) == 0: break
             self.parse_input_command(data)
+            time.sleep(0.08)
 
     def parse_input_command(self, command):
         action_and_params = command.split("||")
@@ -69,6 +72,10 @@ class bluetoothManager:
             else:
                 self.output(Type.LOG, "UNRECOGNIZED_ACTION")
 
+    def invoke(self, method, mac_address, payload, corr_id=None):
+        self.output(Type.RETURN, method, json.dumps({"mac_address": mac_address,
+                                                     "corr_id": corr_id,
+                                                     "return": getattr(self, method)(mac_address, payload)}))
 
     def create_server(self):
         self.listenCounter = self.listenCounter + 1
@@ -104,7 +111,6 @@ class bluetoothManager:
     def write_to_client (self, mac_address, payload):
         client = self.connections.get(mac_address)
         try:
-            client = self.connections.get(mac_address)
             client.get("client_sock").send(payload + "\n")
             return True
         except IOError as e:
@@ -119,11 +125,6 @@ class bluetoothManager:
         print(output)
         sys.stdout.flush()
 
-    def invoke (self,  method, mac_address, payload,corr_id = None):
-        self.output(Type.RETURN, method, json.dumps({"mac_address": mac_address,
-                                                     "corr_id": corr_id,
-                                                     "return": getattr(self, method)(mac_address, payload)}))
-
     def read_from_client (self, mac_address):
         client = self.connections.get(mac_address)
         try:
@@ -132,6 +133,7 @@ class bluetoothManager:
                 if len(data) == 0: break
                 self.output(Type.EVENT, "RECEIVED", json.dumps({"mac_address": mac_address, "data": data}))
                 self.write_to_client(mac_address, "Mensaje Recibido")
+                time.sleep(0.08)
         except IOError as e:
             pass
 
