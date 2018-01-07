@@ -10,20 +10,8 @@ class Type:
     LOG = "LOG"
     EVENT = "EVENT"
 
-def invoke_parser(argstring):
-    args = argstring.split("|")
-    return {
-        "method": args[0],
-        "mac_address": args[1] if args[1] else None,
-        "payload": args[2] if args[2] else None,
-        "corr_id": args[3] if args[3] else None
-    }
-
 class bluetoothManager:
     connections = {}
-    actions = {
-        "invoke": invoke_parser
-    }
     listenCounter = 0
     bluetoothctl = None
     config = None
@@ -60,36 +48,28 @@ class bluetoothManager:
             time.sleep(0.08)
 
     def parse_input_command(self, command):
-        action_and_params = command.split("||")
+        action_and_params = command.split("|")
         action = action_and_params[0]
-        params = action_and_params[1]
-        if action:
-            if action in self.actions:
-                if self.actions[action]:
-                    # noinspection PyCallingNonCallable
-                    args = self.actions[action](params)
-                    if action == "invoke":
-                        self.invoke (
-                            method=args.get('method'),
-                            mac_address=args.get('mac_address'),
-                            payload=args.get('payload'),
-                            corr_id=args.get('corr_id'))
+        method = action_and_params[1]
+        params = None
+        if action_and_params[2]:
+            params = json.loads(action_and_params[2])
+
+        if action and method:
+            if action == "invoke":
+                self.invoke(method, params)
             else:
                 self.output(Type.LOG, "UNRECOGNIZED_ACTION")
 
-    def invoke(self, method, mac_address=None, payload =None, corr_id=None):
-        if mac_address is not None and payload is not None:
-            returnval = getattr(self, method)(mac_address, payload)
-        else:
-            returnval = getattr(self, method)()
+    def invoke(self, method, args):
+        retobj = {}
+        if "mac_address" in args:
+            retobj["mac_address"] = args.get("mac_address")
+        if "corr_id" in args:
+            retobj["corr_id"] = args.get("corr_id")
 
-        self.output(Type.RETURN,
-                    method,
-                    json.dumps({
-                        "mac_address": mac_address,
-                        "corr_id": corr_id,
-                        "return": returnval})
-                    )
+        retobj["return"] = getattr(self, method)(args)
+        self.output(Type.RETURN, args.get("method"), json.dumps(retobj))
 
     def create_server(self):
         self.listenCounter = self.listenCounter + 1
@@ -122,15 +102,26 @@ class bluetoothManager:
             #always keep a server up for new connections
         self.create_server()
 
-    def write_to_client (self, mac_address, payload):
-        client = self.connections.get(mac_address)
-        try:
-            client.get("client_sock").send(payload + "\n")
-            return True
-        except IOError as e:
-            client.get("client_sock").close()
-            client.get("server_sock").close()
-            self.output(Type.EVENT, "DISCONNECTED", json.dumps({"mac_address": mac_address}))
+    def get_connected_devices(self):
+        return list(self.connections.keys())
+
+    def write_to_client (self, args):
+        mac_address = args.get("mac_address")
+        reach_device = args.get("reach_device")
+        if mac_address:
+            payload = {}
+            if reach_device:
+                payload["corr_id"] = args.get("corr_id")
+            payload["payload"] = args.get("payload")
+            client = self.connections.get(mac_address)
+            try:
+                client.get("client_sock").send(payload + "\n")
+                return True
+            except IOError as e:
+                client.get("client_sock").close()
+                client.get("server_sock").close()
+                self.output(Type.EVENT, "DISCONNECTED", json.dumps({"mac_address": mac_address}))
+        self.output(Type.LOG, "write_to_client", "Invalid mac address")
 
     def output (self, type, name, payload = None):
         output = type+"|"+name
@@ -146,7 +137,7 @@ class bluetoothManager:
                 data = client.get("client_sock").recv(1024)
                 if len(data) == 0: break
                 self.output(Type.EVENT, "RECEIVED", json.dumps({"mac_address": mac_address, "data": data}))
-                self.write_to_client(mac_address, "Mensaje Recibido")
+                self.write_to_client( {"mac_address": mac_address, "payload": "Mensaje Recibido"})
                 time.sleep(0.08)
         except IOError as e:
             pass

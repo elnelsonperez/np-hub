@@ -3,23 +3,21 @@ const EventEmitter = require('events').EventEmitter
 const PythonShell = require('python-shell');
 const Parser = require ("./messageParser")
 
-const BluetoothService = function ({debug = false, config = null}) {
-  /*
-  config
-  {
-    allowedMacAddreses: ["...","..."],
-    autoPair: true||false,
-    discoverable: true||false
-  }
-   */
-  this.initialize = () => {
-    if (config) {
-      this.shell = new PythonShell('main.py', {
-        args: [JSON.stringify(config)]
-      });
-    } else {
-      this.shell = new PythonShell('main.py')
+const BluetoothService = function (
+    {
+      debug = false,
+      config = {
+        // allowedMacAddreses: [],
+        autoPair: true,
+        discoverable: true
+      }
     }
+) {
+
+  this.initialize = () => {
+    this.shell = new PythonShell('main.py', {
+      args: [JSON.stringify(config)]
+    });
   }
 
   this.reset = () => {
@@ -33,6 +31,7 @@ const BluetoothService = function ({debug = false, config = null}) {
   }
 
   this.idCounter = 1;
+
   this.parser = new Parser()
 
   this.shell.on('message',  (message) => {
@@ -44,34 +43,32 @@ const BluetoothService = function ({debug = false, config = null}) {
     }
   });
 
-  this.send = ({mac_address, msg}) => {
-    if (isObject(msg))
-      msg = JSON.stringify(msg)
-    const id = this.idCounter++;
-    this.invoke('write_to_client',[mac_address, msg, id])
-    return id
+  this.sendToDevice = ({mac_address, payload}) => {
+    this.invoke('write_to_client',{mac_address, payload})
   }
 
-  this.sendWithResponse = ({mac_address, msg, timeout = 5000}) => {
-    return new Promise((res, rej) => {
-      const id = this.send({mac_address: mac_address, msg: msg})
+  this.getConnectedDevices = async () => {
+    return await this.invokeWithResponse({method: "get_connected_devices"})
+  }
 
+  this.invokeWithResponse = ({method, params = null, timeout = 5000}) => {
+    return new Promise((res, rej) => {
+      const corr_id = this.idCounter++;
+      this.invoke(method,{...params, corr_id})
       const timeout = this.setTimeout(() => {
         this.removeListener("RETURN", callback)
         rej("Timeout Exceeded")
       }, timeout)
-
       const callback = (message) => {
-        if (message.has("mac_address") &&
+        if (
             message.has("corr_id") &&
-            message.body.mac_address === mac_address &&
             message.body.corr_id !== null &&
-            message.body.corr_id === id)
+            message.body.corr_id === corr_id)
         {
           clearInterval(timeout)
           this.removeListener("RETURN", callback)
           if (message.has("return")) {
-            res(message.return)
+            res(message.body.return)
           } else {
             res()
           }
@@ -81,10 +78,42 @@ const BluetoothService = function ({debug = false, config = null}) {
     })
   }
 
+  this.sendWithResponse = ({mac_address, payload, timeout = 5000}) => {
+    return new Promise((res, rej) => {
+      const corr_id = this.idCounter++
+      this.invoke('write_to_client',{mac_address, payload, corr_id, reach_device: true})
+
+      const timeout = this.setTimeout(() => {
+        this.removeListener("RETURN", callback)
+        rej("Timeout Exceeded")
+      }, timeout)
+
+      const callback = (message) => {
+        if (message.name === "RECEIVED" &&
+            message.has("mac_address") &&
+            message.has("corr_id") &&
+            message.body.corr_id !== null &&
+            message.body.mac_address !== null &&
+            message.body.mac_address === mac_address &&
+            message.body.corr_id === corr_id)
+        {
+          clearInterval(timeout)
+          this.removeListener("EVENT", callback)
+          if ( message.body.payload) {
+            res(message.body.payload)
+          } else {
+            res()
+          }
+        }
+      }
+      this.on("EVENT", callback)
+    })
+  }
+
   this.invoke = (method, args = null) => {
-    let msg = "invoke||"+method
-    if (args) {
-      msg += "|"+args.join("|")
+    let msg = "invoke|"+method
+    if (args && isObject(args)) {
+      msg += "|"+JSON.stringify(args)
     }
     this.shell.send(msg)
   }
