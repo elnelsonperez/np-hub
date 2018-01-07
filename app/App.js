@@ -28,6 +28,10 @@ Application = function () {
 
   this.props = { //These are available to all modules and tasks
     applicationEvent: null,
+    config: {
+      distanceBetweenLocations: 10, //meters
+      timeoutSendLocation: 5 //Minutes
+    },
     input: null,
     serial : null, //Pi serial number
     auth: {
@@ -143,6 +147,7 @@ Application = function () {
     for (let module of Object.keys(this.modules)) {
       this.modules[module].removeAllListeners()
     }
+
     this.currentModuleDomain = folder;
     //load modules
     this.loadModules(__dirname+'/modules/'+folder);
@@ -161,36 +166,17 @@ Application = function () {
     this.modules = {};
   }
 
-  this.loadModules = (dir, clearModules = false) => {
+  this.loadModules = async (dir, clearModules = false) => {
     if (clearModules === true) {
       this.setDefaultApplicationProperties();
     }
+
     fs.readdirSync(dir).forEach(file => {
       const module = require(dir+'/'+file);
       if (file === 'config.js') {
         this.screenConfigs = module;
       } else {
         if (module) {
-          for (let injectable of module.inject) {
-            if (injectable.type && injectable.type === "task") {
-              if (injectable.name && this.tasks[injectable.name]) {
-                module[injectable.name] = this.tasks[injectable.name];
-              }
-            } else {
-              if (this.injectable[injectable]) {
-                module[injectable] = this.injectable[injectable];
-              }
-            }
-          }
-
-          module.props = this.props
-
-          if (module.initialize) {
-            module.initialize()
-          }
-
-          module.on('changeLine', this.changeModuleLine)
-          this.screen['line' + module.line].setWriter(module);
           this.modules[module.name] = module;
         }
       }
@@ -198,6 +184,27 @@ Application = function () {
 
     for (let moduleName of Object.keys(this.modules)) {
       let module = this.modules[moduleName];
+      for (let injectable of module.inject) {
+        if (injectable.type && injectable.type === "task") {
+          if (injectable.name && this.tasks[injectable.name]) {
+            module[injectable.name] = this.tasks[injectable.name];
+          }
+        } else {
+          if (this.injectable[injectable]) {
+            module[injectable] = this.injectable[injectable];
+          }
+        }
+      }
+
+      module.props = this.props
+
+      if (module.initialize) {
+        await module.initialize()
+      }
+
+      module.on('changeLine', this.changeModuleLine)
+      this.screen['line' + module.line].setWriter(module);
+
       if(module.dependsOn) {
         if (this.modules[module.dependsOn]) {
           module.parentModule = this.modules[module.dependsOn];

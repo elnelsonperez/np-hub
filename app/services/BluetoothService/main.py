@@ -32,13 +32,13 @@ class bluetoothManager:
         self.bluetoothctl = bluetoothctl.Bluetoothctl()
         self.bluetoothctl.set_default_agent()
         thread.start_new_thread(self.read_input, ())
-        self.output(Type.EVENT, "INITIALIZED")
         self.create_server()
         if sys.argv[1]:
             self.config = json.loads(sys.argv[1])
         if self.config.get("autoPair") \
             and self.config.get("autoPair") == True:
             self.turn_on_auto_pair()
+        self.output(Type.EVENT, "INITIALIZED")
 
     def turn_on_auto_pair(self):
         self.bluetoothctl.make_discoverable()

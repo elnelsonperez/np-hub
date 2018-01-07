@@ -1,5 +1,5 @@
 
-    const Message =function (type, name, payload) {
+const Message = function (type, name, payload) {
   this.name = name;
   this.type = type;
   this.body = jsonOrText(payload)
@@ -21,10 +21,9 @@ function jsonOrText(str = null) {
   if (!str)
     return {}
   try {
-    const res = JSON.parse(str);
-    return res;
+    return JSON.parse(str);
   } catch (e) {
     return str;
   }
 }
-    module.exports = Message;
+module.exports = Message;
