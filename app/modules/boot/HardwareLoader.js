@@ -2,12 +2,12 @@ const ApplicationModule  = require('../../core/Module').ApplicationModule
 const delay = require('../../../lib/functions').delay;
 const appModule = new ApplicationModule (
     {
-        name : 'HardWareLoader',
-        start : 0,
-        end : 19,
-        line : 3,
-        scrolling: false,
-        inject: ['GprsManager', 'BluetoothService']
+      name : 'HardWareLoader',
+      start : 0,
+      end : 19,
+      line : 3,
+      scrolling: false,
+      inject: ['GprsManager', 'BluetoothService']
     }
 );
 
@@ -42,6 +42,12 @@ appModule.initialize = async function () {
 
 appModule.initializeBluetooth = function () {
   this.data.msg = "Bluetooth Init"
+  this.props.input.on('INPUT:btReset:PRESSED', () => {
+    this.BluetoothService.reset()
+  })
+  this.props.input.on('INPUT:btDiscoverable:PRESSED', () => {
+    this.BluetoothService.makeDiscoverable()
+  })
   this.BluetoothService.initialize()
 }
 
@@ -66,14 +72,14 @@ appModule.initializeGprs = async function () {
 }
 
 appModule.view = function (msg) {
-    if (this.data.msg)
-        return this.data.msg
-    else
-        return msg;
+  if (this.data.msg)
+    return this.data.msg
+  else
+    return msg;
 }
 
 appModule.controller = function () {
-    return this.view('Cargando Modulos');
+  return this.view('Cargando Modulos');
 }
 
 module.exports = appModule;

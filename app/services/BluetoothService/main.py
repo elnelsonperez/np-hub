@@ -14,9 +14,9 @@ def invoke_parser(argstring):
     args = argstring.split("|")
     return {
         "method": args[0],
-        "mac_address": args[1],
-        "payload": args[2],
-        "corr_id": args[3]
+        "mac_address": args[1] if args[1] else None,
+        "payload": args[2] if args[2] else None,
+        "corr_id": args[3] if args[3] else None
     }
 
 class bluetoothManager:
@@ -36,12 +36,17 @@ class bluetoothManager:
         if sys.argv[1]:
             self.config = json.loads(sys.argv[1])
         if self.config.get("autoPair") \
-            and self.config.get("autoPair") == True:
+                and self.config.get("autoPair") == True:
             self.turn_on_auto_pair()
+        if self.config.get("discoverable") \
+                and self.config.get("discoverable") == True:
+            self.make_discoverable()
         self.output(Type.EVENT, "INITIALIZED")
 
-    def turn_on_auto_pair(self):
+    def make_discoverable(self):
         self.bluetoothctl.make_discoverable()
+
+    def turn_on_auto_pair(self):
         self.bluetoothctl.auto_accept_on = True
 
     def turn_off_auto_pair(self):
@@ -72,10 +77,19 @@ class bluetoothManager:
             else:
                 self.output(Type.LOG, "UNRECOGNIZED_ACTION")
 
-    def invoke(self, method, mac_address, payload, corr_id=None):
-        self.output(Type.RETURN, method, json.dumps({"mac_address": mac_address,
-                                                     "corr_id": corr_id,
-                                                     "return": getattr(self, method)(mac_address, payload)}))
+    def invoke(self, method, mac_address=None, payload =None, corr_id=None):
+        if mac_address is not None and payload is not None:
+            returnval = getattr(self, method)(mac_address, payload)
+        else:
+            returnval = getattr(self, method)()
+
+        self.output(Type.RETURN,
+                    method,
+                    json.dumps({
+                        "mac_address": mac_address,
+                        "corr_id": corr_id,
+                        "return": returnval})
+                    )
 
     def create_server(self):
         self.listenCounter = self.listenCounter + 1
@@ -97,8 +111,8 @@ class bluetoothManager:
         mac_address = client_info[0]
         # Mac address validation
         if self.config \
-            and self.config.get('allowedMacAddreses') \
-            and mac_address not in self.config.get('allowedMacAddreses'):
+                and self.config.get('allowedMacAddreses') \
+                and mac_address not in self.config.get('allowedMacAddreses'):
             client_sock.close()
             server_sock.close()
         else:

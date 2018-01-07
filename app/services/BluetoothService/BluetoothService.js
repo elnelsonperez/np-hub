@@ -8,7 +8,8 @@ const BluetoothService = function ({debug = false, config = null}) {
   config
   {
     allowedMacAddreses: ["...","..."],
-    autoPair: true||false
+    autoPair: true||false,
+    discoverable: true||false
   }
    */
   this.initialize = () => {
@@ -19,6 +20,16 @@ const BluetoothService = function ({debug = false, config = null}) {
     } else {
       this.shell = new PythonShell('main.py')
     }
+  }
+
+  this.reset = () => {
+    this.shell.childProcess.kill('SIGINT');
+    this.idCounter = 1;
+    this.initialize()
+  }
+
+  this.makeDiscoverable = () => {
+    this.invoke('make_discoverable')
   }
 
   this.idCounter = 1;
@@ -54,6 +65,7 @@ const BluetoothService = function ({debug = false, config = null}) {
         if (message.has("mac_address") &&
             message.has("corr_id") &&
             message.body.mac_address === mac_address &&
+            message.body.corr_id !== null &&
             message.body.corr_id === id)
         {
           clearInterval(timeout)
