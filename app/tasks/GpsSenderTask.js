@@ -24,7 +24,6 @@ GpsSenderTask.run = function () {
       })
       this.ready = true;
     })
-
   }
 
 }

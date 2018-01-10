@@ -84,7 +84,7 @@ const BluetoothService = function (
       this.invoke('write_to_client',{mac_address, payload, corr_id, reach_device: true})
 
       const timeout = this.setTimeout(() => {
-        this.removeListener("RETURN", callback)
+        this.removeListener("EVENT", callback)
         rej("Timeout Exceeded")
       }, timeout)
 
@@ -113,7 +113,7 @@ const BluetoothService = function (
   this.invoke = (method, args = null) => {
     let msg = "invoke|"+method
     if (args && isObject(args)) {
-      msg += "|"+JSON.stringify(args)
+      msg += "|" + JSON.stringify(args)
     }
     this.shell.send(msg)
   }

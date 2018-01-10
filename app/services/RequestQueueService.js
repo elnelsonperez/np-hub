@@ -64,8 +64,10 @@ const RequestQueueService = function () {
           if (err)
             rej(err)
           const obj = row;
-          obj.payload = JSON.parse(row.payload)
-          res(obj)
+          if (obj){
+              obj.payload = JSON.parse(row.payload)
+          }
+            res(obj)
         })
       }
       catch (e) {

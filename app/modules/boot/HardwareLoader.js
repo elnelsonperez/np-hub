@@ -54,10 +54,12 @@ appModule.initializeBluetooth = function () {
 appModule.initializeGprs = async function () {
   this.GprsManager.on('message', (msg) => {
     this.data.msg = msg;
+
   })
   let done = false;
   let counter = 0;
   while (done === false && counter < 3) {
+
     try {
       done = await this.GprsManager.initialize();
       if (done === false)

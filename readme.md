@@ -130,4 +130,4 @@ module.exports = GpsSenderTask;
 1. Necesitas tener los componentes armados arriba en la configuracion presentada.
 2. `git clone ` the repository.
 3. `npm install` or `yarn` para instalar las dependencias.
-4. Correr con `node index.js`.
+4. Correr con `node app.js`.

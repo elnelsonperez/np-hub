@@ -1,86 +1,89 @@
 const util = require('util')
 const EventEmitter = require('events').EventEmitter
-
+const RequestQueueService = require("./../services/RequestQueueService")
 /**
  *
- * @param {RequestQueueService} RequestQueueService
+ * @param {RequestQueueService} QueueService
  * @param {GprsManager} GprsManager
  * @constructor
  */
-const RequestProcessorService = function (RequestQueueService, GprsManager) {
-  this.processNextPendingRequest = () => {
-    return new Promise(resolve => {
-      if (GprsManager.initialized) {
-        let request = RequestQueueService.getNextRequest()
-        let failedRequest = RequestQueueService.getNextRequest(RequestQueueService.STATUS_FAILED)
+const RequestProcessorService =  function (QueueService, GprsManager) {
 
-        if (!request && failedRequest) {
-          resolve({pendingRequests: false})
-        } else if (!request && !failedRequest) {
-          resolve()
+    this.processNextPendingRequest = async () => {
+        if (!GprsManager.initialized) {
+            throw new Error(RequestProcessorService.GPRS_NOT_INITIALIZED)
+        } else {
+            let request = await QueueService.getNextRequest()
+            let failedRequest = await QueueService.getNextRequest(QueueService.STATUS_FAILED)
+
+            if (!request && failedRequest) {
+                return {pendingRequests: false}
+            } else if (!request && !failedRequest) {
+                return
+            }
+
+            let result = null;
+            try {
+                if (request.method === RequestQueueService.METHOD_GET) {
+                    result = await GprsManager.httpGet(request.url, this.appendCreationDate(request.payload))
+                } else if (request.method === RequestQueueService.METHOD_POST) {
+                    result = await GprsManager.httpPost(request.url, this.appendCreationDate(request.payload))
+                }
+
+                QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
+                if (request.event_name) {
+                    this.emit(request.event_name, {error: null, res: result, id: request.id})
+                }
+
+            } catch (e) {
+                QueueService.changeStatus(request.id, RequestQueueService.STATUS_FAILED)
+                if (request.event_name) {
+                    this.emit(request.event_name, {error: e, res: null, id: request.id})
+                }
+            }
+
+        }
+    }
+
+    this.appendCreationDate = (payload) => {
+        const obj = payload;
+        obj.processed_on = + new Date()
+        return obj
+    }
+
+    this.processNextFailedRequest = async () => {
+
+        if (GprsManager.initialized) {
+            let request = await QueueService.getNextRequest(QueueService.STATUS_FAILED)
+            let pendingRequest = await QueueService.getNextRequest();
+            if (pendingRequest || !request) {
+                return {pendingRequests: true}
+            }
+            let result = null;
+            try {
+                if (request.method === RequestQueueService.METHOD_GET) {
+                    result = await GprsManager.httpGet(request.url, this.appendCreationDate(request.payload))
+                } else if (request.method === RequestQueueService.METHOD_POST) {
+                    result = await awaitGprsManager.httpPost(request.url, this.appendCreationDate(request.payload))
+                }
+
+                QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
+                if (request.event_name) {
+                    this.emit(request.event_name, {error: null, res: result, id: request.id})
+                }
+            }catch (e ) {
+                if (request.event_name) {
+                    this.emit(request.event_name, {error: e, res: null, id: request.id})
+                }
+            }
+        } else {
+            throw new Error(RequestProcessorService.GPRS_NOT_INITIALIZED)
         }
 
-        let promise = null;
-        if (request.method === RequestQueueService.METHOD_GET) {
-          promise = GprsManager.httpGet(request.url,this.appendCreationDate(request.payload))
-        } else if (request.method === RequestQueueService.METHOD_POST) {
-          promise = GprsManager.httpPost(request.url, this.appendCreationDate(request.payload))
-        }
-        promise.then((res)=> {
-          RequestQueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
-          if (request.event_name) {
-            this.emit(request.event_name, {error: null, res: res, id: request.id})
-          }
-          resolve()
-        }).catch(e => {
-          RequestQueueService.changeStatus(request.id, RequestQueueService.STATUS_FAILED)
-          if (request.event_name) {
-            this.emit(request.event_name, {error: e, res: null,id: request.id})
-          }
-          resolve()
-        })
-      }
-
-    })
-  }
-
-  this.appendCreationDate = (payload) => {
-    const obj = payload;
-    obj.processed_on = + new Date()
-    return obj
-  }
-
-  this.processNextFailedRequest = () => {
-    return new Promise(resolve => {
-      if (GprsManager.initialized) {
-        let request = RequestQueueService.getNextRequest(RequestQueueService.STATUS_FAILED)
-        let pendingRequest = RequestQueueService.getNextRequest();
-        if (pendingRequest || !request) {
-          resolve({pendingRequests: true})
-        }
-        let promise = null;
-        if (request.method === RequestQueueService.METHOD_GET) {
-          promise = GprsManager.httpGet(request.url, this.appendCreationDate(request.payload))
-        } else if (request.method === RequestQueueService.METHOD_POST) {
-          promise = GprsManager.httpPost(request.url, this.appendCreationDate(request.payload))
-        }
-        promise.then((res) => {
-          RequestQueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
-          if (request.event_name) {
-            this.emit(request.event_name, {error: null, res: res, id: request.id})
-          }
-          resolve()
-        }).catch(e => {
-          if (request.event_name) {
-            this.emit(request.event_name, {error: e, res: null, id: request.id})
-          }
-          resolve()
-        })
-      }
-    })
-  }
-
+    }
 }
+
+RequestProcessorService.GPRS_NOT_INITIALIZED = 100;
 
 util.inherits(RequestProcessorService, EventEmitter)
 module.exports = RequestProcessorService;

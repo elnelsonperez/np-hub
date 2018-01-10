@@ -4,7 +4,7 @@ const RequestQueueTask = new Task (
     {
       name: 'RequestQueueTask',
       every: 1000, //5 Segundos
-      inject: ['RequestProcessorService']
+      inject: ['RequestProcessorService','GprsManager']
     }
 );
 
