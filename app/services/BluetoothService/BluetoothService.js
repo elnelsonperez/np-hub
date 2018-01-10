@@ -14,10 +14,24 @@ const BluetoothService = function (
     }
 ) {
 
+  this.idCounter = 1;
+  this.parser = new Parser()
+
   this.initialize = () => {
-    this.shell = new PythonShell('main.py', {
-      args: [JSON.stringify(config)]
+    this.shell = new PythonShell("main.py", {
+      args: [JSON.stringify(config)],
+      scriptPath: __dirname
     });
+
+    this.shell.on('message',  (message) => {
+      if (debug === true)
+        console.log(message)
+      message = this.parser.parse(message)
+      if (message) {
+        this.emit(message.type, message)
+      }
+    });
+
   }
 
   this.reset = () => {
@@ -29,19 +43,6 @@ const BluetoothService = function (
   this.makeDiscoverable = () => {
     this.invoke('make_discoverable')
   }
-
-  this.idCounter = 1;
-
-  this.parser = new Parser()
-
-  this.shell.on('message',  (message) => {
-    if (debug === true)
-      console.log(message)
-    message = this.parser.parse(message)
-    if (message) {
-      this.emit(message.type, message)
-    }
-  });
 
   this.sendToDevice = ({mac_address, payload}) => {
     this.invoke('write_to_client',{mac_address, payload})

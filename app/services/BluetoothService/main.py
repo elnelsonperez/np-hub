@@ -3,6 +3,8 @@ import thread
 import json
 import sys
 import bluetoothctl
+import time
+
 
 class Type:
     RETURN = "RETURN"
@@ -10,7 +12,8 @@ class Type:
     LOG = "LOG"
     EVENT = "EVENT"
 
-class bluetoothManager:
+
+class BluetoothManager:
     connections = {}
     listenCounter = 0
     bluetoothctl = None
@@ -40,7 +43,7 @@ class bluetoothManager:
     def turn_off_auto_pair(self):
         self.bluetoothctl.auto_accept_on = False
 
-    def read_input (self):
+    def read_input(self):
         while True:
             data = raw_input()
             if len(data) == 0: break
@@ -84,9 +87,9 @@ class bluetoothManager:
                           profiles=[SERIAL_PORT_PROFILE]
                           )
         thread.start_new_thread(self.wait_for_connections, (server_sock,))
-        self.output(Type.EVENT, "SERVER_CREATED",  json.dumps({"channel": port}))
+        self.output(Type.EVENT, "SERVER_CREATED", json.dumps({"channel": port}))
 
-    def wait_for_connections (self, server_sock):
+    def wait_for_connections(self, server_sock):
         client_sock, client_info = server_sock.accept()
         mac_address = client_info[0]
         # Mac address validation
@@ -96,16 +99,16 @@ class bluetoothManager:
             client_sock.close()
             server_sock.close()
         else:
-            self.output(Type.EVENT,"NEW_CONNECTION", json.dumps({"mac_address": mac_address}))
+            self.output(Type.EVENT, "NEW_CONNECTION", json.dumps({"mac_address": mac_address}))
             self.connections[mac_address] = {"client_sock": client_sock, "server_sock": server_sock}
             thread.start_new_thread(self.read_from_client, (mac_address,))
-            #always keep a server up for new connections
+            # always keep a server up for new connections
         self.create_server()
 
     def get_connected_devices(self):
         return list(self.connections.keys())
 
-    def write_to_client (self, args):
+    def write_to_client(self, args):
         mac_address = args.get("mac_address")
         reach_device = args.get("reach_device")
         if mac_address:
@@ -123,35 +126,32 @@ class bluetoothManager:
                 self.output(Type.EVENT, "DISCONNECTED", json.dumps({"mac_address": mac_address}))
         self.output(Type.LOG, "write_to_client", "Invalid mac address")
 
-    def output (self, type, name, payload = None):
-        output = type+"|"+name
+    def output(self, type, name, payload=None):
+        output = type + "|" + name
         if payload is not None:
             output = output + "|" + payload
         print(output)
         sys.stdout.flush()
 
-    def read_from_client (self, mac_address):
+    def read_from_client(self, mac_address):
         client = self.connections.get(mac_address)
         try:
             while True:
                 data = client.get("client_sock").recv(1024)
                 if len(data) == 0: break
                 self.output(Type.EVENT, "RECEIVED", json.dumps({"mac_address": mac_address, "data": data}))
-                self.write_to_client( {"mac_address": mac_address, "payload": "Mensaje Recibido"})
+                self.write_to_client({"mac_address": mac_address, "payload": "Mensaje Recibido"})
                 time.sleep(0.08)
         except IOError as e:
             pass
 
         client.get("client_sock").close()
         client.get("server_sock").close()
-        self.output(Type.EVENT, "DISCONNECTED",json.dumps({"mac_address": mac_address}))
+        self.output(Type.EVENT, "DISCONNECTED", json.dumps({"mac_address": mac_address}))
+
 
 if __name__ == "__main__":
 
-    obj = bluetoothManager()
+    obj = BluetoothManager()
     while True:
         pass
-
-
-
-
