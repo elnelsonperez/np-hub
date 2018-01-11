@@ -1,4 +1,50 @@
 sudo apt-get update
+sudo apt-get dist-upgrade
+
+curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo apt-get install -y build-essential
+
+sudo apt-get install -y htop
+
+sudo apt-get install pi-bluetooth
+sudo hciconfig hci0 noscan
+
+sudo apt install -y samba
+sudo nano /etc/samba/smb.conf
+
+[pi]
+ comment=Samba share
+ path=/home/pi
+ browseable=Yes
+ writeable=Yes
+ only guest=No
+ create mask=0740
+ directory mask=0750
+ public=no
+
+sudo smbpasswd -a pi
+456
+
+sudo nano -w /etc/systemd/system/bluetooth.target.wants/bluetooth.service
+ExecStart=/usr/lib/bluetooth/bluetoothd -C
+ExecStartPost=/usr/bin/sdptool add SP
+
+sudo apt-get install -y git
+
+sudo apt-get install rfkill
+
+sudo apt-get install -y python-pip python-dev build-essential libbluetooth-dev
+sudo pip install --upgrade pip
+sudo pip install --upgrade virtualenv
+pip install pybluez
+pip install pexpect
+
+==========================================================================================================
+===========================================================================================================
+Bluetooth and shit
+
+sudo apt-get update
 
 sudo apt-get install -y libusb-dev libdbus-1-dev libglib2.0-dev libudev-dev libical-dev libreadline-dev
 

@@ -2,7 +2,7 @@ const Message = require("./pythonMessage")
 
 module.exports = function () {
   this.parse = (input) => {
-    if (!input.includes("|")) {
+    if (!input.includes("|") || input.startsWith("~ ")) {
       return null
     }
     const msg = input.split("|")

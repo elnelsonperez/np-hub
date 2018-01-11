@@ -1,23 +1,23 @@
-
 import time
 import pexpect
 import subprocess
 import thread
-import re
+
 
 class BluetoothctlError(Exception):
     """This exception is raised, when bluetoothctl fails to start."""
     pass
 
+
 class Bluetoothctl:
     """A wrapper for bluetoothctl utility."""
 
     def __init__(self):
-        subprocess.check_output("rfkill unblock bluetooth", shell = True)
-        self.child = pexpect.spawn("bluetoothctl", echo = False)
+        subprocess.check_output("rfkill unblock bluetooth", shell=True)
+        self.child = pexpect.spawn("bluetoothctl", echo=False)
         self.auto_accept_on = True
 
-    def get_output(self, command, pause = 0):
+    def get_output(self, command, pause=0):
         """Run a command in bluetoothctl prompt, return output as a list of lines."""
         self.child.send(command + "\n")
         time.sleep(pause)
@@ -40,23 +40,22 @@ class Bluetoothctl:
         try:
             self.get_output("agent on")
             self.get_output("default-agent")
-            thread.start_new_thread(self.auto_accept_pair,())
+            thread.start_new_thread(self.auto_accept_pair, ())
 
         except BluetoothctlError, e:
             print(e)
             return None
 
     def auto_accept_pair(self):
-        while True and self.auto_accept_on == True:
+        while True and self.auto_accept_on is True:
             try:
                 line = self.child.readline()
-                result = re.match("Request confirmation", line)
-                if result:
+                result = line.find("Request confirmation")
+                if result != -1:
                     self.get_output("yes")
-                time.sleep(0.5)
-            except Exception:
+                time.sleep(0.1)
+            except pexpect.TIMEOUT as e:
                 pass
-
 
     def make_discoverable(self):
         """Make device discoverable."""
@@ -183,7 +182,3 @@ class Bluetoothctl:
             res = self.child.expect(["Failed to disconnect", "Successful disconnected", pexpect.EOF])
             success = True if res == 1 else False
             return success
-
-
-
-

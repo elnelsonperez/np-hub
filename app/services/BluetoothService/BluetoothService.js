@@ -20,10 +20,11 @@ const BluetoothService = function (
   this.initialize = () => {
     this.shell = new PythonShell("main.py", {
       args: [JSON.stringify(config)],
-      scriptPath: __dirname
+      scriptPath: __dirname,
+      pythonOptions: ['-u'],
     });
 
-    this.shell.on('message',  (message) => {
+    this.shell.on('message', (message) => {
       if (debug === true)
         console.log(message)
       message = this.parser.parse(message)
@@ -52,21 +53,22 @@ const BluetoothService = function (
     return await this.invokeWithResponse({method: "get_connected_devices"})
   }
 
-  this.invokeWithResponse = ({method, params = null, timeout = 5000}) => {
+  this.invokeWithResponse = ({method, params = null, timeout = 6000}) => {
     return new Promise((res, rej) => {
       const corr_id = this.idCounter++;
       this.invoke(method,{...params, corr_id})
-      const timeout = this.setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         this.removeListener("RETURN", callback)
         rej("Timeout Exceeded")
       }, timeout)
       const callback = (message) => {
         if (
+            message.name === method &&
             message.has("corr_id") &&
             message.body.corr_id !== null &&
             message.body.corr_id === corr_id)
         {
-          clearInterval(timeout)
+          clearInterval(timeoutId)
           this.removeListener("RETURN", callback)
           if (message.has("return")) {
             res(message.body.return)
