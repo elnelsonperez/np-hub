@@ -44,6 +44,7 @@ class BluetoothManager:
         while True:
             # Check child signals
             if self.createNewServerSignal is True:
+                time.sleep(2)
                 thread.start_new_thread(self.create_server, ())
                 self.createNewServerSignal = False
             time.sleep(0.2)
@@ -128,8 +129,7 @@ class BluetoothManager:
         if self.config \
                 and self.config.get('allowedMacAddreses') \
                 and mac_address not in self.config.get('allowedMacAddreses'):
-            client_sock.close()
-            self.serverSock.close()
+            self.disconnect_client(mac_address)
         else:
             self.connections[mac_address] = client_sock
             self.output(Type.EVENT, "NEW_CONNECTION", json.dumps({"mac_address": mac_address}))
@@ -151,9 +151,16 @@ class BluetoothManager:
                 client.send(json.dumps(payload) + "\n")
                 return True
             except IOError as e:
-                client.close()
+                self.disconnect_client(mac_address)
                 self.output(Type.EVENT, "DISCONNECTED", json.dumps({"mac_address": mac_address}))
         self.output(Type.LOG, "write_to_client", "Invalid mac address")
+
+    def disconnect_client(self, mac_address):
+        print( list(self.connections.keys()))
+        client = self.connections.get(mac_address)
+        client.close()
+        del self.connections[mac_address]
+        print( list(self.connections.keys()))
 
     def output(self, type, name, payload=None):
         output = type + "|" + name
@@ -176,7 +183,7 @@ class BluetoothManager:
             print(e)
             pass
 
-        client.close()
+        self.disconnect_client(mac_address)
         self.output(Type.EVENT, "DISCONNECTED", json.dumps({"mac_address": mac_address}))
 
 
