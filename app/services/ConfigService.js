@@ -22,7 +22,6 @@ const ConfigService = function ({RequestSenderService, configEndpoint}) {
           priority: QueueService.PRIORITY_MOST,
           event_name: "CONFIG_REQUEST"
         })
-
         //TODO actually return the config object
         configuration = JSON.parse(response);
       }

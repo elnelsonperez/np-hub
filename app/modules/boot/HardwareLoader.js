@@ -32,7 +32,7 @@ appModule.initialize = async function () {
 
   if (fail === false) {
     this.data.msg = "Obteniendo config"
-    await this.getNpHubConfiguration()
+    thi.props.config = await this.getNpHubConfiguration()
     this.props.applicationEvent.emit('boot.ready')
   } else {
     //Shit does not work. Reboot?
@@ -45,7 +45,7 @@ appModule.getNpHubConfiguration  = async function () {
   this.ConfigService.on("error_message", (message) => {
     this.data.msg = message
   })
-  await this.ConfigService.getDeviceConfiguration()
+  return await this.ConfigService.getDeviceConfiguration()
 }
 
 appModule.initializeBluetooth = function () {
