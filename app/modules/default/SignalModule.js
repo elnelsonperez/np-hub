@@ -8,7 +8,7 @@ const appModule = new ApplicationModule (
         end : 19,
         line : 1,
         scrolling: false,
-        inject: ['GprsManager'],
+        inject: ['GprsService'],
         updateInterval : 15
     }
 );
@@ -17,7 +17,7 @@ const appModule = new ApplicationModule (
 appModule.controller = function () {
 
     if (this.shouldUpdate()) {
-        this.GprsManager.getSignalStrength().then(val => {
+        this.GprsService.getSignalStrength().then(val => {
             this.data.signalLevel = val;
         }).catch(e => this.data.signalLevel = 0)
     }

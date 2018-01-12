@@ -5,7 +5,7 @@ const gpio = require('rpi-gpio');
 /**
  * This object Handles Pi Input
  */
-const InputHandler = function ({delay = 200}) {
+const InputService = function ({delay = 200}) {
 
     let inputPins = []
 
@@ -96,11 +96,10 @@ const InputHandler = function ({delay = 200}) {
 
 }
 
-InputHandler.TYPE_PUSH_BUTTON = 0
-InputHandler.PIN_STATUS_PRESSED = 0;
-InputHandler.PIN_STATUS_IDDLE = 1;
+InputService.TYPE_PUSH_BUTTON = 0
+InputService.PIN_STATUS_PRESSED = 0;
+InputService.PIN_STATUS_IDDLE = 1;
 
+util.inherits(InputService, EventEmitter)
 
-util.inherits(InputHandler, EventEmitter)
-
-module.exports.InputHandler = InputHandler;
+module.exports.InputService = InputService;

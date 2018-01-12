@@ -22,7 +22,6 @@ class BluetoothManager:
     def __init__(self):
         self.createNewServerSignal = False
         self.bluetoothctl = bluetoothctl.Bluetoothctl()
-        self.bluetoothctl.set_default_agent()
         thread.start_new_thread(self.read_input, ())
         thread.start_new_thread(self.create_server, ())
         try:
@@ -49,7 +48,7 @@ class BluetoothManager:
                 self.createNewServerSignal = False
             time.sleep(0.2)
 
-    def make_discoverable(self):
+    def make_discoverable(self, args = None):
         self.log("Make discoverable called")
         self.bluetoothctl.make_discoverable()
 
@@ -101,7 +100,8 @@ class BluetoothManager:
 
         self.log("Invoking method " + method)
         retobj["return"] = getattr(self, method)(args)
-        self.output(Type.RETURN, method, json.dumps(retobj))
+        if "reach_device" not in args or args.get("reach_device") is False:
+            self.output(Type.RETURN, method, json.dumps(retobj))
 
     def get_connected_devices(self, args):
         return list(self.connections.keys())
@@ -131,21 +131,19 @@ class BluetoothManager:
                 and mac_address not in self.config.get('allowedMacAddreses'):
             self.disconnect_client(mac_address)
         else:
+            thread.start_new_thread(self.read_from_client, (mac_address,))
             self.connections[mac_address] = client_sock
             self.output(Type.EVENT, "NEW_CONNECTION", json.dumps({"mac_address": mac_address}))
-            thread.start_new_thread(self.read_from_client, (mac_address,))
             # always keep a server up for new connections
         self.log("Setting create new server signal")
         self.createNewServerSignal = True
 
     def write_to_client(self, args):
         mac_address = args.get("mac_address")
-        reach_device = args.get("reach_device")
         if mac_address:
-            payload = {}
-            if reach_device:
-                payload["corr_id"] = args.get("corr_id")
-            payload["payload"] = args.get("payload")
+            payload = {"corr_id": args.get("corr_id"),
+                       "payload": args.get("payload"),
+                       "type": args.get("type")}
             client = self.connections.get(mac_address)
             try:
                 client.send(json.dumps(payload) + "\n")
@@ -155,12 +153,19 @@ class BluetoothManager:
                 self.output(Type.EVENT, "DISCONNECTED", json.dumps({"mac_address": mac_address}))
         self.output(Type.LOG, "write_to_client", "Invalid mac address")
 
-    def disconnect_client(self, mac_address):
-        print( list(self.connections.keys()))
-        client = self.connections.get(mac_address)
-        client.close()
-        del self.connections[mac_address]
-        print( list(self.connections.keys()))
+    def disconnect_client(self, args_or_mac_address):
+        if isinstance(args_or_mac_address, dict):
+            mac_address = args_or_mac_address.get("mac_address")
+        elif isinstance(args_or_mac_address, basestring):
+            mac_address = args_or_mac_address
+        else:
+            return
+        try:
+            client = self.connections.get(mac_address)
+            client.close()
+            del self.connections[mac_address]
+        except Exception, e:
+            self.log("Exception disconneting client: " + e.message)
 
     def output(self, type, name, payload=None):
         output = type + "|" + name
@@ -176,7 +181,7 @@ class BluetoothManager:
                 if len(data) == 0:
                     break
                 self.log("Message received from %s" % mac_address)
-                self.output(Type.EVENT, "RECEIVED", json.dumps({"mac_address": mac_address, "data": data}))
+                self.output(Type.EVENT, "RECEIVED", json.dumps({"mac_address": mac_address, "data": json.loads(data)}))
                 self.write_to_client({"mac_address": mac_address, "payload": "Mensaje Recibido"})
                 time.sleep(0.1)
         except IOError as e:

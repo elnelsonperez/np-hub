@@ -3,10 +3,10 @@ const getSerial = require('./../lib/systeminfo').getSerial
 const fs = require('fs');
 const Lcdlib = require('../lib/LcdController');
 const SequentialSerialManager = require('../lib/SequentialSerialManager').SequentialSerialManager;
-const GprsManager =  require('../lib/GprsManager').GprsManager;
+const GprsService =  require('./services/GprsService').GprsService;
 const EventEmitter = require('events').EventEmitter
-const IbuttonReader = require('../lib/IbuttonReader').IbuttonReader
-const InputHandler = require('./../lib/InputHandler').InputHandler
+const IbuttonService = require('./services/IbuttonService').IbuttonService
+const InputService = require('./services/InputService').InputService
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
 const BluetoothService = require("./services/BluetoothService/BluetoothService")
@@ -29,42 +29,39 @@ Application = function () {
         lcd: false
     }
 
+    //NpHub Configuation Defaults
+    this.config = {
+      distanceBetweenLocations: 10, //meters
+      timeoutSendLocation: 5 //Minutes
+    }
+
     this.props = { //These are available to all modules and tasks
         applicationEvent: null,
-        config: {
-            distanceBetweenLocations: 10, //meters
-            timeoutSendLocation: 5 //Minutes
-        },
+        config: null,
         input: null,
-        serial : null, //Pi serial number
-        auth: {
-            users: [],
-            config: {
-                requireAll: false
-            }
-        },
+        serialNumber: null //Pi serial number
     }
 
     this.initialize = (defaultModule = 'boot') => {
         this.currentModuleDomain = defaultModule;
         const lcdEnabled = this.disabledFunctionality.lcd === false
-        const inputHandler = new InputHandler(INPUT_DELAY);
+        const InputService = new InputService(INPUT_DELAY);
         inputHandler.registerInputPins(
             {
                 pins: [
                     {
-                        type: InputHandler.TYPE_PUSH_BUTTON,
+                        type: InputService.TYPE_PUSH_BUTTON,
                         number: 33,
                         name: 'showAuth'
                     }
                 ]
             }
         )
-        inputHandler.initializeRegisteredPins();
-        this.props.input = inputHandler
+      InputService.initializeRegisteredPins();
+        this.props.input = InputService
 
         this.props.applicationEvent = new EventEmitter()
-        this.props.serial = getSerial();
+        this.props.serialNumber = getSerial();
         this.setDefaultApplicationProperties();
 
         this.lcd = new Lcdlib.LcdController(1, 0x3f, 20, 4);
@@ -72,13 +69,13 @@ Application = function () {
 
         const Seq = new SequentialSerialManager(true);
         this.injectable.SequentialSerialManager = Seq;
-        this.injectable.GprsManager = new GprsManager(Seq);
-        this.injectable.IbuttonReader = new IbuttonReader({});
+        this.injectable.GprsService = new GprsService(Seq);
+        this.injectable.IbuttonService = new IbuttonService({});
         this.injectable.BluetoothService = new BluetoothService()
         this.injectable.RequestQueueService = new RequestQueueService()
         this.injectable.RequestProcessorService = new RequestProcessorService(
             this.injectable.RequestQueueService,
-            this.injectable.GprsManager
+            this.injectable.GprsService
         )
         if (lcdEnabled)
             this.printBootingMessage();

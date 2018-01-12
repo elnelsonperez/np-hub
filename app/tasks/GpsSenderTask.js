@@ -4,7 +4,8 @@ const GpsSenderTask = new Task (
     {
       name: 'GpsSenderTask',
       every: 5000, //5 Segundos
-      inject: ['RequestQueueService', 'RequestProcessorService']
+      inject: ['RequestQueueService', 'RequestProcessorService'],
+      autoload: false
     }
 );
 
@@ -13,8 +14,8 @@ GpsSenderTask.run = function () {
     this.ready = false
     const eventName = "locationSent"
     this.siblingTasks.GpsTask.getNextLocations(5).then((locs) => {
-      this.RequestQueueService.insertRequest({
-        url: 'http://nppms.us/api/locations/new/'+this.props.serial,
+      this.RequestQueueService.addRequest({
+        url: 'http://nppms.us/api/locations/new/'+this.props.serialNumber,
         method: RequestQueueService.METHOD_POST,
         payload: JSON.stringify({
           locations: locs
@@ -25,6 +26,6 @@ GpsSenderTask.run = function () {
       this.ready = true;
     })
   }
-
 }
+
 module.exports = GpsSenderTask;

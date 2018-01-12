@@ -1,7 +1,7 @@
 const util = require('util')
 const events = require('events')
 const gpio = require('rpi-gpio');
-const delay = require('../lib/functions').delay
+const delay = require('../../lib/functions').delay
 const GPRS_TURN_ON_PIN = 37;
 
 function ErrorCounter (maximun) {
@@ -38,7 +38,7 @@ function IsJsonString(str) {
 
 events.EventEmitter.call(this);
 
-GprsManager = function (SequentialSerialManager) {
+GprsService = function (SequentialSerialManager) {
 
     this.initialized = false;
     this.turnOn = async function () {
@@ -414,5 +414,5 @@ GprsManager = function (SequentialSerialManager) {
 
 };
 
-util.inherits(GprsManager,events.EventEmitter)
-module.exports.GprsManager = GprsManager;
+util.inherits(GprsService,events.EventEmitter)
+module.exports.GprsService = GprsService;

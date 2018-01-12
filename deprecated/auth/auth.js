@@ -7,7 +7,7 @@ const appModule = new ApplicationModule (
         end : 19,
         line : 1,
         scrolling: false,
-        inject: ['IbuttonReader', 'GprsManager'],
+        inject: ['IbuttonReader', 'GprsService'],
         data: {
             authenticated: null
         }
@@ -23,7 +23,7 @@ appModule.initialize = function () {
   if (!this.props.users) {
           this.data.msg = 'Obteniendo usuarios'
 
-          this.GprsManager.httpGet(
+          this.GprsService.httpGet(
               'http://nppms.us/api/getAsignedUsers/'+this.props.serial,null,30000).then( (res) => {
               if (res.code === '200') {
                   this.props.auth.users = res.content;

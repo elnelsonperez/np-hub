@@ -7,7 +7,7 @@ const appModule = new ApplicationModule (
       end : 19,
       line : 3,
       scrolling: false,
-      inject: ['GprsManager', 'BluetoothService']
+      inject: ['GprsService', 'BluetoothService','ConfigService']
     }
 );
 
@@ -31,13 +31,21 @@ appModule.initialize = async function () {
   }
 
   if (fail === false) {
-    this.data.msg = "Modulos Listos"
+    this.data.msg = "Obteniendo config"
+    await this.getNpHubConfiguration()
     this.props.applicationEvent.emit('boot.ready')
   } else {
     //Shit does not work. Reboot?
     require('child_process').exec('sudo /sbin/shutdown -r now', function (msg) { console.log(msg)});
   }
+}
 
+
+appModule.getNpHubConfiguration  = async function () {
+  this.ConfigService.on("error_message", (message) => {
+    this.data.msg = message
+  })
+  await this.ConfigService.getDeviceConfiguration()
 }
 
 appModule.initializeBluetooth = function () {
@@ -52,16 +60,14 @@ appModule.initializeBluetooth = function () {
 }
 
 appModule.initializeGprs = async function () {
-  this.GprsManager.on('message', (msg) => {
+  this.GprsService.on('message', (msg) => {
     this.data.msg = msg;
-
   })
   let done = false;
   let counter = 0;
   while (done === false && counter < 3) {
-
     try {
-      done = await this.GprsManager.initialize();
+      done = await this.GprsService.initialize();
       if (done === false)
         this.data.msg = "Fail. Reintentando"
       await delay(1800);

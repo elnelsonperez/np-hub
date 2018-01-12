@@ -3,14 +3,15 @@ const Database = require("./../core/Database")
 const RequestQueueService = function () {
   this.table = "requests_queue"
   const db = Database.conn
-  this.insertRequest = (
-      {url, method, payload, priority = RequestQueueService.PRIORITY_LOW, event_name = null}
+  this.addRequest = (
+      {url, method, payload, priority = RequestQueueService.PRIORITY_LOW, event_name = null,auto_discard =false}
   ) => {
+
     return new Promise((res,rej) => {
       try {
         const stmt = db.prepare(
-            `INSERT INTO ${this.table}(url,method,payload,priority,event_name) 
-            VALUES (?,?,?,?,?)`, [url,method,payload,priority,event_name])
+            `INSERT INTO ${this.table}(url,method,payload,priority,event_name,auto_discard) 
+            VALUES (?,?,?,?,?,?)`, [url,method,payload,priority,event_name, auto_discard === true ? 1 : 0])
         stmt.run(function () {
           res(this.lastID)
         })
@@ -145,6 +146,8 @@ RequestQueueService.METHOD_GET = "GET"
 RequestQueueService.STATUS_PENDING = 0
 RequestQueueService.STATUS_DONE = 1
 RequestQueueService.STATUS_FAILED = 2
+RequestQueueService.STATUS_NEVER = 3
+
 
 module.exports = RequestQueueService;
 
@@ -157,5 +160,6 @@ CREATE TABLE requests_queue (
     priority integer default 0,
     event_name text,
     status integer default 0,
+    auto_discard integer default 0
     date datetime default CURRENT_TIMESTAMP
 )*/

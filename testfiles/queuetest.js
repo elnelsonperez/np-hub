@@ -1,12 +1,12 @@
 const RequestQueueService = require ("./../app/services/RequestQueueService")
 const RequestProcessorService = require ("./../app/services/RequestProcessorService")
 const SequentialSerialManager = require ( "./../lib/SequentialSerialManager")
-const GprsObj = require("./../lib/GprsManager").GprsManager
+const GprsObj = require("../app/services/GprsService").GprsService
 const SerialManager =  new SequentialSerialManager.SequentialSerialManager(true);
 const Service = new RequestQueueService()
 const GprsManager = new GprsObj(SerialManager)
 
-// Service.insertRequest({
+// Service.addRequest({
 //   url: "http://test.com",
 //   method: "GET",
 //   payload: JSON.stringify({data: "Hello"}),

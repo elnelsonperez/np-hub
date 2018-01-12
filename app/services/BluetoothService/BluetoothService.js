@@ -2,7 +2,7 @@ const util = require('util')
 const EventEmitter = require('events').EventEmitter
 const PythonShell = require('python-shell');
 const Parser = require ("./messageParser")
-
+const BtMessage = require("./BtMessage")
 const BluetoothService = function (
     {
       debug = false,
@@ -33,24 +33,34 @@ const BluetoothService = function (
       }
     });
 
-  }
+    this.shell.on("error", (e) => {
+      if (e.message === "KeyboardInterrupt") {
+        console.log("Program Reset")
+      } else {
+        console.log(e.message)
+      }
+    })
 
-  this.reset = () => {
-    this.shell.childProcess.kill('SIGINT');
-    this.idCounter = 1;
-    this.initialize()
   }
 
   this.makeDiscoverable = () => {
     this.invoke('make_discoverable')
   }
 
-  this.sendToDevice = ({mac_address, payload}) => {
-    this.invoke('write_to_client',{mac_address, payload})
+  this.disconnectDevice = ({mac_address}) => {
+    this.invoke("disconnect_client", {mac_address})
   }
 
   this.getConnectedDevices = async () => {
     return await this.invokeWithResponse({method: "get_connected_devices"})
+  }
+
+  this.invoke = (method, args = null) => {
+    let msg = "invoke|"+method
+    if (args && isObject(args)) {
+      msg += "|" + JSON.stringify(args)
+    }
+    this.shell.send(msg)
   }
 
   this.invokeWithResponse = ({method, params = null, timeout = 6000}) => {
@@ -81,29 +91,35 @@ const BluetoothService = function (
     })
   }
 
-  this.sendWithResponse = ({mac_address, payload, timeout = 5000}) => {
-    return new Promise((res, rej) => {
-      const corr_id = this.idCounter++
-      this.invoke('write_to_client',{mac_address, payload, corr_id, reach_device: true})
+  /**
+   *
+   * @param {String} mac_address
+   * @param {BtMessage} message
+   */
+  this.sendToDevice = ({mac_address, message}) => {
+    this.invoke('write_to_client',
+        {mac_address, payload: message.payload, type: message.type, corr_id: message.corr_id})
+  }
 
-      const timeout = this.setTimeout(() => {
+  this.sendWithResponse = ({mac_address, message, timeout = 5000}) => {
+    return new Promise((res, rej) => {
+      this.sendToDevice({mac_address, message})
+      const timeoutId = setTimeout(() => {
         this.removeListener("EVENT", callback)
         rej("Timeout Exceeded")
       }, timeout)
 
-      const callback = (message) => {
-        if (message.name === "RECEIVED" &&
-            message.has("mac_address") &&
-            message.has("corr_id") &&
-            message.body.corr_id !== null &&
-            message.body.mac_address !== null &&
-            message.body.mac_address === mac_address &&
-            message.body.corr_id === corr_id)
+      const callback = (msg) => {
+        if (msg.name === "RECEIVED" &&
+            msg.body.mac_address &&
+            msg.body.mac_address === mac_address &&
+            msg.body.data.corr_id &&
+            msg.body.data.corr_id === message.corr_id)
         {
-          clearInterval(timeout)
+          clearInterval(timeoutId)
           this.removeListener("EVENT", callback)
-          if ( message.body.payload) {
-            res(message.body.payload)
+          if (msg.body.data) {
+            res(msg.body.data)
           } else {
             res()
           }
@@ -113,13 +129,7 @@ const BluetoothService = function (
     })
   }
 
-  this.invoke = (method, args = null) => {
-    let msg = "invoke|"+method
-    if (args && isObject(args)) {
-      msg += "|" + JSON.stringify(args)
-    }
-    this.shell.send(msg)
-  }
+
 }
 
 function isObject(obj) {

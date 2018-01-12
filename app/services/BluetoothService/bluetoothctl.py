@@ -16,12 +16,16 @@ class Bluetoothctl:
         subprocess.check_output("rfkill unblock bluetooth", shell=True)
         self.child = pexpect.spawn("bluetoothctl", echo=False)
         self.auto_accept_on = True
+        thread.start_new_thread(self.auto_accept_pair, ())
+        print("bluetoothctl started")
 
     def get_output(self, command, pause=0):
         """Run a command in bluetoothctl prompt, return output as a list of lines."""
         self.child.send(command + "\n")
         time.sleep(pause)
-        start_failed = self.child.expect(["bluetooth", pexpect.EOF])
+        start_failed = self.child.expect(["bluetooth",
+                                          "Agent is already registered",
+                                          "Default agent request successful", pexpect.EOF])
 
         if start_failed:
             raise BluetoothctlError("Bluetoothctl failed after running " + command)
@@ -32,16 +36,6 @@ class Bluetoothctl:
         """Start bluetooth scanning process."""
         try:
             out = self.get_output("scan on")
-        except BluetoothctlError, e:
-            print(e)
-            return None
-
-    def set_default_agent(self):
-        try:
-            self.get_output("agent on")
-            self.get_output("default-agent")
-            thread.start_new_thread(self.auto_accept_pair, ())
-
         except BluetoothctlError, e:
             print(e)
             return None
@@ -61,8 +55,7 @@ class Bluetoothctl:
         """Make device discoverable."""
         try:
             out = self.get_output("discoverable on")
-        except BluetoothctlError, e:
-            print(e)
+        except pexpect.TIMEOUT,e:
             return None
 
     def parse_device_info(self, info_string):
