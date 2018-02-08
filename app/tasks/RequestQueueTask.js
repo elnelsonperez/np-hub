@@ -3,7 +3,7 @@ const Task  = require('../core/Task').Task
 const RequestQueueTask = new Task (
     {
       name: 'RequestQueueTask',
-      every: 1000, //5 Segundos
+      every: 1000,
       inject: ['RequestProcessorService','GprsService'],
       autoload: true
     }

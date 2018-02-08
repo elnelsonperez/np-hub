@@ -54,6 +54,23 @@ const RequestQueueService = function () {
     })
   }
 
+  this.getRetryCount = (id) => {
+    return new Promise((res, rej) => {
+      try {
+        db.get(`
+        SELECT retry_count FROM ${this.table} 
+        WHERE id = ${id}`, (err, row) => {
+          if (err)
+            rej(err)
+          res(row.retry_count)
+        })
+      }
+      catch (e) {
+        rej(e)
+      }
+    })
+  }
+
   //The one with the most priority
   this.getNextRequest = (status = RequestQueueService.STATUS_PENDING) => {
     return new Promise((res, rej) => {
@@ -121,6 +138,20 @@ const RequestQueueService = function () {
     })
   }
 
+  this.incrementRetryCounter = (id) => {
+    return new Promise((res,rej) => {
+      try {
+        db.run(
+            `UPDATE ${this.table} set retry_counter = retry_counter+1 WHERE id = ${id}`, function () {
+              res(this.lastID)
+            })
+      }
+      catch (e) {
+        rej(e)
+      }
+    })
+  }
+
   this.getAllRequests = () => {
     return new Promise((res, rej) => {
       try {
@@ -160,6 +191,7 @@ CREATE TABLE requests_queue (
     priority integer default 0,
     event_name text,
     status integer default 0,
-    auto_discard integer default 0
+    auto_discard integer default 0,
+    retry_counter integer default 0,
     date datetime default CURRENT_TIMESTAMP
 )*/
