@@ -31,7 +31,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
         }
 
         if (result.code.startsWith("6")) {
-          throw new Error("HTTPCODE6xx: Request not possible")
+          throw new Error("HTTPCODE6xx")
         } else {
           QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
           if (request.event_name) {
@@ -76,7 +76,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
         }
 
         if (result.code.startsWith("6")) {
-          throw new Error("HTTPCODE6xx: Request not possible")
+          throw new Error("HTTPCODE6xx")
         } else {
           QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
           if (request.event_name) {
