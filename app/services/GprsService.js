@@ -63,6 +63,16 @@ GprsService = function (SequentialSerialManager) {
 
   this.initialize = async () => {
 
+    SequentialSerialManager.on('specialMessage', msg => {
+      if (msg.includes( "+SAPBR 1: DEACT")) {
+        SequentialSerialManager.send({cmd: 'AT+HTTPTERM', alwaysresolve: true});
+      }
+      else if (msg.includes("PDP: DEACT")) {
+        SequentialSerialManager.send({cmd: 'AT+CIPSHUT', alwaysresolve: true});
+        this.obtainIpAdress()
+      }
+    })
+
     await this.mandatoryCommand(
         SequentialSerialManager.send,
         {cmd: 'AT'},
@@ -202,7 +212,6 @@ GprsService = function (SequentialSerialManager) {
   this.httpGet = async (url, params, time = 20000) => {
     ip = await this.checkIp();
     if (ip) {
-
       try {
         if (params) {
           url = url + "?params="+encodeURIComponent(JSON.stringify(params));
@@ -212,31 +221,24 @@ GprsService = function (SequentialSerialManager) {
           await SequentialSerialManager.send({cmd: 'AT+HTTPINIT'});
         }  catch (e) {
           //This should be managed by a mandatory command
-          if (e.res.includes('+CME ERROR: operation not allowed')){
-            await this.powerCycle();
+          if (e.res.includes('ERROR')){
+            await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', alwaysresolve: true});
+            await SequentialSerialManager.send({cmd: 'AT+HTTPINIT', alwaysresolve: true});
           }
         }
 
-        try {
-          await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="CID",1'});
-        }  catch (e) {
-          console.log(e)
-        }
+        await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="CID",1', alwaysresolve: true});
 
-        await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="URL","'+url+'"'});
+        await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="URL","'+url+'"', alwaysresolve: true});
+
         responsecode =  await SequentialSerialManager.send({cmd: 'AT+HTTPACTION=0', afterdelimiter: 1, timeout: time});
         myRegexp = /,(\d.*),/g;
         match = myRegexp.exec(responsecode.res[1]);
         responsecode  = match[1];
 
         if (responsecode.startsWith('6')){
-          try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
-          return {code: responsecode, content: 'ERROR'}
-        }
-
-        if (responsecode === '404'){
-          try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
-          return {code: responsecode, content: '404 NOT FOUND'}
+          await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
+          return {code: responsecode, content: 'Network Error: Impossible'}
         }
 
         result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD'});
@@ -250,58 +252,61 @@ GprsService = function (SequentialSerialManager) {
         } else {
           content = result.res;
         }
-
-        try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
-
+        await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
         return {code: responsecode, content: content}
+
       } catch (e) {
         try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
         return {code: 600, content: e}
       }
 
-
     } else {
-      try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
-
-      return {code: 601, content: 'No hay IP'}
+      return {code: 699, content: 'Sin Conexion'}
     }
 
   }
 
-  this.httpPost = async (url, params) => {
+  this.httpPost = async (url, params,time = 20000) => {
     ip = await this.checkIp();
     if (ip) {
       try {
         try {
           await SequentialSerialManager.send({cmd: 'AT+HTTPINIT'});
         }  catch (e) {
-          console.log(e)
+          //This should be managed by a mandatory command
+          if (e.res.includes('ERROR')){
+            await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', alwaysresolve: true});
+            await SequentialSerialManager.send({cmd: 'AT+HTTPINIT', alwaysresolve: true});
+          }
         }
 
-        try {
-          await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="CID",1'});
-        }  catch (e) {}
+        await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="CID",1', alwaysresolve: true});
 
-        await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="URL","'+url+'"'});
+        await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="URL","'+url+'"', alwaysresolve: true});
 
         if (params) {
           params = JSON.stringify(params);
-          console.log(params);
           await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="CONTENT","application/json"'})
-
-          await SequentialSerialManager.send({cmd: 'AT+HTTPDATA='+params.length+','+'5000', delimiter: 'DOWNLOAD',
-            expect: 'DOWNLOAD', timeout: 10000})
-          res =  await SequentialSerialManager.send({cmd: params })
+          await SequentialSerialManager.send(
+              {
+                cmd: 'AT+HTTPDATA='+params.length+','+'5000',
+                delimiter: 'DOWNLOAD',
+                expect: "DOWNLOAD",
+                timeout: 10000
+              }
+          )
+          console.log("POST PARAMS: "+params)
+          await SequentialSerialManager.send({cmd: params})
         }
 
-        responsecode =  await SequentialSerialManager.send({cmd: 'AT+HTTPACTION=1', afterdelimiter: 1, timeout: 20000});
+        responsecode =  await SequentialSerialManager.send({cmd: 'AT+HTTPACTION=1', afterdelimiter: 1, timeout: time});
         myRegexp = /,(\d.*),/g;
         match = myRegexp.exec(responsecode.res[1]);
         responsecode  = match[1];
 
         if (responsecode.startsWith('6')){
-          try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
-          return {code: responsecode, content: 'ERROR'}
+          await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
+          return {code: responsecode, content: 'Network Error: Impossible'}
         }
 
         result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD'});
@@ -315,22 +320,17 @@ GprsService = function (SequentialSerialManager) {
         } else {
           content = result.res;
         }
-
-        try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
-
+        await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
         return {code: responsecode, content: content}
+
       } catch (e) {
         try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
         return {code: 600, content: e}
       }
 
-
     } else {
-      try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
-
-      return {code: 601, content: 'No hay IP'}
+      return {code: 699, content: 'Sin Conexion'}
     }
-
   }
 
   this.hasInternet = async () => {
