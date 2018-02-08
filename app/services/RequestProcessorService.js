@@ -98,7 +98,6 @@ const RequestProcessorService =  function (QueueService, GprsService) {
     } else {
       throw new Error(RequestProcessorService.GPRS_NOT_INITIALIZED)
     }
-
   }
 }
 
