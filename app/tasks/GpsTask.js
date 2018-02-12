@@ -70,7 +70,7 @@ GpsTask.pushOrRejectLocation = function(location) {
   if (selectedLocations.length > 0) {
     const prevloc = selectedLocations[selectedLocations.length - 1]
     const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
-      console.log("[NEW LOC] \n-> Distancia a anterior: "+ distance+"\n")
+      // console.log("[NEW LOC] D.A.: "+ distance+"\n")
     if (distance > this.props.config.distanceBetweenLocations) {
       this.pushALocation(location)
     } else {

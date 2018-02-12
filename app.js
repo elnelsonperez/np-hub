@@ -10,14 +10,13 @@ process.on('unhandledRejection', (reason, p) => {
 
 app.props.applicationEvent.on('boot.ready', function () {
     setTimeout(() => {
-        app.switchModuleDomain('default')
+        // app.switchModuleDomain('default')
+      console.log(" ==== BOOT READY ====\n")
     }, 1500)
 })
 
 process.on('SIGINT', function() {
     console.log('======================\nReceived shut down signal\n========================\n')
-    app.injectable.GprsService.turnOff().then(() => {
-            process.exit();
-    })
+    process.exit();
 });
 

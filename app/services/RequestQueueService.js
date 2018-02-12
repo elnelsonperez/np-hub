@@ -4,16 +4,16 @@ const RequestQueueService = function () {
   this.table = "requests_queue"
   const db = Database.conn
   this.addRequest = (
-      {url, method, payload, priority = RequestQueueService.PRIORITY_LOW, event_name = null,auto_discard =false}
+      {url, method, payload = {}, priority = RequestQueueService.PRIORITY_LOW, event_name = null,auto_discard =false}
   ) => {
-
     return new Promise((res,rej) => {
       try {
         const stmt = db.prepare(
             `INSERT INTO ${this.table}(url,method,payload,priority,event_name,auto_discard) 
-            VALUES (?,?,?,?,?,?)`, [url,method,JSON.parse(payload),priority,event_name, auto_discard === true ? 1 : 0])
+            VALUES (?,?,?,?,?,?)`, [url,method,JSON.stringify(payload),priority,event_name, auto_discard === true ? 1 : 0])
         stmt.run(function () {
           res(this.lastID)
+          console.log("New Request added to queue")
         })
       }
       catch (e) {

@@ -104,7 +104,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
   }
 }
 
-RequestProcessorService.GPRS_NOT_INITIALIZED = 100;
+RequestProcessorService.GPRS_NOT_INITIALIZED = "El modulo GPRS no esta activo";
 
 util.inherits(RequestProcessorService, EventEmitter)
 module.exports = RequestProcessorService;

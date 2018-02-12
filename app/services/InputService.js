@@ -25,7 +25,7 @@ const InputService = function ({delay = 200}) {
                     if (!pin.hasOwnProperty('name')) {
                         pin.name = pin.number;
                     }
-                    pin.status = InputHandler.PIN_STATUS_IDDLE;
+                    pin.status = InputService.PIN_STATUS_IDDLE;
                     inputPins.push(pin)
                 }
             }
@@ -46,14 +46,14 @@ const InputService = function ({delay = 200}) {
     }
 
     this.handlePinStatus = function (pin, status) {
-        if (pin.type === InputHandler.TYPE_PUSH_BUTTON) {
-            if (status === true && pin.status !== InputHandler.PIN_STATUS_PRESSED) {
-                pin.status = InputHandler.PIN_STATUS_PRESSED;
+        if (pin.type === InputService.TYPE_PUSH_BUTTON) {
+            if (status === true && pin.status !== InputService.PIN_STATUS_PRESSED) {
+                pin.status = InputService.PIN_STATUS_PRESSED;
                 this.emit('INPUT:'+pin.name+':PRESSED')
             } else {
                 if (status === false) {
-                    if (pin.status !== InputHandler.PIN_STATUS_IDDLE) {
-                        pin.status = InputHandler.PIN_STATUS_IDDLE;
+                    if (pin.status !== InputService.PIN_STATUS_IDDLE) {
+                        pin.status = InputService.PIN_STATUS_IDDLE;
                         this.emit('INPUT:'+pin.name+':UNPRESSED')
                     }
                 }

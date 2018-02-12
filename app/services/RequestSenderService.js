@@ -1,15 +1,14 @@
 const QueueService = require("./RequestQueueService")
 
 /**
- *
  * @param {RequestQueueService} RequestQueueService
  * @param {RequestProcessorService} RequestProcessorService
  * @constructor
  */
-const RequestSenderService = function ({RequestQueueService, RequestProcessorService}) {
+const RequestSenderService = function (RequestQueueService, RequestProcessorService) {
 
   this.requestWithResponse = (
-      {url, method, payload, priority = QueueService.PRIORITY_LOW, event_name = null, timeout= 10000}) => {
+      {url, method, payload, priority = QueueService.PRIORITY_LOW, event_name = null, timeout= 15000}) => {
     return new Promise((res,rej) => {
       RequestQueueService.addRequest({
         url: url,

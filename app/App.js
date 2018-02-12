@@ -6,6 +6,8 @@ const SequentialSerialManager = require('../lib/SequentialSerialManager').Sequen
 const GprsService =  require('./services/GprsService').GprsService;
 const EventEmitter = require('events').EventEmitter
 const IbuttonService = require('./services/IbuttonService').IbuttonService
+const ConfigService = require('./services/ConfigService')
+const RequestSenderService = require('./services/RequestSenderService')
 const InputService = require('./services/InputService').InputService
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
@@ -29,7 +31,6 @@ Application = function () {
     lcd: false
   }
 
-
   this.props = { //These are available to all modules and tasks
     applicationEvent: null,
     config:  {
@@ -43,8 +44,8 @@ Application = function () {
   this.initialize = (defaultModule = 'boot') => {
     this.currentModuleDomain = defaultModule;
     const lcdEnabled = this.disabledFunctionality.lcd === false
-    const InputService = new InputService(INPUT_DELAY);
-    inputHandler.registerInputPins(
+    const inputService = new InputService(INPUT_DELAY);
+    inputService.registerInputPins(
         {
           pins: [
             {
@@ -55,8 +56,8 @@ Application = function () {
           ]
         }
     )
-    InputService.initializeRegisteredPins();
-    this.props.input = InputService
+    inputService.initializeRegisteredPins();
+    this.props.input = inputService
 
     this.props.applicationEvent = new EventEmitter()
     this.props.serialNumber = getSerial();
@@ -69,12 +70,22 @@ Application = function () {
     this.injectable.SequentialSerialManager = Seq;
     this.injectable.GprsService = new GprsService(Seq);
     this.injectable.IbuttonService = new IbuttonService({});
-    this.injectable.BluetoothService = new BluetoothService()
+    this.injectable.BluetoothService = new BluetoothService({})
     this.injectable.RequestQueueService = new RequestQueueService()
     this.injectable.RequestProcessorService = new RequestProcessorService (
         this.injectable.RequestQueueService,
         this.injectable.GprsService
     )
+    this.injectable.RequestSenderService = new RequestSenderService(
+        this.injectable.RequestQueueService,
+        this.injectable.RequestProcessorService,
+    )
+
+    this.injectable.ConfigService = new ConfigService(
+        this.injectable.RequestSenderService,
+        "http://nppms.us/api/hub_config"
+    )
+
     if (lcdEnabled)
       this.printBootingMessage();
 
@@ -83,24 +94,20 @@ Application = function () {
 
     if (lcdEnabled) {
       this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
-            //Stats to run tasks
+            //Print to screen.
+            this.lcdPrintLoop()
             this.runTasks();
             //Input
             this.props.input.monitorRegisteredPins()
-
-            if (lcdEnabled) {
-              this.lcdPrintLoop()
-            }
           }
-      )
+      );
     }
     else {
-      //Stats to run tasks
       this.runTasks();
       //Input
       this.props.input.monitorRegisteredPins()
-
     }
+
 
   }
 

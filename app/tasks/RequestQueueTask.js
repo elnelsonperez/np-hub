@@ -3,33 +3,53 @@ const Task  = require('../core/Task').Task
 const RequestQueueTask = new Task (
     {
       name: 'RequestQueueTask',
-      every: 1000,
       inject: ['RequestProcessorService','GprsService'],
-      autoload: true
+      autoload: false,
+      ready: false,
+      every: 1500
     }
 );
 
-RequestQueueTask.doPending = function () {
-  this.RequestProcessorService.processNextPendingRequest().then((a) => {
-    if (a && a.pendingRequests === false) {
-      this.doFailed()
+RequestQueueTask.doPending = async function () {
+  try {
+    const resp = await this.RequestProcessorService.processNextPendingRequest()
+    if (resp && resp.pendingRequests === false) {
+      await this.doFailed()
     } else {
       this.ready = true;
     }
-  })
+  }
+  catch (e) {
+    console.log(e.message)
+    this.ready = true;
+  }
+
 }
 
-RequestQueueTask.doFailed = function () {
-  this.RequestProcessorService.processNextFailedRequest().then((a) => {
-    if (a && a.pendingRequests === true) {
-      this.doPending()
+RequestQueueTask.doFailed = async function () {
+  try {
+    const resp = await this.RequestProcessorService.processNextFailedRequest()
+    if (resp && resp.pendingRequests === true) {
+      await this.doPending()
     } else {
       this.ready = true;
     }
+  }
+  catch (e) {
+    console.log(e.message)
+    this.ready = true;
+  }
+
+}
+
+RequestQueueTask.initialize = function () {
+  this.props.applicationEvent.on("boot.ready", () => {
+    this.ready = true;
   })
 }
 
 RequestQueueTask.run = function () {
+  console.log("=== Request Queue Task Ran ===")
   if (this.ready === true) {
     this.ready = false
     this.doPending()
