@@ -15,11 +15,11 @@ GpsSenderTask.run = function () {
     const eventName = "locationSent"
     this.siblingTasks.GpsTask.getNextLocations(5).then((locs) => {
       this.RequestQueueService.addRequest({
-        url: 'http://nppms.us/api/locations/new/'+this.props.serialNumber,
+        url: 'http://nppms.us/api/hub_localizaciones',
         method: RequestQueueService.METHOD_POST,
-        payload: JSON.stringify({
+        payload: {
           locations: locs
-        }),
+        },
         priority: RequestQueueService.PRIORITY_MEDIUM,
         event_name: eventName
       })

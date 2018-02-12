@@ -6,35 +6,17 @@ const SerialManager =  new SequentialSerialManager.SequentialSerialManager(true)
 const Service = new RequestQueueService()
 const GprsManager = new GprsObj(SerialManager)
 
-// Service.addRequest({
-//   url: "http://httpbin.org/post",
-//   method: "POST",
-//   payload: JSON.stringify({data: "Hello"}),
-//   priority: RequestQueueService.PRIORITY_MEDIUM,
-//   event_name: "hello"
-// })
 Service.addRequest({
   url: "http://httpbin.org/post",
   method: "POST",
-  payload: JSON.stringify({
+  payload: {
     "userId": 1,
     "id": 1,
     "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
     "body": "quia et suscipit suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto"
-  }),
+  },
   priority: RequestQueueService.PRIORITY_MEDIUM,
   event_name: "hello"
-})
-Service.addRequest({
-  url: "http://httpbin.org/post",
-  method: "POST",
-  payload: JSON.stringify({data: "Hello"}),
-  priority: RequestQueueService.PRIORITY_MEDIUM,
-  event_name: "hello"
-})
-Service.getAllRequests().then(s => {
-    console.log("PendingRequests")
-    console.log(s)
 })
 
 GprsManager.initialize().then(() => {

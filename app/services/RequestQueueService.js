@@ -11,7 +11,7 @@ const RequestQueueService = function () {
       try {
         const stmt = db.prepare(
             `INSERT INTO ${this.table}(url,method,payload,priority,event_name,auto_discard) 
-            VALUES (?,?,?,?,?,?)`, [url,method,payload,priority,event_name, auto_discard === true ? 1 : 0])
+            VALUES (?,?,?,?,?,?)`, [url,method,JSON.parse(payload),priority,event_name, auto_discard === true ? 1 : 0])
         stmt.run(function () {
           res(this.lastID)
         })

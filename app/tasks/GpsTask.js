@@ -70,6 +70,7 @@ GpsTask.pushOrRejectLocation = function(location) {
   if (selectedLocations.length > 0) {
     const prevloc = selectedLocations[selectedLocations.length - 1]
     const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
+      console.log("[NEW LOC] \n-> Distancia a anterior: "+ distance+"\n")
     if (distance > this.props.config.distanceBetweenLocations) {
       this.pushALocation(location)
     } else {
@@ -116,13 +117,14 @@ GpsTask.getNextLocations = async function (amount = 1) { //
       this.data.locationCallbackRegistered = true;
       const callback = (length) => {
         if (length >= amount) {
-          this.removeEventListener('newLocation', callback)
+          this.removeListener('newLocation', callback)
           this.data.locationCallbackRegistered = false;
           returnResult()
         }
       };
       this.on('newLocation', callback)
     }
+
   })
 }
 

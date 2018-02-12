@@ -1,6 +1,7 @@
 const util = require('util')
 const EventEmitter = require('events').EventEmitter
 const RequestQueueService = require("./../services/RequestQueueService")
+const getSerial = require('./../../lib/systeminfo').getSerial
 /**
  *
  * @param {RequestQueueService} QueueService
@@ -8,6 +9,7 @@ const RequestQueueService = require("./../services/RequestQueueService")
  * @constructor
  */
 const RequestProcessorService =  function (QueueService, GprsService) {
+  this.serial = getSerial()
 
   this.processNextPendingRequest = async () => {
     if (!GprsService.initialized) {
@@ -25,9 +27,9 @@ const RequestProcessorService =  function (QueueService, GprsService) {
       let result = null;
       try {
         if (request.method === RequestQueueService.METHOD_GET) {
-          result = await GprsService.httpGet(request.url, this.appendCreationDate(request.payload))
+          result = await GprsService.httpGet(request.url, this.appendExtraData(request.payload))
         } else if (request.method === RequestQueueService.METHOD_POST) {
-          result = await GprsService.httpPost(request.url, this.appendCreationDate(request.payload))
+          result = await GprsService.httpPost(request.url, this.appendExtraData(request.payload))
         }
 
         if (result.code.startsWith("6")) {
@@ -53,10 +55,11 @@ const RequestProcessorService =  function (QueueService, GprsService) {
     }
   }
 
-  this.appendCreationDate = (payload) => {
-    const obj = payload;
-    obj.processed_on = + new Date()
-    return obj
+  this.appendExtraData = (payload) => {
+    let realPayload = Object.assign({}, payload)
+    realPayload.hub_serial = this.serial
+    realPayload.processed_on = + new Date()
+    return realPayload
   }
 
   this.processNextFailedRequest = async () => {
@@ -70,9 +73,9 @@ const RequestProcessorService =  function (QueueService, GprsService) {
       let result = null;
       try {
         if (request.method === RequestQueueService.METHOD_GET) {
-          result = await GprsService.httpGet(request.url, this.appendCreationDate(request.payload))
+          result = await GprsService.httpGet(request.url, this.appendExtraData(request.payload))
         } else if (request.method === RequestQueueService.METHOD_POST) {
-          result = await GprsService.httpPost(request.url, this.appendCreationDate(request.payload))
+          result = await GprsService.httpPost(request.url, this.appendExtraData(request.payload))
         }
 
         if (result.code.startsWith("6")) {
