@@ -7,7 +7,7 @@ const BluetoothService = function (
     {
       debug = false,
       config = {
-        // allowedMacAddreses: [],
+        allowedMacAddreses: [],
         autoPair: true,
         discoverable: true
       }

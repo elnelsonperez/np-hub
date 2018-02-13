@@ -20,7 +20,8 @@ const props = { //These are available to all modules and tasks
   applicationEvent: null,
   config:  {
     distanceBetweenLocations: undefined,
-    timeoutSendLocation: undefined
+    timeoutSendLocation: undefined,
+    allowedMacAddresses: undefined
   },
   input: null,
   serialNumber: null //Pi serial number
@@ -70,7 +71,6 @@ Application = function () {
     this.injectable.SequentialSerialManager = Seq;
     this.injectable.GprsService = new GprsService(Seq);
     this.injectable.IbuttonService = new IbuttonService({});
-    this.injectable.BluetoothService = new BluetoothService({debug: true})
     this.injectable.RequestQueueService = new RequestQueueService()
     this.injectable.RequestProcessorService = new RequestProcessorService (
         this.injectable.RequestQueueService,
@@ -87,9 +87,15 @@ Application = function () {
     )
 
     props.applicationEvent.on('config.ready', config => {
-      props.config = config
       console.log("======== CONFIG LOADED ==========")
       console.log(config)
+      props.config = config
+      this.injectable.BluetoothService = new BluetoothService(
+          {
+            debug: true,
+            allowedMacAddresses: props.config.allowedMacAddreses
+          }
+      )
     })
 
     if (lcdEnabled)
@@ -219,7 +225,7 @@ Application = function () {
           }
         }
       }
-      
+
       if (module.initialize) {
         await module.initialize()
       }
