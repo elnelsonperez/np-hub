@@ -7,14 +7,10 @@ const Service = new RequestQueueService()
 const GprsManager = new GprsObj(SerialManager)
 
 Service.addRequest({
-  url: "http://httpbin.org/post",
+  url: "http://nppms.us/api/hub_test",
   method: "POST",
-  payload: {
-    "userId": 1,
-    "id": 1,
-    "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-    "body": "quia et suscipit suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto"
-  },
+  payload:  {"locations":[{"time":"2018-02-13 02:20:22","lat":19.445528333333332,"lng":-70.669127}],
+    "hub_serial":"00000000ddc7c7fb","processed_on":1518502908379},
   priority: RequestQueueService.PRIORITY_MEDIUM,
   event_name: "hello"
 })

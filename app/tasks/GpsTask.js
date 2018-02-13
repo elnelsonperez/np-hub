@@ -66,11 +66,10 @@ GpsTask.run = function () {
 }
 
 GpsTask.pushOrRejectLocation = function(location) {
-  const selectedLocations = this.data.selectedLocations;
-  if (selectedLocations.length > 0) {
-    const prevloc = selectedLocations[selectedLocations.length - 1]
+  if (this.data.lastLocation) {
+    const prevloc = this.data.lastLocation;
     const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
-      // console.log("[NEW LOC] D.A.: "+ distance+"\n")
+      console.log("[NEW LOC] D.A.: "+ distance+"\n")
     if (distance > this.props.config.distanceBetweenLocations) {
       this.pushALocation(location)
     } else {
@@ -89,6 +88,7 @@ GpsTask.pushOrRejectLocation = function(location) {
 
 GpsTask.pushALocation = function (location) {
   this.data.selectedLocations.push(location)
+  this.data.lastLocation = location;
   this.emit('newLocation', this.data.selectedLocations.length)
   this.data.lastLocationDate = new Date();
 }

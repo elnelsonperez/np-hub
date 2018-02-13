@@ -152,6 +152,21 @@ const RequestQueueService = function () {
     })
   }
 
+
+  this.clearRequests = () => {
+    return new Promise((res,rej) => {
+      try {
+        db.run(
+            `DELETE FROM ${this.table}`, function () {
+              res()
+            })
+      }
+      catch (e) {
+        rej(e)
+      }
+    })
+  }
+
   this.getAllRequests = () => {
     return new Promise((res, rej) => {
       try {

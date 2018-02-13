@@ -49,7 +49,6 @@ RequestQueueTask.initialize = function () {
 }
 
 RequestQueueTask.run = function () {
-  console.log("=== Request Queue Task Ran ===")
   if (this.ready === true) {
     this.ready = false
     this.doPending()

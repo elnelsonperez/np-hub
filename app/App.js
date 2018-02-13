@@ -70,7 +70,7 @@ Application = function () {
     this.injectable.SequentialSerialManager = Seq;
     this.injectable.GprsService = new GprsService(Seq);
     this.injectable.IbuttonService = new IbuttonService({});
-    this.injectable.BluetoothService = new BluetoothService({})
+    this.injectable.BluetoothService = new BluetoothService({debug: true})
     this.injectable.RequestQueueService = new RequestQueueService()
     this.injectable.RequestProcessorService = new RequestProcessorService (
         this.injectable.RequestQueueService,
@@ -119,6 +119,7 @@ Application = function () {
       if (this.tasks[task].every) { //Si el task tiene un "every"
         setInterval(() => {
           if (this.tasks[task].ready === true) {
+            console.log("-> Running '"+this.tasks[task].name+"'\n")
             this.tasks[task].run.bind(this.tasks[task])()
           }
         }, this.tasks[task].every) //Correr cada "every" milisegundos

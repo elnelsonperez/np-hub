@@ -68,7 +68,7 @@ GprsService = function (SequentialSerialManager) {
         SequentialSerialManager.send({cmd: 'AT+HTTPTERM', alwaysresolve: true});
       }
       else if (msg.includes("PDP: DEACT")) {
-        SequentialSerialManager.send({cmd: 'AT+CIPSHUT', alwaysresolve: true});
+        SequentialSerialManager.send({cmd: 'AT+CIPSHUT', alwaysresolve: true, expect: "SHUT OK"});
         this.obtainIpAdress()
       }
     })
@@ -162,51 +162,57 @@ GprsService = function (SequentialSerialManager) {
           cmd: 'AT+CIPSTATUS',
           afterdelimiter: 1,
           alwaysresolve: true});
-        if (!ipstatus.responseContains('STATE: IP GPRSACT') || !ipTrueOrFalse) {
-          if (ipstatus.responseContains('STATE: IP START')) {
-            try {
-              await SequentialSerialManager.send({cmd: 'AT+CIICR',timeout: 12000, expect: ["OK"]});
-            } catch (e) {
-              console.log(e)
+        if (ipstatus.responseContains("STATE: PDP DEACT")) {
+          SequentialSerialManager.send({cmd: 'AT+CIPSHUT', alwaysresolve: true, expect: "SHUT OK"});
+          await check();
+        } else {
+          if (!ipstatus.responseContains('STATE: IP GPRSACT') || !ipTrueOrFalse) {
+            if (ipstatus.responseContains('STATE: IP START')) {
+              try {
+                await SequentialSerialManager.send({cmd: 'AT+CIICR',timeout: 12000, expect: ["OK"]});
+              } catch (e) {
+                console.log(e)
+              }
+              await check()
             }
-            await check()
+            else {
+              await SequentialSerialManager.send({cmd: 'AT+SAPBR=3,1,"Contype","GPRS"',alwaysresolve: true});
+
+              const sapbr = await this.executeSapbr();
+              if (sapbr.responseContains("ERROR")) {
+                await  SequentialSerialManager.send({cmd: 'AT+SAPBR=0,1', expect: ['OK','ERROR'], alwaysresolve: true})
+                await this.executeSapbr()
+              }
+
+              await this.mandatoryCommand(
+                  SequentialSerialManager.send,
+                  {cmd: 'AT+CSTT="internet.ideasclaro.com.do"', expect: ['OK']},
+                  3000,
+                  () => {
+                    console.log('No se pudo configurar el APN. Reintentando en 3 segs...',)
+                    this.emit('message', 'APN: Intentando...')
+                  });
+
+              await check();
+            }
           }
           else {
-            await SequentialSerialManager.send({cmd: 'AT+SAPBR=3,1,"Contype","GPRS"',alwaysresolve: true});
-            
-            const sapbr = await this.executeSapbr();
-            if (sapbr.responseContains("ERROR")) {
-              await  SequentialSerialManager.send({cmd: 'AT+SAPBR=0,1', expect: ['OK','ERROR'], alwaysresolve: true})
-              await this.executeSapbr()
+            if (ipTrueOrFalse) {
+              res(true);
+            } else {
+              setTimeout(async  () => {
+                let tryAgain = errorConter.updateCounter();
+                if (!tryAgain) {
+                  res(false)
+                }
+                console.log('\n No se ha podido obtener una IP. Intentando en 3 Segs...\n')
+                this.emit('message', 'IP: Intentando...')
+                await check();
+              },3000)
             }
-
-            await this.mandatoryCommand(
-                SequentialSerialManager.send,
-                {cmd: 'AT+CSTT="internet.ideasclaro.com.do"', expect: ['OK']},
-                3000,
-                () => {
-                  console.log('No se pudo configurar el APN. Reintentando en 3 segs...',)
-                  this.emit('message', 'APN: Intentando...')
-                });
-
-            await check();
           }
         }
-        else {
-          if (ipTrueOrFalse) {
-            res(true);
-          } else {
-            setTimeout(async  () => {
-              let tryAgain = errorConter.updateCounter();
-              if (!tryAgain) {
-                res(false)
-              }
-              console.log('\n No se ha podido obtener una IP. Intentando en 3 Segs...\n')
-              this.emit('message', 'IP: Intentando...')
-              await check();
-            },3000)
-          }
-        }
+
       }
       check();
     });
@@ -298,6 +304,7 @@ GprsService = function (SequentialSerialManager) {
       if (params) {
         params = JSON.stringify(params);
         await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="CONTENT","application/json"'})
+
         await SequentialSerialManager.send(
             {
               cmd: 'AT+HTTPDATA='+params.length+','+'5000',
