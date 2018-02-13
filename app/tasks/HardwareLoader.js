@@ -24,9 +24,7 @@ HardwareLoader.run = async function () {
     this.initializeBluetooth()
   } catch (e) {
     console.log(e)
-    fail = true;
     props.applicationEvent.emit('hardwareLoader.message', "Bluetooh Fail")
-
   }
 
   if (fail === false) {
@@ -48,7 +46,7 @@ HardwareLoader.getNpHubConfiguration  = async function () {
   while (tries < 5) {
     let config = await this.ConfigService.getDeviceConfiguration();
     if (config) {
-      props.applicationEvent.emit('config.ready',config)
+      props.applicationEvent.emit('config.ready', config)
       return;
     }
     tries++;
@@ -57,7 +55,7 @@ HardwareLoader.getNpHubConfiguration  = async function () {
   // reset();
 }
 
-HardwareLoader.initializeBluetooth = function () {
+HardwareLoader.initializeBluetooth = function (config) {
   props.applicationEvent.emit('hardwareLoader.message', "Bluetooth Init")
   props.input.on('INPUT:btReset:PRESSED', () => {
     this.BluetoothService.reset()
@@ -65,7 +63,9 @@ HardwareLoader.initializeBluetooth = function () {
   props.input.on('INPUT:btDiscoverable:PRESSED', () => {
     this.BluetoothService.makeDiscoverable()
   })
-  this.BluetoothService.initialize()
+  props.applicationEvent.once('config.ready', config => {
+    this.BluetoothService.initialize({allowedMacAddresses: config.allowedMacAddresses})
+  })
 }
 
 HardwareLoader.initializeGprs = async function () {

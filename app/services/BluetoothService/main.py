@@ -127,8 +127,9 @@ class BluetoothManager:
         mac_address = client_info[0]
         # Mac address validation
         if self.config \
-                and self.config.get('allowedMacAddreses') \
-                and mac_address not in self.config.get('allowedMacAddreses'):
+                and self.config.get('allowedMacAddresses') \
+                and mac_address not in self.config.get('allowedMacAddresses'):
+            self.output(Type.EVENT, "UNAUTHORIZED",json.dumps({"mac_address": mac_address}))
             self.disconnect_client(mac_address)
         else:
             thread.start_new_thread(self.read_from_client, (mac_address,))

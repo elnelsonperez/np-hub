@@ -70,6 +70,7 @@ Application = function () {
     const Seq = new SequentialSerialManager(true);
     this.injectable.SequentialSerialManager = Seq;
     this.injectable.GprsService = new GprsService(Seq);
+    this.injectable.BluetoothService = new BluetoothService({debug: true})
     this.injectable.IbuttonService = new IbuttonService({});
     this.injectable.RequestQueueService = new RequestQueueService()
     this.injectable.RequestProcessorService = new RequestProcessorService (
@@ -86,16 +87,10 @@ Application = function () {
         "http://nppms.us/api/hub_config"
     )
 
-    props.applicationEvent.on('config.ready', config => {
+    props.applicationEvent.once('config.ready', config => {
       console.log("======== CONFIG LOADED ==========")
       console.log(config)
       props.config = config
-      this.injectable.BluetoothService = new BluetoothService(
-          {
-            debug: true,
-            allowedMacAddresses: props.config.allowedMacAddreses
-          }
-      )
     })
 
     if (lcdEnabled)

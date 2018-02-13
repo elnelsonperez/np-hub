@@ -3,23 +3,18 @@ const EventEmitter = require('events').EventEmitter
 const PythonShell = require('python-shell');
 const Parser = require ("./messageParser")
 const BtMessage = require("./BtMessage")
-const BluetoothService = function (
-    {
-      debug = false,
-      config = {
-        allowedMacAddreses: [],
-        autoPair: true,
-        discoverable: true
-      }
-    }
-) {
+const BluetoothService = function ({debug = false}){
 
   this.idCounter = 1;
   this.parser = new Parser()
 
-  this.initialize = () => {
+  this.initialize = ({
+                       allowedMacAddresses = [],
+                       autoPair = true,
+                       discoverable = true
+                     }) => {
     this.shell = new PythonShell("main.py", {
-      args: [JSON.stringify(config)],
+      args: [JSON.stringify({allowedMacAddresses, autoPair, discoverable})],
       scriptPath: __dirname,
       pythonOptions: ['-u'],
     });
