@@ -183,7 +183,6 @@ class BluetoothManager:
                     break
                 self.log("Message received from %s" % mac_address)
                 self.output(Type.EVENT, "RECEIVED", json.dumps({"mac_address": mac_address, "data": json.loads(data)}))
-                self.write_to_client({"mac_address": mac_address, "payload": "Mensaje Recibido"})
                 time.sleep(0.1)
         except IOError as e:
             print(e)

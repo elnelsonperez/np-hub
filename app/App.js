@@ -127,7 +127,7 @@ Application = function () {
       if (this.tasks[task].every) { //Si el task tiene un "every"
         setInterval(() => {
           if (this.tasks[task].ready === true) {
-            console.log("-> Running '"+this.tasks[task].name+"'\n")
+            // console.log("-> Running '"+this.tasks[task].name+"'\n")
             this.tasks[task].run.bind(this.tasks[task])()
           }
         }, this.tasks[task].every) //Correr cada "every" milisegundos
