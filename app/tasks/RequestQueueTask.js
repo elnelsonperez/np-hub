@@ -1,4 +1,5 @@
 const Task  = require('../core/Task').Task
+const props = require('./../App').props
 
 const RequestQueueTask = new Task (
     {
@@ -43,7 +44,7 @@ RequestQueueTask.doFailed = async function () {
 }
 
 RequestQueueTask.initialize = function () {
-  this.props.applicationEvent.on("boot.ready", () => {
+  props.applicationEvent.on("boot.ready", () => {
     this.ready = true;
   })
 }

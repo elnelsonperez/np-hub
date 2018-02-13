@@ -1,5 +1,7 @@
 const Task  = require('../core/Task').Task
 const RequestQueueService = require ("./../../app/services/RequestQueueService")
+const props = require('./../App').props
+
 const GpsSenderTask = new Task (
     {
       name: 'GpsSenderTask',
@@ -11,7 +13,7 @@ const GpsSenderTask = new Task (
 );
 
 GpsSenderTask.initialize = function () {
-  this.props.applicationEvent.on("boot.ready", () => {
+  props.applicationEvent.on("config.ready", () => {
     this.ready = true;
   })
 }

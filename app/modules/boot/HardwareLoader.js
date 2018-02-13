@@ -1,4 +1,5 @@
 const ApplicationModule  = require('../../core/Module').ApplicationModule
+const props = require('./../../App').props
 
 const appModule = new ApplicationModule (
     {
@@ -12,7 +13,7 @@ const appModule = new ApplicationModule (
 
 appModule.initialize = async function () {
   this.ready = false;
-  this.props.applicationEvent.on('hardwareLoader.message', msg => {
+  props.applicationEvent.on('hardwareLoader.message', msg => {
     this.data.msg = msg;
   })
 }

@@ -32,7 +32,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
           result = await GprsService.httpPost(request.url, this.appendExtraData(request.payload))
         }
 
-        if (result.code.startsWith("6")) {
+        if (result.code.toString().startsWith("6")) {
           throw new Error("HTTPCODE6xx")
         } else {
           QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
@@ -78,7 +78,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
           result = await GprsService.httpPost(request.url, this.appendExtraData(request.payload))
         }
 
-        if (result.code.startsWith("6")) {
+        if (result.code.toString().startsWith("6")) {
           throw new Error("HTTPCODE6xx")
         } else {
           QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)

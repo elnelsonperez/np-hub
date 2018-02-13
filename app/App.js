@@ -16,6 +16,16 @@ const BluetoothService = require("./services/BluetoothService/BluetoothService")
 const SCREEN_REFRESH_DELAY = 500;
 const INPUT_DELAY = 150;
 
+const props = { //These are available to all modules and tasks
+  applicationEvent: null,
+  config:  {
+    distanceBetweenLocations: undefined,
+    timeoutSendLocation: undefined
+  },
+  input: null,
+  serialNumber: null //Pi serial number
+};
+
 Application = function () {
   this.screen = null //4 Line objects basically
   this.lcd = null //Lcd library
@@ -29,16 +39,6 @@ Application = function () {
   this.currentModuleDomain = null;
   this.disabledFunctionality = {
     lcd: false
-  }
-
-  this.props = { //These are available to all modules and tasks
-    applicationEvent: null,
-    config:  {
-      distanceBetweenLocations: 10, //meters
-      timeoutSendLocation: 5 //Minutes
-    },
-    input: null,
-    serialNumber: null //Pi serial number
   }
 
   this.initialize = (defaultModule = 'boot') => {
@@ -57,10 +57,10 @@ Application = function () {
         }
     )
     inputService.initializeRegisteredPins();
-    this.props.input = inputService
+    props.input = inputService
 
-    this.props.applicationEvent = new EventEmitter()
-    this.props.serialNumber = getSerial();
+    props.applicationEvent = new EventEmitter()
+    props.serialNumber = getSerial();
     this.setDefaultApplicationProperties();
 
     this.lcd = new Lcdlib.LcdController(1, 0x3f, 20, 4);
@@ -86,11 +86,18 @@ Application = function () {
         "http://nppms.us/api/hub_config"
     )
 
+    props.applicationEvent.on('config.ready', config => {
+      props.config = config
+      console.log("======== CONFIG LOADED ==========")
+      console.log(config)
+    })
+
     if (lcdEnabled)
       this.printBootingMessage();
 
     //Loads tasks
     this.loadTasks(__dirname+'/tasks');
+
 
     if (lcdEnabled) {
       this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
@@ -98,14 +105,14 @@ Application = function () {
             this.lcdPrintLoop()
             this.runTasks();
             //Input
-            this.props.input.monitorRegisteredPins()
+            props.input.monitorRegisteredPins()
           }
       );
     }
     else {
       this.runTasks();
       //Input
-      this.props.input.monitorRegisteredPins()
+      props.input.monitorRegisteredPins()
     }
 
 
@@ -136,7 +143,6 @@ Application = function () {
     fs.readdirSync(dir).forEach(file => {
       const task = require(dir+'/'+file);
       if (task) {
-        task.props = this.props
         if (task.initialize) {
           task.initialize()
         }
@@ -213,9 +219,7 @@ Application = function () {
           }
         }
       }
-
-      module.props = this.props
-
+      
       if (module.initialize) {
         await module.initialize()
       }
@@ -280,3 +284,4 @@ Application = function () {
 };
 
 module.exports.Application = Application;
+module.exports.props = props;

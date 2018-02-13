@@ -9,28 +9,31 @@ const QueueService = require("./RequestQueueService")
  */
 const ConfigService = function (RequestSenderService, configEndpoint) {
   this.eventName = "CONFIG_REQUEST"
-  /**
-   * @param {String} serialNumber
-   */
-  this.getDeviceConfiguration = async function (serialNumber) {
+
+  this.getDeviceConfiguration = async function () {
     let configuration = null
-      try {
-        console.log("Requesting Device Configuration");
-        const response = await RequestSenderService.requestWithResponse({
-          url: configEndpoint+"/"+serialNumber,
-          method: "GET",
-          priority: QueueService.PRIORITY_MOST,
-          event_name: this.eventName
-        })
-        //TODO actually return the config object
-        configuration = JSON.parse(response);
+    try {
+      console.log("Requesting Device Configuration");
+      const response  = await RequestSenderService.requestWithResponse({
+        url: configEndpoint,
+        method: "POST",
+        priority: QueueService.PRIORITY_MOST,
+        event_name: this.eventName
+      })
+      if (response.code !== 200) {
+        this.emit("Config request failed", response.code)
+        return null;
       }
-      catch (e) {
-        console.log(e)
-        if (!e.code || e.code !== 800) {
-          this.emit("error_message", e.message)
-        }
+      else {
+        configuration = response.content;
       }
+    }
+    catch (e) {
+      console.log(e)
+      if (!e.code || e.code !== 800) {
+        this.emit("error_message", e.message)
+      }
+    }
     return configuration
   }
 }

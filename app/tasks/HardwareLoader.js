@@ -1,6 +1,7 @@
 const Task  = require('../core/Task').Task
 const delay = require('../../lib/functions').delay;
 const reset = require('../../lib/functions').reset;
+const props = require('./../App').props
 const HardwareLoader = new Task (
     {
       name: 'HardwareLoader',
@@ -16,7 +17,7 @@ HardwareLoader.run = async function () {
   } catch (e) {
     console.log(e)
     fail = true;
-    this.props.applicationEvent.emit('hardwareLoader.message', "Gprs Fail")
+    props.applicationEvent.emit('hardwareLoader.message', "Gprs Fail")
   }
 
   try {
@@ -24,12 +25,13 @@ HardwareLoader.run = async function () {
   } catch (e) {
     console.log(e)
     fail = true;
-    this.props.applicationEvent.emit('hardwareLoader.message', "Bluetooh Fail")
+    props.applicationEvent.emit('hardwareLoader.message', "Bluetooh Fail")
 
   }
 
   if (fail === false) {
-    this.props.applicationEvent.emit('boot.ready')
+    props.applicationEvent.emit('boot.ready')
+    await this.getNpHubConfiguration()
   }
   else {
     //Shit does not work. Reboot?
@@ -40,26 +42,27 @@ HardwareLoader.run = async function () {
 
 HardwareLoader.getNpHubConfiguration  = async function () {
   this.ConfigService.on("error_message", (message) => {
-    this.props.applicationEvent.emit('hardwareLoader.message', message)
+    props.applicationEvent.emit('hardwareLoader.message', message)
   })
   let tries = 0;
   while (tries < 5) {
-    let config = await this.ConfigService.getDeviceConfiguration(this.props.serialNumber);
+    let config = await this.ConfigService.getDeviceConfiguration();
     if (config) {
-      return config;
+      props.applicationEvent.emit('config.ready',config)
+      return;
     }
     tries++;
   }
-  reset();
-  return null;
+  //Could not fetch config reset?
+  // reset();
 }
 
 HardwareLoader.initializeBluetooth = function () {
-  this.props.applicationEvent.emit('hardwareLoader.message', "Bluetooth Init")
-  this.props.input.on('INPUT:btReset:PRESSED', () => {
+  props.applicationEvent.emit('hardwareLoader.message', "Bluetooth Init")
+  props.input.on('INPUT:btReset:PRESSED', () => {
     this.BluetoothService.reset()
   })
-  this.props.input.on('INPUT:btDiscoverable:PRESSED', () => {
+  props.input.on('INPUT:btDiscoverable:PRESSED', () => {
     this.BluetoothService.makeDiscoverable()
   })
   this.BluetoothService.initialize()
@@ -67,7 +70,7 @@ HardwareLoader.initializeBluetooth = function () {
 
 HardwareLoader.initializeGprs = async function () {
   this.GprsService.on('message', (msg) => {
-    this.props.applicationEvent.emit('hardwareLoader.message', msg)
+    props.applicationEvent.emit('hardwareLoader.message', msg)
   })
   let done = false;
   let counter = 0;
@@ -75,7 +78,7 @@ HardwareLoader.initializeGprs = async function () {
     try {
       done = await this.GprsService.initialize();
       if (done === false)
-        this.props.applicationEvent.emit('hardwareLoader.message', "Fail. Reintentando")
+        props.applicationEvent.emit('hardwareLoader.message', "Fail. Reintentando")
       await delay(1800);
     }catch (e) {console.log(e)}
     counter++

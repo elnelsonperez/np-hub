@@ -1,6 +1,7 @@
 const Task  = require('../core/Task').Task
 const FixedQueue = require('./../../lib/Queue').FixedQueue
 const SerialPort = require('serialport');
+const props = require('./../App').props
 const GPS = require('gps');
 const dateFormat = require('dateformat');
 
@@ -13,48 +14,53 @@ const GpsTask = new Task (
         lastLocationDate: new Date(),
         locationCallbackRegistered: false
       },
-      every: 5000
+      every: 5000,
+      ready: false,
+      autoload: false
     }
 );
 
 GpsTask.initialize = function () {
-  const file = '/dev/ttyUSB0';
-  const parsers = SerialPort.parsers;
-  const parser = new parsers.Readline({
-    delimiter: '\r\n'
-  });
 
-  const port = new SerialPort(file, {
-    baudRate: 9600
-  });
+  props.applicationEvent.on("config.ready", () => {
+    this.ready = true;
+    const file = '/dev/ttyUSB0';
+    const parsers = SerialPort.parsers;
+    const parser = new parsers.Readline({
+      delimiter: '\r\n'
+    });
 
-  port.pipe(parser);
+    const port = new SerialPort(file, {
+      baudRate: 9600
+    });
 
-  const gps = new GPS;
+    port.pipe(parser);
 
-  parser.on('data', function(data) {
-    try {
-      gps.update(data);
-    } catch (e) {
-      console.log(e)
-    }
-  });
+    const gps = new GPS;
 
-  gps.on('GLL', (parsed) => {
-    if (parsed.valid === true &&
-        parsed.status === "active" &&
-        parsed.lat !== null
-        && parsed.lon !== null)
-    {
-      const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
-      this.data.rawLocations.push({
-        time: time,
-        lat: parsed.lat,
-        lng: parsed.lon
-      });
-    }
-  });
+    parser.on('data', function(data) {
+      try {
+        gps.update(data);
+      } catch (e) {
+        console.log(e)
+      }
+    });
 
+    gps.on('GLL', (parsed) => {
+      if (parsed.valid === true &&
+          parsed.status === "active" &&
+          parsed.lat !== null
+          && parsed.lon !== null)
+      {
+        const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
+        this.data.rawLocations.push({
+          time: time,
+          lat: parsed.lat,
+          lng: parsed.lon
+        });
+      }
+    });
+  })
 }
 
 GpsTask.run = function () {
@@ -70,14 +76,14 @@ GpsTask.pushOrRejectLocation = function(location) {
     const prevloc = this.data.lastLocation;
     const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
       console.log("[NEW LOC] D.A.: "+ distance+"\n")
-    if (distance > this.props.config.distanceBetweenLocations) {
+    if (distance > props.config.distanceBetweenLocations) {
       this.pushALocation(location)
     } else {
       const now = new Date();
       let timeDiff = now - this.data.lastLocationDate;
       timeDiff /= 1000; //ms to s
       timeDiff /= 60; //s to m
-      if (timeDiff > this.props.config.timeoutSendLocation) {
+      if (timeDiff > props.config.timeoutSendLocation) {
         this.pushALocation(location)
       }
     }

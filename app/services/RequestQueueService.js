@@ -13,7 +13,7 @@ const RequestQueueService = function () {
             VALUES (?,?,?,?,?,?)`, [url,method,JSON.stringify(payload),priority,event_name, auto_discard === true ? 1 : 0])
         stmt.run(function () {
           res(this.lastID)
-          console.log("New Request added to queue")
+          console.log("New "+method+" | "+url+" added to queue")
         })
       }
       catch (e) {

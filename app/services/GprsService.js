@@ -258,14 +258,14 @@ GprsService = function (SequentialSerialManager) {
 
       if (responsecode.startsWith('6')){
         await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
-        return {code: responsecode, content: 'Network Error: Impossible'}
+        return {code: parseInt(responsecode), content: 'Network Error: Impossible'}
       }
 
-      result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD'});
+      let result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD'});
       if (result.res[1]) {
-        resultJson = IsJsonString(result.res[1])
+        const resultJson = IsJsonString(result.res[1])
         if (resultJson) {
-          content = resultJson;
+           content = resultJson;
         } else {
           content = result.res[1];
         }
@@ -273,7 +273,7 @@ GprsService = function (SequentialSerialManager) {
         content = result.res;
       }
       await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
-      return {code: responsecode, content: content}
+      return {code: parseInt(responsecode), content: content}
 
     } catch (e) {
       try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
@@ -324,7 +324,7 @@ GprsService = function (SequentialSerialManager) {
 
       if (responsecode.startsWith('6')){
         await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
-        return {code: responsecode, content: 'Network Error: Impossible'}
+        return {code: parseInt(responsecode), content: 'Network Error: Impossible'}
       }
 
       result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD'});
@@ -339,7 +339,7 @@ GprsService = function (SequentialSerialManager) {
         content = result.res;
       }
       await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
-      return {code: responsecode, content: content}
+      return {code: parseInt(responsecode), content: content}
 
     } catch (e) {
       try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
@@ -351,7 +351,7 @@ GprsService = function (SequentialSerialManager) {
   this.hasInternet = async () => {
     try {
       result =  await this.httpGet('http://nppms.us/api/status');
-      if (result.code === '200' && result.content === 'ACTIVO') {
+      if (result.code === 200 && result.content === 'ACTIVO') {
         return true;
       }
     } catch (e) {console.log(e)}
