@@ -14,7 +14,8 @@ const RequestQueueTask = new Task (
 RequestQueueTask.doPending = async function () {
   try {
     const resp = await this.RequestProcessorService.processNextPendingRequest()
-    if (resp && resp.pendingRequests === false) {
+    // console.log("============================= RESPONSE PENDING REQUEST",resp)
+    if (resp && resp.doFailed === true) {
       await this.doFailed()
     } else {
       this.ready = true;
@@ -30,7 +31,8 @@ RequestQueueTask.doPending = async function () {
 RequestQueueTask.doFailed = async function () {
   try {
     const resp = await this.RequestProcessorService.processNextFailedRequest()
-    if (resp && resp.pendingRequests === true) {
+    // console.log("============================= RESPONSE FAILED REQUEST",resp)
+    if (resp && resp.doPending === true) {
       await this.doPending()
     } else {
       this.ready = true;

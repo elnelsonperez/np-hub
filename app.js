@@ -3,7 +3,12 @@ const props = require('./app/App').props;
 const BtMessage = require('./app/services/BluetoothService/BtMessage')
 app = new Application();
 app.disabledFunctionality.lcd = true;
-app.initialize();
+const argv = require('minimist')(process.argv.slice(2));
+if (argv.verbose) {
+  app.initialize({verbose: true});
+} else {
+  app.initialize({});
+}
 
 process.on('unhandledRejection', (reason, p) => {
     console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);

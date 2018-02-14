@@ -6,14 +6,14 @@ const SerialManager =  new SequentialSerialManager.SequentialSerialManager(true)
 const Service = new RequestQueueService()
 const GprsManager = new GprsObj(SerialManager)
 
-Service.addRequest({
-  url: "http://nppms.us/api/hub_test",
-  method: "POST",
-  payload:  {"locations":[{"time":"2018-02-13 02:20:22","lat":19.445528333333332,"lng":-70.669127}],
-    "hub_serial":"00000000ddc7c7fb","processed_on":1518502908379},
-  priority: RequestQueueService.PRIORITY_MEDIUM,
-  event_name: "hello"
-})
+// Service.addRequest({
+//   url: "http://nppms.us/api/hub_test",
+//   method: "POST",
+//   payload:  {"locations":[{"time":"2018-02-13 02:20:22","lat":19.445528333333332,"lng":-70.669127}],
+//     "hub_serial":"00000000ddc7c7fb","processed_on":1518502908379},
+//   priority: RequestQueueService.PRIORITY_MEDIUM,
+//   event_name: "hello"
+// })
 
 GprsManager.initialize().then(() => {
     const processor = new RequestProcessorService(Service, GprsManager)
@@ -22,11 +22,8 @@ GprsManager.initialize().then(() => {
         console.log(a)
     })
 
-    processor.processNextPendingRequest().then(() => {
-      console.log("Pending request processed")
-      processor.processNextPendingRequest().then( () => {
-        console.log("Pending request processed")
-      })
+    processor.processNextPendingRequest().then((a) => {
+      console.log("Pending request processed:", a)
     }).catch(e => {
       console.log(e)
     })

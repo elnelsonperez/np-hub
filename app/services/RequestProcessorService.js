@@ -16,12 +16,12 @@ const RequestProcessorService =  function (QueueService, GprsService) {
       throw new Error(RequestProcessorService.GPRS_NOT_INITIALIZED)
     } else {
       let request = await QueueService.getNextRequest()
-      let failedRequest = await QueueService.getNextRequest(QueueService.STATUS_FAILED)
+      let failedRequest = await QueueService.getNextRequest(RequestQueueService.STATUS_FAILED)
 
       if (!request && failedRequest) {
-        return {pendingRequests: false}
+        return {doFailed: true}
       } else if (!request && !failedRequest) {
-        return
+        return;
       }
 
       let result = null;
@@ -52,6 +52,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
           this.emit(request.event_name, {error: e, res: null, id: request.id})
         }
       }
+
     }
   }
 
@@ -65,10 +66,10 @@ const RequestProcessorService =  function (QueueService, GprsService) {
   this.processNextFailedRequest = async () => {
 
     if (GprsService.initialized) {
-      let request = await QueueService.getNextRequest(QueueService.STATUS_FAILED)
-      let pendingRequest = await QueueService.getNextRequest();
+      let request = await QueueService.getNextRequest(RequestQueueService.STATUS_FAILED)
+      let pendingRequest = await QueueService.getNextRequest(RequestQueueService.STATUS_PENDING);
       if (pendingRequest || !request) {
-        return {pendingRequests: true}
+        return {doPending: true}
       }
       let result = null;
       try {
@@ -101,6 +102,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
     } else {
       throw new Error(RequestProcessorService.GPRS_NOT_INITIALIZED)
     }
+
   }
 }
 
