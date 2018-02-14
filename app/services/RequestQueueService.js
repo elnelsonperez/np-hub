@@ -58,11 +58,11 @@ const RequestQueueService = function () {
     return new Promise((res, rej) => {
       try {
         db.get(`
-        SELECT retry_count FROM ${this.table} 
+        SELECT retry_counter FROM ${this.table} 
         WHERE id = ${id}`, (err, row) => {
           if (err)
             rej(err)
-          res(row.retry_count)
+          res(row.retry_counter)
         })
       }
       catch (e) {
