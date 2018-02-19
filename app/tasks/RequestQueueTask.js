@@ -1,6 +1,11 @@
 const Task  = require('../core/Task').Task
 const props = require('./../App').props
 
+/**
+ * Se encarga de periodicamente mandar a procesar los requests pendientes
+ * en el queue;
+ * @type {Task}
+ */
 const RequestQueueTask = new Task (
     {
       name: 'RequestQueueTask',

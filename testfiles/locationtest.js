@@ -8,7 +8,7 @@ gps.props = { //These are available to all modules and tasks
     input: null,
     serialNumber: null //Pi serial number
 }
-gps.initialize()
+gps.initialize(true)
 
 setInterval(gps.run.bind(gps), 1000)
 

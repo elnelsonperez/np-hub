@@ -44,9 +44,9 @@ const RequestProcessorService =  function (QueueService, GprsService) {
       }
       catch (e) {
         if (request.auto_discard && request.auto_discard !== 0) {
-          QueueService.changeStatus(request.id, RequestQueueService.STATUS_NEVER)
+          await QueueService.changeStatus(request.id, RequestQueueService.STATUS_NEVER)
         } else {
-          QueueService.changeStatus(request.id, RequestQueueService.STATUS_FAILED)
+          await QueueService.changeStatus(request.id, RequestQueueService.STATUS_FAILED)
         }
         if (request.event_name) {
           this.emit(request.event_name, {error: e, res: null, id: request.id})
@@ -82,7 +82,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
         if (result.code.toString().startsWith("6")) {
           throw new Error("HTTPCODE6xx")
         } else {
-          QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
+          await QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
           if (request.event_name) {
             this.emit(request.event_name, {error: null, res: result, id: request.id})
           }
@@ -90,10 +90,10 @@ const RequestProcessorService =  function (QueueService, GprsService) {
 
       }
       catch (e) {
-        if (QueueService.getRetryCount(request.id) >= 3) {
-          QueueService.changeStatus(request.id, RequestQueueService.STATUS_NEVER)
+        if (await QueueService.getRetryCount(request.id) >= 3) {
+          await QueueService.changeStatus(request.id, RequestQueueService.STATUS_NEVER)
         } else {
-          QueueService.incrementRetryCounter(request.id)
+          await QueueService.incrementRetryCounter(request.id)
         }
         if (request.event_name) {
           this.emit(request.event_name, {error: e, res: null, id: request.id})

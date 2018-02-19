@@ -4,22 +4,12 @@ const BtMessage = require('./app/services/BluetoothService/BtMessage')
 app = new Application();
 app.disabledFunctionality.lcd = true;
 const argv = require('minimist')(process.argv.slice(2));
-if (argv.verbose) {
-  app.initialize({verbose: true});
-} else {
-  app.initialize({});
-}
+
+app.initialize({verbose: !!argv.verbose, bridgeDebug: argv.bridgeDebug});
 
 process.on('unhandledRejection', (reason, p) => {
     console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
-
-app.injectable.BluetoothService.on('EVENT', msg => {
-    if (msg.name === "RECEIVED") {
-      app.injectable.BluetoothService.sendToDevice({mac_address: msg.body.mac_address, message:
-      new BtMessage({corr_id : null, type: "TEST", payload:{data: "Eco desde Hub :'"+msg.body.data.payload+"'"}})})
-    }
-})
 
 props.applicationEvent.on('boot.ready', function () {
     setTimeout(() => {

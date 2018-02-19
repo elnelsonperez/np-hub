@@ -5,6 +5,12 @@ const props = require('./../App').props
 const GPS = require('gps');
 const dateFormat = require('dateformat');
 
+/**
+ * Inicializa el serialport para leer la data del modulo GPS y se encarga de validar
+ * las localizaciones obtenidas de acuerdo a las configuraciones ya conseguidas
+ * desde el servidor
+ * @type {Task}
+ */
 const GpsTask = new Task (
     {
       name: 'GpsTask',
@@ -20,11 +26,11 @@ const GpsTask = new Task (
     }
 );
 
-GpsTask.initialize = function () {
+GpsTask.initialize = function (debug = false) {
 
-  props.applicationEvent.on("config.ready", () => {
+  const init = () => {
     this.ready = true;
-    const file = '/dev/ttyUSB0';
+    const file = '/dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_6_-_GPS_Receiver-if00';
     const parsers = SerialPort.parsers;
     const parser = new parsers.Readline({
       delimiter: '\r\n'
@@ -60,7 +66,13 @@ GpsTask.initialize = function () {
         });
       }
     });
-  })
+  }
+  if (debug === false ) {
+    props.applicationEvent.on("config.ready", init)
+  } else {
+    init()
+  }
+
 }
 
 GpsTask.run = function () {

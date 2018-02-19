@@ -18,7 +18,10 @@ const ConfigService = function (RequestSenderService, configEndpoint) {
         url: configEndpoint,
         method: "POST",
         priority: QueueService.PRIORITY_MOST,
-        event_name: this.eventName
+        event_name: this.eventName,
+        payload: {
+          force: true
+        }
       })
       if (response.code !== 200) {
         this.emit("Config request failed", response.code)

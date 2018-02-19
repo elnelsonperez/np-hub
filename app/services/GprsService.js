@@ -60,7 +60,6 @@ GprsService = function (SequentialSerialManager) {
     })
   };
 
-
   this.initialize = async () => {
 
     SequentialSerialManager.on('specialMessage', msg => {
@@ -155,71 +154,75 @@ GprsService = function (SequentialSerialManager) {
   this.obtainIpAdress = () => {
     return new Promise(res => {
       let errorConter = new ErrorCounter(2)
-      check = async () => {
+      const check = async () => {
         let ipTrueOrFalse = await this.checkIp();
 
-        const ipstatus = await SequentialSerialManager.send({
-          cmd: 'AT+CIPSTATUS',
-          afterdelimiter: 1,
-          alwaysresolve: true});
-        if (ipstatus.responseContains("STATE: PDP DEACT")) {
-          SequentialSerialManager.send({cmd: 'AT+CIPSHUT', alwaysresolve: true, expect: "SHUT OK"});
-          await check();
-        } else {
-          if (!ipstatus.responseContains('STATE: IP GPRSACT') || !ipTrueOrFalse) {
-            if (ipstatus.responseContains('STATE: IP START')) {
-              try {
-                await SequentialSerialManager.send({cmd: 'AT+CIICR',timeout: 12000, expect: ["OK"]});
-              } catch (e) {
-                console.log(e)
+        try {
+          const ipstatus = await SequentialSerialManager.send({
+            cmd: 'AT+CIPSTATUS',
+            afterdelimiter: 1,
+            alwaysresolve: true});
+
+          if (ipstatus.responseContains("STATE: PDP DEACT")) {
+            SequentialSerialManager.send({cmd: 'AT+CIPSHUT', alwaysresolve: true, expect: "SHUT OK",delimiter: "SHUT OK"});
+            await check();
+          } else {
+            if (!ipstatus.responseContains('STATE: IP GPRSACT') || !ipTrueOrFalse) {
+              if (ipstatus.responseContains('STATE: IP START')) {
+                try {
+                  await SequentialSerialManager.send({cmd: 'AT+CIICR',timeout: 12000, expect: ["OK"]});
+                } catch (e) {
+                  console.log(e)
+                }
+                await check()
               }
-              await check()
+              else {
+                await SequentialSerialManager.send({cmd: 'AT+SAPBR=3,1,"Contype","GPRS"',alwaysresolve: true});
+
+                const sapbr = await this.executeSapbr();
+                if (sapbr.responseContains("ERROR")) {
+                  await  SequentialSerialManager.send({cmd: 'AT+SAPBR=0,1', expect: ['OK','ERROR'], alwaysresolve: true})
+                  await this.executeSapbr()
+                }
+
+                await this.mandatoryCommand(
+                    SequentialSerialManager.send,
+                    {cmd: 'AT+CSTT="internet.ideasclaro.com.do"', expect: ['OK']},
+                    3000,
+                    () => {
+                      console.log('No se pudo configurar el APN. Reintentando en 3 segs...',)
+                      this.emit('message', 'APN: Intentando...')
+                    });
+
+                await check();
+              }
             }
             else {
-              await SequentialSerialManager.send({cmd: 'AT+SAPBR=3,1,"Contype","GPRS"',alwaysresolve: true});
-
-              const sapbr = await this.executeSapbr();
-              if (sapbr.responseContains("ERROR")) {
-                await  SequentialSerialManager.send({cmd: 'AT+SAPBR=0,1', expect: ['OK','ERROR'], alwaysresolve: true})
-                await this.executeSapbr()
+              if (ipTrueOrFalse) {
+                res(true);
+              } else {
+                setTimeout(async  () => {
+                  let tryAgain = errorConter.updateCounter();
+                  if (!tryAgain) {
+                    res(false)
+                  }
+                  console.log('\n No se ha podido obtener una IP. Intentando en 3 Segs...\n')
+                  this.emit('message', 'IP: Intentando...')
+                  await check();
+                },3000)
               }
-
-              await this.mandatoryCommand(
-                  SequentialSerialManager.send,
-                  {cmd: 'AT+CSTT="internet.ideasclaro.com.do"', expect: ['OK']},
-                  3000,
-                  () => {
-                    console.log('No se pudo configurar el APN. Reintentando en 3 segs...',)
-                    this.emit('message', 'APN: Intentando...')
-                  });
-
-              await check();
             }
           }
-          else {
-            if (ipTrueOrFalse) {
-              res(true);
-            } else {
-              setTimeout(async  () => {
-                let tryAgain = errorConter.updateCounter();
-                if (!tryAgain) {
-                  res(false)
-                }
-                console.log('\n No se ha podido obtener una IP. Intentando en 3 Segs...\n')
-                this.emit('message', 'IP: Intentando...')
-                await check();
-              },3000)
-            }
-          }
+        } catch (e) {
+          res(false)
         }
-
       }
       check();
     });
   }
 
   this.checkIp = async ()  =>{
-    const ip = await SequentialSerialManager.send({cmd: 'AT+SAPBR=2,1'});
+    const ip = await SequentialSerialManager.send({cmd: 'AT+SAPBR=2,1', expect: ["OK","ERROR"]});
     myRegexp = /"((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))"/g;
     if (ip.res[0]) {
       match = myRegexp.exec(ip.res[0]);
@@ -231,7 +234,6 @@ GprsService = function (SequentialSerialManager) {
   }
 
   this.httpGet = async (url, params, time = 20000) => {
-
     try {
       if (params) {
         url = url + "?params="+encodeURIComponent(JSON.stringify(params));
@@ -251,10 +253,14 @@ GprsService = function (SequentialSerialManager) {
 
       await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="URL","'+url+'"', alwaysresolve: true});
 
-      responsecode =  await SequentialSerialManager.send({cmd: 'AT+HTTPACTION=0', afterdelimiter: 1, timeout: time});
-      myRegexp = /,(\d.*),/g;
-      match = myRegexp.exec(responsecode.res[1]);
+      let responsecode =  await SequentialSerialManager.send({cmd: 'AT+HTTPACTION=0', afterdelimiter: 1, timeout: time});
+      const myRegexp = /,(\d.*),/g;
+      const  match = myRegexp.exec(responsecode.res[1]);
       responsecode  = match[1];
+
+      if (responsecode === "601") {
+        this.emit('networkError')
+      }
 
       if (responsecode.startsWith('6')){
         await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
@@ -265,7 +271,7 @@ GprsService = function (SequentialSerialManager) {
       if (result.res[1]) {
         const resultJson = IsJsonString(result.res[1])
         if (resultJson) {
-           content = resultJson;
+          content = resultJson;
         } else {
           content = result.res[1];
         }
@@ -279,9 +285,6 @@ GprsService = function (SequentialSerialManager) {
       try { await SequentialSerialManager.send({cmd: 'AT+HTTPTERM'});}catch (e) {}
       return {code: 600, content: e}
     }
-
-
-
   }
 
   this.httpPost = async (url, params,time = 20000) => {
@@ -317,10 +320,15 @@ GprsService = function (SequentialSerialManager) {
         await SequentialSerialManager.send({cmd: params})
       }
 
-      responsecode =  await SequentialSerialManager.send({cmd: 'AT+HTTPACTION=1', afterdelimiter: 1, timeout: time});
-      myRegexp = /,(\d.*),/g;
-      match = myRegexp.exec(responsecode.res[1]);
+      let responsecode =  await SequentialSerialManager.send({cmd: 'AT+HTTPACTION=1', afterdelimiter: 1, timeout: time});
+      const  myRegexp = /,(\d.*),/g;
+      const match = myRegexp.exec(responsecode.res[1]);
       responsecode  = match[1];
+
+      if (responsecode === "601") {
+        this.emit('networkError')
+      }
+
 
       if (responsecode.startsWith('6')){
         await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})

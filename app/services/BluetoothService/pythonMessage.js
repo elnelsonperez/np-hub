@@ -1,5 +1,5 @@
 
-const Message = function (type, name, payload) {
+const pythonMessage = function (type, name, payload) {
   this.name = name;
   this.type = type;
   this.body = jsonOrText(payload)
@@ -26,4 +26,4 @@ function jsonOrText(str = null) {
     return str;
   }
 }
-module.exports = Message;
+module.exports = pythonMessage;

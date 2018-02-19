@@ -6,13 +6,13 @@ const BtMessage = function ({corr_id = null, type, payload}) {
     this.corr_id = +autoincrement
   else
     this.corr_id = corr_id
-  this.payload = jsonOrText(payload)
+  this.payload = jsonTextOrObj(payload)
   this.has = (body_param) => {
     return !!this.body[body_param];
   }
 }
 
-function jsonOrText(str = null) {
+function jsonTextOrObj(str = null) {
   if (!str)
     return {}
   try {

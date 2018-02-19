@@ -20,6 +20,7 @@ const BluetoothService = function ({debug = false}){
     });
 
     this.shell.on('message', (message) => {
+      message = message.trim()
       if (debug === true)
         console.log(message)
       message = this.parser.parse(message)

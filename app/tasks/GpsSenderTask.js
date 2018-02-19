@@ -2,6 +2,11 @@ const Task  = require('../core/Task').Task
 const RequestQueueService = require ("./../../app/services/RequestQueueService")
 const props = require('./../App').props
 
+/**
+ * Se encarga de enviar las localizaciones validadas por el hermano GpsTask al servidor
+ * periodicamente
+ * @type {Task}
+ */
 const GpsSenderTask = new Task (
     {
       name: 'GpsSenderTask',

@@ -7,6 +7,7 @@ const GprsService =  require('./services/GprsService').GprsService;
 const EventEmitter = require('events').EventEmitter
 const IbuttonService = require('./services/IbuttonService').IbuttonService
 const ConfigService = require('./services/ConfigService')
+const MensajeService = require('./services/MensajeService')
 const RequestSenderService = require('./services/RequestSenderService')
 const InputService = require('./services/InputService').InputService
 const RequestQueueService = require("./services/RequestQueueService")
@@ -43,9 +44,12 @@ Application = function () {
     lcd: false
   }
 
-  this.initialize = ({defaultModule = 'boot', verbose = false}) => {
+  this.pulledData = {}
+
+  this.initialize = ({defaultModule = 'boot', verbose = false, bridgeDebug = false}) => {
     props.argv = {
-      verbose: verbose
+      verbose,
+      bridgeDebug
     };
     this.currentModuleDomain = defaultModule;
     const lcdEnabled = this.disabledFunctionality.lcd === false
@@ -91,10 +95,14 @@ Application = function () {
         "http://nppms.us/api/hub_config"
     )
 
+    this.injectable.MensajeService = new MensajeService(this.injectable.RequestSenderService)
+
     props.applicationEvent.once('config.ready', config => {
       console.log("======== CONFIG LOADED ==========")
-      console.log(config)
       props.config = config
+      // this.injectable.MensajeService.getMensajes({today: true}).then(a => {
+      //   console.log("getMensajes Response =====================>", a)
+      // })
     })
 
     if (lcdEnabled)
@@ -152,9 +160,7 @@ Application = function () {
     fs.readdirSync(dir).forEach(file => {
       const task = require(dir+'/'+file);
       if (task) {
-        if (task.initialize) {
-          task.initialize()
-        }
+
         for (let injectable of task.inject) {
           if (this.injectable[injectable]) {
             task[injectable] = this.injectable[injectable];
@@ -162,6 +168,9 @@ Application = function () {
         }
         task.siblingTasks = this.tasks;
         this.tasks[task.name] = task;
+        if (task.initialize) {
+          task.initialize()
+        }
       }
     });
   }
