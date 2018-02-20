@@ -50,6 +50,8 @@ BluetoothBridgeTask.initialize = function () {
     }
 
   })
+
+  props.applicationEvent.on("webMessageReceived", this.webMessageReceived)
 }
 
 /**
@@ -63,6 +65,10 @@ BluetoothBridgeTask.newConnection = function (msg) {
   }
 }
 
+BluetoothBridgeTask.webMessageReceived = function (mensajes) {
+  console.log("========================> Mensajes\n", mensajes)
+}
+
 /**
  *
  * @param {pythonMessage} msg
@@ -71,28 +77,48 @@ BluetoothBridgeTask.received = function (msg) {
   if (msg.has("mac_address") && msg.has("data")) {
     const action = msg.body.data;
     if (action.type && action.payload) {
-      switch (action.type) {
-        case "GET_TODAY_MENSAJES" :
-          this.MensajeService.getMensajes({today: true}).then(mensajes => {
-            if (mensajes) {
-              this.BluetoothService.sendToDevice(
-                  {
-                    mac_address: msg.body.mac_address,
-                    message: new BtMessage(
-                        {
-                          type: "GET_TODAY_MENSAJES_RESPONSE",
-                          payload:  {mensajes}
-                        }
-                    )
-                  }
-              )
-            }
-          })
-          break
+      if (this["action_"+action.type]) {
+        this["action_"+action.type](msg)
       }
     }
-
   }
+}
+
+BluetoothBridgeTask.action_AUTO_PULL_MENSAJES  = function(msg) {
+  props.applicationEvent.emit("action_AUTO_PULL_MENSAJES",!!msg.body.data === true)
+}
+BluetoothBridgeTask.action_SEND_MENSAJE_TO_SERVER = function(msg) {
+  const action = msg.body.data;
+  if (action.payload
+      && action.payload.oficial_unidad_id
+      && action.payload.contenido) {
+    this.MensajeService.sendMensaje({
+      oficial_unidad_id: action.payload.oficial_unidad_id,
+      contenido: action.payload.contenido
+    }).then(r => {
+      if (r !== null) {
+        console.log("===================> Mensaje ENVIADO\n")
+      }
+    })
+  }
+}
+
+BluetoothBridgeTask.action_GET_TODAY_MENSAJES  = function(msg) {
+  this.MensajeService.getMensajes({today: true}).then(mensajes => {
+    if (mensajes) {
+      this.BluetoothService.sendToDevice(
+          {
+            mac_address: msg.body.mac_address,
+            message: new BtMessage(
+                {
+                  type: "GET_TODAY_MENSAJES_RESPONSE",
+                  payload:  mensajes
+                }
+            )
+          }
+      )
+    }
+  })
 }
 
 /**

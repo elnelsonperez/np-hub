@@ -8,7 +8,6 @@ const MensajeService = function (RequestSenderService) {
 
   this.getMensajes = async function ({today = false, from = false, to = false}) {
     try {
-      console.log("Requesting Mensajes Pendientes");
       const response  = await RequestSenderService.requestWithResponse({
         url: "http://nppms.us/api/hub_get_mensajes",
         method: "POST",
@@ -20,8 +19,11 @@ const MensajeService = function (RequestSenderService) {
           to
         }
       })
-      if (response.code === 200 || response.code === 204) {
+      if (response.code === 200) {
         return response.content;
+      }
+      if (response.code === 204) {
+       return null;
       }
     }
     catch (e) {
@@ -30,12 +32,10 @@ const MensajeService = function (RequestSenderService) {
         this.emit("error_message", e.message)
       }
     }
-    return null;
   }
 
   this.sendMensaje = async function ({oficial_unidad_id, contenido}) {
     try {
-      console.log("Requesting Mensajes Pendientes");
       const response  = await RequestSenderService.requestWithResponse({
         url: "http://nppms.us/api/hub_mensajes",
         method: "POST",

@@ -166,13 +166,17 @@ Application = function () {
             task[injectable] = this.injectable[injectable];
           }
         }
-        task.siblingTasks = this.tasks;
         this.tasks[task.name] = task;
         if (task.initialize) {
           task.initialize()
         }
       }
     });
+
+    for (let key of Object.keys(this.tasks)) {
+      this.tasks[key].siblingTasks = this.tasks;
+    }
+
   }
 
   /**
