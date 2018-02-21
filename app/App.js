@@ -46,10 +46,11 @@ Application = function () {
 
   this.pulledData = {}
 
-  this.initialize = ({defaultModule = 'boot', verbose = false, bridgeDebug = false}) => {
+  this.initialize = ({defaultModule = 'boot', verbose = false, bridgeDebug = false, noLocations = false}) => {
     props.argv = {
       verbose,
-      bridgeDebug
+      bridgeDebug,
+      noLocations
     };
     this.currentModuleDomain = defaultModule;
     const lcdEnabled = this.disabledFunctionality.lcd === false

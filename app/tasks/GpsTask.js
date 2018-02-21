@@ -27,52 +27,52 @@ const GpsTask = new Task (
 );
 
 GpsTask.initialize = function (debug = false) {
+  if (!props.argv.noLocations) {
+    const init = () => {
+      this.ready = true;
+      const file = '/dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_6_-_GPS_Receiver-if00';
+      const parsers = SerialPort.parsers;
+      const parser = new parsers.Readline({
+        delimiter: '\r\n'
+      });
 
-  const init = () => {
-    this.ready = true;
-    const file = '/dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_6_-_GPS_Receiver-if00';
-    const parsers = SerialPort.parsers;
-    const parser = new parsers.Readline({
-      delimiter: '\r\n'
-    });
+      const port = new SerialPort(file, {
+        baudRate: 9600
+      });
 
-    const port = new SerialPort(file, {
-      baudRate: 9600
-    });
+      port.pipe(parser);
 
-    port.pipe(parser);
+      const gps = new GPS;
 
-    const gps = new GPS;
+      parser.on('data', function(data) {
+        try {
+          gps.update(data);
+        } catch (e) {
+          console.log(e)
+        }
+      });
 
-    parser.on('data', function(data) {
-      try {
-        gps.update(data);
-      } catch (e) {
-        console.log(e)
-      }
-    });
-
-    gps.on('GLL', (parsed) => {
-      if (parsed.valid === true &&
-          parsed.status === "active" &&
-          parsed.lat !== null
-          && parsed.lon !== null)
-      {
-        const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
-        this.data.rawLocations.push({
-          time: time,
-          lat: parsed.lat,
-          lng: parsed.lon
-        });
-      }
-    });
+      gps.on('GLL', (parsed) => {
+        if (parsed.valid === true &&
+            parsed.status === "active" &&
+            parsed.lat !== null
+            && parsed.lon !== null)
+        {
+          const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
+          this.data.rawLocations.push({
+            time: time,
+            lat: parsed.lat,
+            lng: parsed.lon
+          });
+        }
+      });
+    }
+    if (debug === false ) {
+      props.applicationEvent.on("config.ready", init)
+    } else {
+      init()
+    }
   }
-  if (debug === false ) {
-    props.applicationEvent.on("config.ready", init)
-  } else {
-    init()
-  }
-
 }
 
 GpsTask.run = function () {

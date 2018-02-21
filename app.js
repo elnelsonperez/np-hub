@@ -5,7 +5,11 @@ app = new Application();
 app.disabledFunctionality.lcd = true;
 const argv = require('minimist')(process.argv.slice(2));
 
-app.initialize({verbose: !!argv.verbose, bridgeDebug: argv.bridgeDebug});
+app.initialize({
+  verbose: !!argv.verbose,
+  bridgeDebug: !!argv.bridgeDebug,
+  noLocations: !!argv.noLocations,
+});
 
 process.on('unhandledRejection', (reason, p) => {
     console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);

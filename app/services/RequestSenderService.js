@@ -24,15 +24,21 @@ const RequestSenderService = function (RequestQueueService, RequestProcessorServ
           rej(error)
         }, timeout)
 
-        RequestProcessorService.on(event_name, (response) => {
-          if (response.error)
+        const callback =  (response) => {
+          if (response.error) {
+            RequestProcessorService.removeListener(event_name,callback)
             rej(response.error)
+          }
+
           if (response.id && response.id === requestId) {
             clearTimeout(timeoutId)
+            RequestProcessorService.removeListener(event_name,callback)
             res(response.res)
           }
-        })
+        };
+        RequestProcessorService.on(event_name,callback)
       }).catch(e => {
+        RequestProcessorService.removeListener(event_name,callback)
         rej(e)
       })
 

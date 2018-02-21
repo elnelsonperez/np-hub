@@ -1,6 +1,7 @@
 const Task  = require('./../core/Task').Task
 const props = require('./../App').props
 const BtMessage  = require('./../services/BluetoothService/BtMessage')
+const dateformat = require('dateformat')
 /**
  * Se encarga de interpretar los mensajes reportados por el servicio de Bluetooth.
  * Sirve como puente entre la data en el Hub y los dispositivos conectados por Bt.
@@ -15,14 +16,14 @@ const BluetoothBridgeTask = new Task (
       autoload: false,
       ready: false,
       data: {
-        connectedMacAddresses: []
+        connectedMacAddresses: [],
+        pullingData : {}
       }
     }
 );
 
 BluetoothBridgeTask.initialize = function () {
   this.BluetoothService.on("EVENT", msg => {
-
     switch (msg.name) {
       case "AWAITING_NEW_CONNECTION":
         this.awaitingConnection(msg)
@@ -48,10 +49,40 @@ BluetoothBridgeTask.initialize = function () {
       case "UNAUTHORIZED":
         break
     }
-
   })
 
-  props.applicationEvent.on("webMessageReceived", this.webMessageReceived)
+  props.applicationEvent.on("autopulledMessages", (payload) => {
+    if (payload.mensajes && payload.mensajes.length > 0) {
+      let minDate = null;
+      for (let m of Object.keys(payload.mensajes)) {
+        const date =  new Date(payload.mensajes[m].creado_en)
+        if (minDate === null) {
+          minDate = date;
+        } else {
+          if (date > minDate) {
+            minDate = date;
+          }
+        }
+      }
+
+      if (minDate) {
+        this.data.pullingData[payload.mac].lastPulledMessageDate = dateformat(minDate,"yyyy-mm-dd HH:MM:ss");
+      }
+
+      this.BluetoothService.sendToDevice(
+          {
+            mac_address: payload.mac,
+            message: new BtMessage(
+                {
+                  type: "NEW_SERVER_MESSAGES",
+                  payload:  payload.mensajes
+                }
+            )
+          }
+      )
+    }
+  })
+
 }
 
 /**
@@ -62,11 +93,12 @@ BluetoothBridgeTask.newConnection = function (msg) {
   if (msg.has("mac_address")
       && !this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
     this.data.connectedMacAddresses.push(msg.body.mac_address)
+    if (!this.data.pullingData[msg.body.mac_address]) {
+      this.data.pullingData[msg.body.mac_address] = {
+        lastPulledMessageDate: null
+      }
+    }
   }
-}
-
-BluetoothBridgeTask.webMessageReceived = function (mensajes) {
-  console.log("========================> Mensajes\n", mensajes)
 }
 
 /**
@@ -84,26 +116,8 @@ BluetoothBridgeTask.received = function (msg) {
   }
 }
 
-BluetoothBridgeTask.action_AUTO_PULL_MENSAJES  = function(msg) {
-  props.applicationEvent.emit("action_AUTO_PULL_MENSAJES",!!msg.body.data === true)
-}
-BluetoothBridgeTask.action_SEND_MENSAJE_TO_SERVER = function(msg) {
-  const action = msg.body.data;
-  if (action.payload
-      && action.payload.oficial_unidad_id
-      && action.payload.contenido) {
-    this.MensajeService.sendMensaje({
-      oficial_unidad_id: action.payload.oficial_unidad_id,
-      contenido: action.payload.contenido
-    }).then(r => {
-      if (r !== null) {
-        console.log("===================> Mensaje ENVIADO\n")
-      }
-    })
-  }
-}
 
-BluetoothBridgeTask.action_GET_TODAY_MENSAJES  = function(msg) {
+BluetoothBridgeTask.action_GET_TODAY_MESSAGES  = function(msg) {
   this.MensajeService.getMensajes({today: true}).then(mensajes => {
     if (mensajes) {
       this.BluetoothService.sendToDevice(
@@ -111,7 +125,7 @@ BluetoothBridgeTask.action_GET_TODAY_MENSAJES  = function(msg) {
             mac_address: msg.body.mac_address,
             message: new BtMessage(
                 {
-                  type: "GET_TODAY_MENSAJES_RESPONSE",
+                  type: "GET_TODAY_MESSAGES_RESPONSE",
                   payload:  mensajes
                 }
             )
@@ -120,6 +134,58 @@ BluetoothBridgeTask.action_GET_TODAY_MENSAJES  = function(msg) {
     }
   })
 }
+
+BluetoothBridgeTask.action_SEND_MESSAGE_TO_SERVER = function(msg) {
+  const action = msg.body.data;
+  if (action.payload
+      && action.payload.oficial_unidad_id
+      && action.payload.temp_id
+      && action.payload.contenido) {
+    this.MensajeService.sendMensaje({
+      oficial_unidad_id: action.payload.oficial_unidad_id,
+      contenido: action.payload.contenido
+    }).then(r => {
+      if (r !== null) {
+        this.BluetoothService.sendToDevice(
+            {
+              mac_address: msg.body.mac_address,
+              message: new BtMessage(
+                  {
+                    type: "SEND_MESSAGE_TO_SERVER_RESPONSE",
+                    payload: {
+                      tmp_id: action.payload.temp_id,
+                      mensaje: r
+                    }
+                  }
+              )
+            }
+        )
+      }
+    })
+  }
+}
+BluetoothBridgeTask.action_GET_DEVICE_CONFIG = function(msg) {
+  if (props.config.oficiales) {
+    const configs = {
+      oficial: props.config.oficiales.find(v => {
+        return v.mac_address === msg.mac_address
+      })
+    }
+    this.BluetoothService.sendToDevice(
+        {
+          mac_address: msg.body.mac_address,
+          message: new BtMessage(
+              {
+                type: "GET_DEVICE_CONFIG_RESPONSE",
+                payload: configs
+              }
+          )
+        }
+    )
+  }
+
+}
+
 
 /**
  *
@@ -138,6 +204,9 @@ BluetoothBridgeTask.disconnected = function (msg) {
       && this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
     this.data.connectedMacAddresses.splice(
         this.data.connectedMacAddresses.findIndex(v => v === msg.body.mac_address),1)
+    if (this.data.pullingData[msg.body.mac_address]) {
+      delete this.data.pullingData[msg.body.mac_address]
+    }
   }
 }
 
