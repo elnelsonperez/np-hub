@@ -335,7 +335,7 @@ GprsService = function (SequentialSerialManager) {
         return {code: parseInt(responsecode), content: 'Network Error: Impossible'}
       }
 
-      result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD'});
+      result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD',timeout: 12000});
       if (result.res[1]) {
         resultJson = IsJsonString(result.res[1])
         if (resultJson) {
