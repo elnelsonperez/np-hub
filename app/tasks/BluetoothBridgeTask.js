@@ -65,7 +65,7 @@ BluetoothBridgeTask.initialize = function () {
         }
       }
 
-      if (minDate) {
+      if (minDate && this.data.pullingData[payload.mac]) {
         this.data.pullingData[payload.mac].lastPulledMessageDate = dateformat(minDate,"yyyy-mm-dd HH:MM:ss");
       }
 
@@ -136,6 +136,7 @@ BluetoothBridgeTask.action_GET_TODAY_MESSAGES  = function(msg) {
 }
 
 BluetoothBridgeTask.action_SEND_MESSAGE_TO_SERVER = function(msg) {
+  console.log("=======================> Send msg to server received")
   const action = msg.body.data;
   if (action.payload
       && action.payload.oficial_unidad_id

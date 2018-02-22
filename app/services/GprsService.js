@@ -267,7 +267,7 @@ GprsService = function (SequentialSerialManager) {
         return {code: parseInt(responsecode), content: 'Network Error: Impossible'}
       }
 
-      let result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD'});
+      let result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD', timeout: 12000});
       if (result.res[1]) {
         const resultJson = IsJsonString(result.res[1])
         if (resultJson) {

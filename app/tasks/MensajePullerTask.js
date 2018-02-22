@@ -4,7 +4,7 @@ const props = require('./../App').props
 const MensajePullerTask = new Task (
     {
       name: 'MensajePullerTask',
-      every: 8000,
+      every: 5000,
       inject: ["MensajeService","BluetoothService"],
       autoload: true,
       ready: true
