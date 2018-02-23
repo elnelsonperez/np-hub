@@ -17,7 +17,10 @@ const BluetoothBridgeTask = new Task (
       ready: false,
       data: {
         connectedMacAddresses: [],
-        pullingData : {}
+        pullingData : {
+          lastPulledMessageDate: null,
+          lastPulledIncidenciaDate: null
+        }
       }
     }
 );
@@ -51,38 +54,55 @@ BluetoothBridgeTask.initialize = function () {
     }
   })
 
-  props.applicationEvent.on("autopulledMessages", (payload) => {
-    if (payload.mensajes && payload.mensajes.length > 0) {
-      let minDate = null;
-      for (let m of Object.keys(payload.mensajes)) {
-        const date =  new Date(payload.mensajes[m].creado_en)
-        if (minDate === null) {
+  props.applicationEvent.on("autopulledMessages", (data) => {this.autoPulledHandler('mensajes',data)})
+  props.applicationEvent.on("autopulledIncidencias", (data) => {this.autoPulledHandler('incidencias',data)})
+
+}
+
+BluetoothBridgeTask.autoPulledHandler  = function(type, payload) {
+  if (payload && payload.length > 0) {
+    let minDate = null;
+    for (let m of Object.keys(payload)) {
+      const date =  new Date(payload[m].creado_en)
+      if (minDate === null) {
+        minDate = date;
+      } else {
+        if (date > minDate) {
           minDate = date;
-        } else {
-          if (date > minDate) {
-            minDate = date;
-          }
         }
       }
+    }
 
-      if (minDate && this.data.pullingData[payload.mac]) {
-        this.data.pullingData[payload.mac].lastPulledMessageDate = dateformat(minDate,"yyyy-mm-dd HH:MM:ss");
+    if (minDate) {
+      if (type === "mensajes") {
+        this.data.pullingData.lastPulledMessageDate = dateformat(minDate, "yyyy-mm-dd HH:MM:ss");
+      } else if (type === "incidencias") {
+        this.data.pullingData.lastPulledIncidenciaDate = dateformat(minDate, "yyyy-mm-dd HH:MM:ss");
       }
+    }
 
+    let name = null;
+    if (type === "mensajes") {
+      name = "NEW_SERVER_MESSAGES";
+    } else if (type === "incidencias") {
+      name = "NEW_SERVER_INCIDENCIAS";
+    }
+
+    for (let mac of this.data.connectedMacAddresses) {
       this.BluetoothService.sendToDevice(
           {
-            mac_address: payload.mac,
+            mac_address: mac,
             message: new BtMessage(
                 {
-                  type: "NEW_SERVER_MESSAGES",
-                  payload:  payload.mensajes
+                  type: name,
+                  payload: payload
                 }
             )
           }
       )
     }
-  })
 
+  }
 }
 
 /**

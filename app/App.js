@@ -8,6 +8,7 @@ const EventEmitter = require('events').EventEmitter
 const IbuttonService = require('./services/IbuttonService').IbuttonService
 const ConfigService = require('./services/ConfigService')
 const MensajeService = require('./services/MensajeService')
+const IncidenciaService = require('./services/IncidenciaService')
 const RequestSenderService = require('./services/RequestSenderService')
 const InputService = require('./services/InputService').InputService
 const RequestQueueService = require("./services/RequestQueueService")
@@ -97,6 +98,7 @@ Application = function () {
     )
 
     this.injectable.MensajeService = new MensajeService(this.injectable.RequestSenderService)
+    this.injectable.IncidenciaService = new IncidenciaService(this.injectable.RequestSenderService)
 
     props.applicationEvent.once('config.ready', config => {
       console.log("======== CONFIG LOADED ==========")

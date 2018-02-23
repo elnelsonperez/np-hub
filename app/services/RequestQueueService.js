@@ -1,7 +1,7 @@
 const Database = require("./../core/Database")
 
 const RequestQueueService = function () {
-  this.table = "requests_queue"
+  this.table = "queue"
   const db = Database.conn
   this.addRequest = (
       {url, method, payload = {}, priority = RequestQueueService.PRIORITY_LOW, event_name = null,auto_discard =false}
@@ -198,7 +198,7 @@ RequestQueueService.STATUS_NEVER = 3
 module.exports = RequestQueueService;
 
 /*
-CREATE TABLE requests_queue (
+CREATE TABLE queue (
     id integer PRIMARY KEY,
     url text NOT NULL,
     method text NOT NULL,
@@ -209,4 +209,7 @@ CREATE TABLE requests_queue (
     auto_discard integer default 0,
     retry_counter integer default 0,
     date datetime default CURRENT_TIMESTAMP
-)*/
+);
+CREATE INDEX index_priority ON queue (priority);
+CREATE INDEX index_status ON queue (status);
+*/
