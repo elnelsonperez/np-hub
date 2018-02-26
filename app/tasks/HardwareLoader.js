@@ -16,7 +16,6 @@ const HardwareLoader = new Task (
       autoload: false
     }
 );
-
 HardwareLoader.initialize = async function () {
   let fail = false;
 
@@ -26,6 +25,8 @@ HardwareLoader.initialize = async function () {
         //Reset the shit
         console.log("============== WOULD RESET =====================")
       }
+    }).catch(e => {
+      console.log("============== WOULD RESET =====================")
     })
   })
 

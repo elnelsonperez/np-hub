@@ -7,53 +7,39 @@ const QueueService = require("./RequestQueueService")
 const IncidenciaService = function (RequestSenderService) {
 
   this.getIncidencias = async function ({from = false}) {
-    try {
-      const response  = await RequestSenderService.requestWithResponse({
-        url: "http://nppms.us/api/hub_get_incidencias",
-        method: "POST",
-        priority: QueueService.PRIORITY_HIGH,
-        event_name: "INCIDENCIAS_GET",
-        payload: {
-          from
-        }
-      })
-      if (response.code === 200) {
-        return response.content;
+
+    const response  = await RequestSenderService.requestWithResponse({
+      url: "http://nppms.us/api/hub_get_incidencias",
+      method: "POST",
+      priority: QueueService.PRIORITY_HIGH,
+      event_name: "INCIDENCIAS_GET",
+      payload: {
+        from
       }
-      if (response.code === 204) {
-        return null;
-      }
+    })
+    if (response.code === 200) {
+      return response.content;
     }
-    catch (e) {
-      console.log(e)
-      if (!e.code || e.code !== 800) {
-        this.emit("error_message", e.message)
-      }
+    if (response.code === 204) {
+      return null;
     }
+
   }
 
   //Ids in DB
   this.changeStatus = async function ({estado_id = 4, incidencia_id}) {
-    try {
-      const response  = await RequestSenderService.requestWithResponse({
-        url: "http://nppms.us/api/hub_estado_incidencias",
-        method: "POST",
-        priority: QueueService.PRIORITY_HIGH,
-        event_name: "INCIDENCIA_ESTADO",
-        payload: {
-          estado_id,
-          incidencia_id
-        }
-      })
-      if (response.code === 200) {
-        return response.content;
+    const response  = await RequestSenderService.requestWithResponse({
+      url: "http://nppms.us/api/hub_estado_incidencias",
+      method: "POST",
+      priority: QueueService.PRIORITY_HIGH,
+      event_name: "INCIDENCIA_ESTADO",
+      payload: {
+        estado_id,
+        incidencia_id
       }
-    }
-    catch (e) {
-      console.log(e)
-      if (!e.code || e.code !== 800) {
-        this.emit("error_message", e.message)
-      }
+    })
+    if (response.code === 200) {
+      return response.content;
     }
   }
 }

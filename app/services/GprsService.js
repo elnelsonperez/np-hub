@@ -36,6 +36,7 @@ events.EventEmitter.call(this);
 
 GprsService = function (SequentialSerialManager) {
 
+  this.mandatoryErrors = 0;
   this.initialized = false;
 
   /**
@@ -44,8 +45,16 @@ GprsService = function (SequentialSerialManager) {
    */
   this.mandatoryCommand = async function (promise, args, delay, fn = null) {
     return new Promise (res => {
-      function doIt() {
-        promise(args).then(res).catch(e => {
+      const doIt = () => {
+        promise(args).then((r) => {
+          this.mandatoryErrors = 0;
+          res(r)}).catch(e => {
+            this.mandatoryErrors++
+            console.log("Mandatory error counter: ", this.mandatoryErrors)
+          if (this.mandatoryErrors >= 5) {
+            console.log("========================> GPRS MANAGER WOULD RESET HERE")
+            process.exit()
+          }
           if (fn) {
             respuesta = fn();
             if(Promise.resolve(respuesta) === respuesta){
@@ -267,7 +276,7 @@ GprsService = function (SequentialSerialManager) {
         return {code: parseInt(responsecode), content: 'Network Error: Impossible'}
       }
 
-      let result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD', timeout: 12000});
+      let result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD', timeout: 15000});
       if (result.res[1]) {
         const resultJson = IsJsonString(result.res[1])
         if (resultJson) {
@@ -278,7 +287,7 @@ GprsService = function (SequentialSerialManager) {
       } else {
         content = result.res;
       }
-      await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
+
       return {code: parseInt(responsecode), content: content}
 
     } catch (e) {
@@ -294,10 +303,10 @@ GprsService = function (SequentialSerialManager) {
         await SequentialSerialManager.send({cmd: 'AT+HTTPINIT'});
       }  catch (e) {
         //This should be managed by a mandatory command
-        if (e.res.includes('ERROR')){
-          await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', alwaysresolve: true});
-          await SequentialSerialManager.send({cmd: 'AT+HTTPINIT', alwaysresolve: true});
-        }
+        // if (e.res.includes('ERROR')){
+        //   await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', alwaysresolve: true});
+        //   await SequentialSerialManager.send({cmd: 'AT+HTTPINIT', alwaysresolve: true});
+        // }
       }
 
       await SequentialSerialManager.send({cmd: 'AT+HTTPPARA="CID",1', alwaysresolve: true});
@@ -335,7 +344,7 @@ GprsService = function (SequentialSerialManager) {
         return {code: parseInt(responsecode), content: 'Network Error: Impossible'}
       }
 
-      result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD',timeout: 12000});
+      result = await SequentialSerialManager.send({cmd: 'AT+HTTPREAD',timeout: 15000});
       if (result.res[1]) {
         resultJson = IsJsonString(result.res[1])
         if (resultJson) {
@@ -346,7 +355,7 @@ GprsService = function (SequentialSerialManager) {
       } else {
         content = result.res;
       }
-      await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
+      // await SequentialSerialManager.send({cmd: 'AT+HTTPTERM', expect: ['ERROR','OK']})
       return {code: parseInt(responsecode), content: content}
 
     } catch (e) {

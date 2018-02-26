@@ -9,6 +9,7 @@ const RequestSenderService = function (RequestQueueService, RequestProcessorServ
 
   this.requestWithResponse = (
       {url, method, payload, priority = QueueService.PRIORITY_LOW, event_name = null, timeout= 15000}) => {
+    let timeoutId = null;
     return new Promise((res,rej) => {
       RequestQueueService.addRequest({
         url: url,
@@ -18,14 +19,15 @@ const RequestSenderService = function (RequestQueueService, RequestProcessorServ
         payload: payload,
         auto_discard: true
       }).then((requestId) => {
-        const timeoutId = setTimeout(() => {
+        timeoutId = setTimeout(() => {
           const error = new Error("Timeout for request reached")
           error.code = 800
           rej(error)
         }, timeout)
 
-        const callback =  (response) => {
+        const callback = (response) => {
           if (response.error) {
+            clearTimeout(timeoutId)
             RequestProcessorService.removeListener(event_name,callback)
             rej(response.error)
           }
@@ -38,7 +40,8 @@ const RequestSenderService = function (RequestQueueService, RequestProcessorServ
         };
         RequestProcessorService.on(event_name,callback)
       }).catch(e => {
-        RequestProcessorService.removeListener(event_name,callback)
+        clearTimeout(timeoutId)
+        RequestProcessorService.removeAllListeners(event_name)
         rej(e)
       })
 

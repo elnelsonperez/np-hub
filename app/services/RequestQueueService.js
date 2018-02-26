@@ -78,7 +78,7 @@ const RequestQueueService = function () {
         db.get(`
         SELECT * FROM ${this.table} 
         WHERE status = ${status} 
-        ORDER BY priority DESC, date ASC `, (err, row) => {
+        ORDER BY date ASC,priority DESC`, (err, row) => {
           if (err)
             rej(err)
           const obj = row;

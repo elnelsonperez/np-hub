@@ -162,7 +162,7 @@ BluetoothBridgeTask.action_SEND_MESSAGE_TO_SERVER = function(msg) {
       && action.payload.oficial_unidad_id
       && action.payload.temp_id
       && action.payload.contenido) {
-    this.MensajeService.sendMensaje({
+    this.MensajeService.sendMessage({
       oficial_unidad_id: action.payload.oficial_unidad_id,
       contenido: action.payload.contenido
     }).then(r => {
@@ -225,9 +225,8 @@ BluetoothBridgeTask.disconnected = function (msg) {
       && this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
     this.data.connectedMacAddresses.splice(
         this.data.connectedMacAddresses.findIndex(v => v === msg.body.mac_address),1)
-    if (this.data.pullingData[msg.body.mac_address]) {
-      delete this.data.pullingData[msg.body.mac_address]
-    }
+    this.data.pullingData.lastPulledMessageDate = null;
+    this.data.pullingData.lastPulledIncidenciaDate = null;
   }
 }
 

@@ -14,7 +14,7 @@ const InputService = require('./services/InputService').InputService
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
 const BluetoothService = require("./services/BluetoothService/BluetoothService")
-
+const reset = require('./../lib/functions').reset;
 const SCREEN_REFRESH_DELAY = 500;
 const INPUT_DELAY = 150;
 
@@ -34,7 +34,6 @@ Application = function () {
   this.screen = null //4 Line objects basically
   this.lcd = null //Lcd library
   this.timer = null //Lcd update timer
-
   this.modules = {} //Module list
   this.tasks = {} //Task list
   this.injectable = {} //Which libraries are injectable to modules or tasks
@@ -45,14 +44,14 @@ Application = function () {
     lcd: false
   }
 
-  this.pulledData = {}
-
   this.initialize = ({defaultModule = 'boot', verbose = false, bridgeDebug = false, noLocations = false}) => {
+
     props.argv = {
       verbose,
       bridgeDebug,
       noLocations
     };
+
     this.currentModuleDomain = defaultModule;
     const lcdEnabled = this.disabledFunctionality.lcd === false
     const inputService = new InputService(INPUT_DELAY);
@@ -71,6 +70,7 @@ Application = function () {
     props.input = inputService
 
     props.applicationEvent = new EventEmitter()
+
     props.serialNumber = getSerial();
     this.setDefaultApplicationProperties();
 
