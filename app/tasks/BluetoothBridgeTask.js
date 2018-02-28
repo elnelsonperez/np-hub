@@ -113,11 +113,6 @@ BluetoothBridgeTask.newConnection = function (msg) {
   if (msg.has("mac_address")
       && !this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
     this.data.connectedMacAddresses.push(msg.body.mac_address)
-    if (!this.data.pullingData[msg.body.mac_address]) {
-      this.data.pullingData[msg.body.mac_address] = {
-        lastPulledMessageDate: null
-      }
-    }
   }
 }
 
@@ -186,12 +181,16 @@ BluetoothBridgeTask.action_SEND_MESSAGE_TO_SERVER = function(msg) {
   }
 }
 BluetoothBridgeTask.action_GET_DEVICE_CONFIG = function(msg) {
+
   if (props.config.oficiales) {
     const configs = {
       oficial: props.config.oficiales.find(v => {
         return v.mac_address === msg.mac_address
-      })
+      }),
+      sector: props.config.sector,
+      destacamento: props.config.destacamento,
     }
+    console.log(configs)
     this.BluetoothService.sendToDevice(
         {
           mac_address: msg.body.mac_address,
