@@ -190,7 +190,6 @@ BluetoothBridgeTask.action_GET_DEVICE_CONFIG = function(msg) {
       sector: props.config.sector,
       destacamento: props.config.destacamento,
     }
-    console.log(configs)
     this.BluetoothService.sendToDevice(
         {
           mac_address: msg.body.mac_address,
