@@ -151,7 +151,6 @@ BluetoothBridgeTask.action_GET_TODAY_MESSAGES  = function(msg) {
 }
 
 BluetoothBridgeTask.action_SEND_MESSAGE_TO_SERVER = function(msg) {
-  console.log("=======================> Send msg to server received")
   const action = msg.body.data;
   if (action.payload
       && action.payload.oficial_unidad_id
@@ -170,7 +169,26 @@ BluetoothBridgeTask.action_SEND_MESSAGE_TO_SERVER = function(msg) {
                     type: "SEND_MESSAGE_TO_SERVER_RESPONSE",
                     payload: {
                       tmp_id: action.payload.temp_id,
-                      mensaje: r
+                      mensaje: r,
+                      status: "OK",
+                      callPayload: null
+                    }
+                  }
+              )
+            }
+        )
+      } else {
+        this.BluetoothService.sendToDevice(
+            {
+              mac_address: msg.body.mac_address,
+              message: new BtMessage(
+                  {
+                    type: "SEND_MESSAGE_TO_SERVER_RESPONSE",
+                    payload: {
+                      tmp_id: null,
+                      mensaje: null,
+                      status: "FAILED",
+                      callPayload: action.payload
                     }
                   }
               )
@@ -180,6 +198,51 @@ BluetoothBridgeTask.action_SEND_MESSAGE_TO_SERVER = function(msg) {
     })
   }
 }
+
+BluetoothBridgeTask.action_UPDATE_MESSAGES_STATUS = function(msg) {
+  const action = msg.body.data;
+  if (action.payload
+      && action.payload.mensajes_ids
+      && action.payload.estado_id) {
+    this.MensajeService.updateMessagesStatus({
+      mensajes_ids: action.payload.mensajes_ids,
+      estado_id: action.payload.estado_id
+    }).then(r => {
+      if (r !== null) {
+        this.BluetoothService.sendToDevice(
+            {
+              mac_address: msg.body.mac_address,
+              message: new BtMessage(
+                  {
+                    type: "UPDATE_MESSAGES_STATUS_RESPONSE",
+                    payload: {
+                      status: 'OK',
+                      callPayload: action.payload
+                    }
+                  }
+              )
+            }
+        )
+      } else {
+        this.BluetoothService.sendToDevice(
+            {
+              mac_address: msg.body.mac_address,
+              message: new BtMessage(
+                  {
+                    type: "UPDATE_MESSAGES_STATUS_RESPONSE",
+                    payload: {
+                      status: 'FAILED',
+                      callPayload: action.payload
+                    }
+                  }
+              )
+            }
+        )
+      }
+    })
+  }
+}
+
 BluetoothBridgeTask.action_GET_DEVICE_CONFIG = function(msg) {
 
   if (props.config.oficiales) {
@@ -204,7 +267,6 @@ BluetoothBridgeTask.action_GET_DEVICE_CONFIG = function(msg) {
   }
 
 }
-
 
 /**
  *

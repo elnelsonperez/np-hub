@@ -40,10 +40,20 @@ const MensajeService = function (RequestSenderService) {
     return null
   }
 
-
+  this.updateMessagesStatus = async function ({mensajes_ids, estado_id}) {
+    const response  = await RequestSenderService.requestWithResponse({
+      url: "http://nppms.us/api/hub_estado_mensajes",
+      method: "POST",
+      priority: QueueService.PRIORITY_MEDIUM,
+      event_name: "MENSAJE_ESTADO",
+      payload: {mensajes_ids, estado_id}
+    })
+    if (response.code === 200) {
+      return response.content;
+    }
+    return null
+  }
 }
-
-
 
 util.inherits(MensajeService, EventEmitter)
 module.exports = MensajeService;
