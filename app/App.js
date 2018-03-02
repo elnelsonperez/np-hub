@@ -308,5 +308,11 @@ Application = function () {
 
 };
 
+Promise.prototype.finally = function(cb) {
+  const res = () => this
+  const fin = () => Promise.resolve(cb()).then(res)
+  return this.then(fin, fin);
+};
+
 module.exports.Application = Application;
 module.exports.props = props;

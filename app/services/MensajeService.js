@@ -6,10 +6,12 @@ const QueueService = require("./RequestQueueService")
  */
 const MensajeService = function (RequestSenderService) {
 
-  this.getMensajes = async function ({today = false, from = false, to = false}) {
+  this.getMensajes = async function ({today = false, from = false, to = false,
+                                       paginateUrl = "http://nppms.us/api/hub_get_mensajes"}) {
     const response  = await RequestSenderService.requestWithResponse({
-      url: "http://nppms.us/api/hub_get_mensajes",
+      url: paginateUrl,
       method: "POST",
+      timeout: 20000,
       priority: QueueService.PRIORITY_MEDIUM,
       event_name: "MENSAJES_GET",
       payload: {
