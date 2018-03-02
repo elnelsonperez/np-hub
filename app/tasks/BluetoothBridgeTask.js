@@ -63,7 +63,7 @@ BluetoothBridgeTask.autoPulledHandler  = function(type, payload) {
   if (payload && payload.length > 0) {
     let minDate = null;
     for (let m of Object.keys(payload)) {
-      const date =  new Date(payload[m].creado_en)
+      const date =  new Date(payload[m].actualizado_en)
       if (minDate === null) {
         minDate = date;
       } else {

@@ -12,7 +12,7 @@ const RequestQueueTask = new Task (
       inject: ['RequestProcessorService','GprsService'],
       autoload: false,
       ready: false,
-      every: 1500
+      every: 1000
     }
 );
 
