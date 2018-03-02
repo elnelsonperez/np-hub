@@ -51,11 +51,17 @@ DataPullerTask.pullMensajes = function (lastDate, paginateUrl = null) {
       if (pagination && pagination.data) {
         props.applicationEvent.emit("autopulledMessages", pagination.data)
       }
-      if (pagination && pagination.next_page_url !== null) {
-        this.pullMensajes(null, pagination.next_page_url).finally(() => {
+
+      if (Object.keys(this.siblingTasks.BluetoothBridgeTask.data.connectedMacAddresses).length > 0 &&
+          pagination &&
+          pagination.next_page_url !== null) {
+        this.pullMensajes(lastDate, pagination.next_page_url).finally(() => {
           this.errorsClear()
           resolve()
         })
+      } else {
+        this.errorsClear()
+        resolve()
       }
     }).catch(e => {
       console.log("Pulling messages error: ", e)

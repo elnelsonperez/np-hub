@@ -61,23 +61,28 @@ BluetoothBridgeTask.initialize = function () {
 
 BluetoothBridgeTask.autoPulledHandler  = function(type, payload) {
   if (payload && payload.length > 0) {
-    let minDate = null;
+    let maxDate = null;
     for (let m of Object.keys(payload)) {
       const date =  new Date(payload[m].actualizado_en)
-      if (minDate === null) {
-        minDate = date;
+      if (maxDate === null) {
+        maxDate = date;
       } else {
-        if (date > minDate) {
-          minDate = date;
+        if (date > maxDate) {
+          maxDate = date;
         }
       }
     }
 
-    if (minDate) {
+    if (maxDate) {
       if (type === "mensajes") {
-        this.data.pullingData.lastPulledMessageDate = dateformat(minDate, "yyyy-mm-dd HH:MM:ss");
+        if (
+            this.data.pullingData.lastPulledMessageDate == null ||
+            new Date(this.data.pullingData.lastPulledMessageDate) < maxDate
+        ) {
+          this.data.pullingData.lastPulledMessageDate = dateformat(maxDate, "yyyy-mm-dd HH:MM:ss");
+        }
       } else if (type === "incidencias") {
-        this.data.pullingData.lastPulledIncidenciaDate = dateformat(minDate, "yyyy-mm-dd HH:MM:ss");
+        this.data.pullingData.lastPulledIncidenciaDate = dateformat(maxDate, "yyyy-mm-dd HH:MM:ss");
       }
     }
 
