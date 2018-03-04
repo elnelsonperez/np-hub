@@ -27,7 +27,7 @@ const IncidenciaService = function (RequestSenderService) {
   }
 
   //Ids in DB
-  this.changeStatus = async function ({estado_id = 4, incidencia_id}) {
+  this.updateIncidenciaStatus = async function ({estado_id, incidencia_id}) {
     const response  = await RequestSenderService.requestWithResponse({
       url: "http://nppms.us/api/hub_estado_incidencias",
       method: "POST",

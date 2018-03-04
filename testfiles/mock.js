@@ -42,7 +42,56 @@ Bluetooth.on("EVENT", (e) => {
             )
           }
       )
+      setTimeout(() => {
+
+        Bluetooth.sendToDevice(
+            {
+              mac_address: "80:65:6D:90:43:F7",
+              message: new BtMessage(
+                  {
+                    type: "NEW_SERVER_INCIDENCIAS",
+                    payload: [{"distancia": "2.2km","tiempo": "00:04:20", "id":4,"creada_por":1,"destacamento_id":1,"sector_id":71,"prioridad_id":4,"estado_id":3,"tipo_id":2,"fecha_incidencia":"2018-02-23 18:42:34","detalle_incidente":"Sint quo tenetur rem minima vero sunt at consequatur qui eius eum eveniet libero neque eaque reprehenderit aut.","detalle_ubicacion":"2894 Norbert Plaza Apt. 813","ubicacion":{"type":"Point","coordinates":[-70.704077035189,19.463506965434]},"detalle_solucion":null,"ubicacion_texto":"Hamill Square","nombre_civil":"Felton Abernathy","telefono_civil":"809-051-5733","personas_involucradas":1,"creado_en":"2018-02-25 19:04:06","actualizado_en":"2018-02-25 20:30:35","pivot":{"unidad_id":1,"incidencia_id":4,"creado_en":"2018-02-25 20:30:35","actualizado_en":"2018-02-25 20:30:35"},"tipo":{"id":2,"nombre":"Accidente de Transito"},"prioridad":{"id":4,"nombre":"Baja","orden":1},"sector":{"id":71,"nombre":"La Lotería"},"estado":{"id":3,"nombre":"Asignada"},"creador":{"id":1,"oficial_id":1,"oficial":{"id":1,"nombre":"Nelson","apellido":"Perez Lora"}}}]
+                  }
+              )
+            }
+        )
+      },1000)
+
     })
+  }
+
+  if (e.name === "RECEIVED") {
+    console.log(e)
+    if (e.body.data.type === "UPDATE_INCIDENCIA_STATUS") {
+      Bluetooth.sendToDevice(
+          {
+            mac_address: "80:65:6D:90:43:F7",
+            message: new BtMessage(
+                {
+                  type: "UPDATE_INCIDENCIA_STATUS_RESPONSE",
+                  payload: {
+                    status: 'OK',
+                    incidencia: {
+                      "distancia": "2.2km",
+                      "tiempo": "00:04:20",
+                      "id":4,
+                      "creada_por":1,
+                      "destacamento_id":1,
+                      "sector_id":71,
+                      "prioridad_id":4,
+                      "estado_id":4,
+                      "tipo_id":2,
+                      "fecha_incidencia":"2018-02-23 18:42:34",
+                      "detalle_incidente":"Sint quo tenetur rem minima vero sunt at consequatur qui eius eum eveniet libero neque eaque reprehenderit aut.","detalle_ubicacion":"2894 Norbert Plaza Apt. 813","ubicacion":{"type":"Point","coordinates":[-70.704077035189,19.463506965434]},"detalle_solucion":null,"ubicacion_texto":"Hamill Square","nombre_civil":"Felton Abernathy","telefono_civil":"809-051-5733","personas_involucradas":1,"creado_en":"2018-02-25 19:04:06","actualizado_en":"2018-02-25 20:30:35","pivot":{"unidad_id":1,"incidencia_id":4,"creado_en":"2018-02-25 20:30:35","actualizado_en":"2018-02-25 20:30:35"},"tipo":{"id":2,"nombre":"Accidente de Transito"},"prioridad":{"id":4,"nombre":"Baja","orden":1},"sector":{"id":71,"nombre":"La Lotería"},
+                      "estado":{"id":4,"nombre":"En Curso"},"creador":{"id":1,"oficial_id":1,
+                        "oficial":{"id":1,"nombre":"Nelson","apellido":"Perez Lora"}}},
+                    callPayload: null
+                  }
+                }
+            )
+          }
+      )
+    }
   }
 })
 

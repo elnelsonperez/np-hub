@@ -10,7 +10,7 @@ const dateformat = require('dateformat')
 const BluetoothBridgeTask = new Task (
     {
       name: 'BluetoothBridgeTask',
-      inject: ['BluetoothService','MensajeService'],
+      inject: ['BluetoothService','MensajeService', 'IncidenciaService'],
       //Only needs to be initialized
       every: null,
       autoload: false,
@@ -247,6 +247,52 @@ BluetoothBridgeTask.action_UPDATE_MESSAGES_STATUS = function(msg) {
     })
   }
 }
+
+BluetoothBridgeTask.action_UPDATE_INCIDENCIA_STATUS = function(msg) {
+  const action = msg.body.data;
+  if (action.payload
+      && action.payload.incidencia_id
+      && action.payload.estado_id) {
+    this.IncidenciaService.updateIncidenciaStatus({
+      incidencia_id: action.payload.incidencia_id,
+      estado_id: action.payload.estado_id
+    }).then(r => {
+      if (r !== null) {
+        this.BluetoothService.sendToDevice(
+            {
+              mac_address: msg.body.mac_address,
+              message: new BtMessage(
+                  {
+                    type: "UPDATE_INCIDENCIA_STATUS_RESPONSE",
+                    payload: {
+                      status: 'OK',
+                      incidencia: r,
+                      callPayload: action.payload
+                    }
+                  }
+              )
+            }
+        )
+      } else {
+        this.BluetoothService.sendToDevice(
+            {
+              mac_address: msg.body.mac_address,
+              message: new BtMessage(
+                  {
+                    type: "UPDATE_INCIDENCIA_STATUS_RESPONSE",
+                    payload: {
+                      status: 'FAILED',
+                      callPayload: action.payload
+                    }
+                  }
+              )
+            }
+        )
+      }
+    })
+  }
+}
+
 
 BluetoothBridgeTask.action_GET_DEVICE_CONFIG = function(msg) {
 
