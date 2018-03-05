@@ -335,9 +335,9 @@ BluetoothBridgeTask.disconnected = function (msg) {
   if (msg.has("mac_address")
       && this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
     this.data.connectedMacAddresses.splice(
-        this.data.connectedMacAddresses.findIndex(v => v === msg.body.mac_address),1)
-    this.data.pullingData.lastPulledMessageDate = null;
-    this.data.pullingData.lastPulledIncidenciaDate = null;
+        this.data.connectedMacAddresses.findIndex(v => v === msg.body.mac_address), 1)
+    this.data.pullingData.lastPulledMessageDate = null
+    this.data.pullingData.lastPulledIncidenciaDate = null
   }
 }
 
