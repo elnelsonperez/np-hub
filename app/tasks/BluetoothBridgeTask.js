@@ -10,7 +10,7 @@ const dateformat = require('dateformat')
 const BluetoothBridgeTask = new Task (
     {
       name: 'BluetoothBridgeTask',
-      inject: ['BluetoothService','MensajeService', 'IncidenciaService'],
+      inject: ['BluetoothService','MensajeService', 'IncidenciaService', 'IbuttonService'],
       //Only needs to be initialized
       every: null,
       autoload: false,
@@ -117,20 +117,20 @@ BluetoothBridgeTask.autoPulledHandler  = function(type, payload) {
 BluetoothBridgeTask.newConnection = function (msg) {
   if (msg.has("mac_address")) {
 
-    const timeoutid = setTimeout(() => {
-      props.applicationEvent.removeListener('ibutton.read', callback)
-      this.BluetoothService.sendToDevice(
-          {
-            mac_address: msg.body.mac_address,
-            message: new BtMessage(
-                {
-                  type: "AUTH_TIMEOUT",
-                  payload:  {}
-                }
-            )
-          }
-      )
-    }, 15000)
+    // const timeoutid = setTimeout(() => {
+    //   props.applicationEvent.removeListener('ibutton.read', callback)
+    //   this.BluetoothService.sendToDevice(
+    //       {
+    //         mac_address: msg.body.mac_address,
+    //         message: new BtMessage(
+    //             {
+    //               type: "AUTH_TIMEOUT",
+    //               payload:  {}
+    //             }
+    //         )
+    //       }
+    //   )
+    // }, 15000)
 
     const callback = code => {
       if (props.config.ibuttons
@@ -151,12 +151,15 @@ BluetoothBridgeTask.newConnection = function (msg) {
                 )
               }
           )
+          this.IbuttonService.turnLed(false)
         }
-        clearTimeout(timeoutid)
+        // clearTimeout(timeoutid)
         props.applicationEvent.removeListener('ibutton.read', callback)
       }
     }
-    props.applicationEvent.on('ibutton.read', callback)
+    this.IbuttonService.turnLed(true).finally(() => {
+      props.applicationEvent.on('ibutton.read', callback)
+    })
   }
 }
 

@@ -9,7 +9,7 @@ chmod a+w /sys/devices/w1_bus_master1/w1_master_search
 
 const READ_FILE = '/sys/devices/w1_bus_master1/w1_master_slaves'
 const REMOVE_FILE = '/sys/devices/w1_bus_master1/w1_master_remove'
-const LED_GPIO = 0
+const LED_GPIO = 16
 
 const IbuttonService = function () {
 
@@ -49,9 +49,6 @@ const IbuttonService = function () {
       });
     });
   }
-
-
-
 }
 
 module.exports = IbuttonService;
