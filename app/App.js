@@ -23,7 +23,8 @@ const props = { //These are available to all modules and tasks
   config:  {
     distanceBetweenLocations: undefined,
     timeoutSendLocation: undefined,
-    allowedMacAddresses: undefined
+    allowedMacAddresses: undefined,
+    ibuttons: undefined
   },
   input: null,
   serialNumber: null, //Pi serial number,

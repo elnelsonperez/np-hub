@@ -115,9 +115,48 @@ BluetoothBridgeTask.autoPulledHandler  = function(type, payload) {
  * @param {pythonMessage} msg
  */
 BluetoothBridgeTask.newConnection = function (msg) {
-  if (msg.has("mac_address")
-      && !this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
-    this.data.connectedMacAddresses.push(msg.body.mac_address)
+  if (msg.has("mac_address")) {
+
+    const timeoutid = setTimeout(() => {
+      props.applicationEvent.removeListener('ibutton.read', callback)
+      this.BluetoothService.sendToDevice(
+          {
+            mac_address: msg.body.mac_address,
+            message: new BtMessage(
+                {
+                  type: "AUTH_TIMEOUT",
+                  payload:  {}
+                }
+            )
+          }
+      )
+    }, 15000)
+
+    const callback = code => {
+      if (props.config.ibuttons
+          && props.config.ibuttons[msg.body.mac_address]
+          && code === props.config.ibuttons[msg.body.mac_address]
+      ) {
+        //logged in
+        if (!this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
+          this.data.connectedMacAddresses.push(msg.body.mac_address)
+          this.BluetoothService.sendToDevice(
+              {
+                mac_address: msg.body.mac_address,
+                message: new BtMessage(
+                    {
+                      type: "AUTH_SUCCESS",
+                      payload:  {}
+                    }
+                )
+              }
+          )
+        }
+        clearTimeout(timeoutid)
+        props.applicationEvent.removeListener('ibutton.read', callback)
+      }
+    }
+    props.applicationEvent.on('ibutton.read', callback)
   }
 }
 
@@ -126,11 +165,16 @@ BluetoothBridgeTask.newConnection = function (msg) {
  * @param {pythonMessage} msg
  */
 BluetoothBridgeTask.received = function (msg) {
-  if (msg.has("mac_address") && msg.has("data")) {
-    const action = msg.body.data;
-    if (action.type && action.payload) {
-      if (this["action_"+action.type]) {
-        this["action_"+action.type](msg)
+  if (msg.has("mac_address")) {
+    //Si la mac address esta en este array es porque ya esta logueado
+    if (this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
+      if (msg.has("data")) {
+        const action = msg.body.data;
+        if (action.type && action.payload) {
+          if (this["action_"+action.type]) {
+            this["action_"+action.type](msg)
+          }
+        }
       }
     }
   }
@@ -292,7 +336,6 @@ BluetoothBridgeTask.action_UPDATE_INCIDENCIA_STATUS = function(msg) {
     })
   }
 }
-
 
 BluetoothBridgeTask.action_GET_DEVICE_CONFIG = function(msg) {
 
