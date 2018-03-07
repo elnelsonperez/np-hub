@@ -1,15 +1,10 @@
 const gpio = require('rpi-gpio');
 
-gpio.setup(33, gpio.DIR_IN,function (err) {
+gpio.setup(11, gpio.DIR_OUT,function (err) {
+  if (err)
+    throw err
+  gpio.write(11,false, function (err) {
     if (err)
-        throw err
-    
-    setInterval(function () {
-        gpio.read(33, function (err, val) {
-            if (err)
-                throw err
-            console.log(val)
-        })
-    },150)
-
+      throw err
+  })
 });

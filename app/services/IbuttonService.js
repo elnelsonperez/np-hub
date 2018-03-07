@@ -1,28 +1,57 @@
 const fs = require('fs')
 const gpio = require('rpi-gpio');
+const interval = require('interval-promise')
 /*
 Necesario
-chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves
-chmod a+w /sys/devices/w1_bus_master1/w1_master_remove
-chmod a+w /sys/devices/w1_bus_master1/w1_master_search
+
+modprobe wire timeout=1 slave_ttl=3
+modprobe w1-gpio
+modprobe w1-smem
+
+sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves
+sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_remove
+sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_search
+
+To speed the reading time Edit this file as Sudo
+/etc/modprobe.d/w1.conf
+And add:
+options wire timeout=1 slave_ttl=3
 */
 
 const READ_FILE = '/sys/devices/w1_bus_master1/w1_master_slaves'
 const REMOVE_FILE = '/sys/devices/w1_bus_master1/w1_master_remove'
-const LED_GPIO = 16
+const LED_GPIO = 11
 
 const IbuttonService = function () {
 
   let ready = false;
+  let blinkStopFunc = null;
+  let ledState = false;
 
-  gpio.promise.setup(LED_GPIO, gpio.DIR_LOW).then(() => {
-    ready = true;
+  gpio.promise.setup(LED_GPIO, gpio.DIR_OUT).then(() => {
+    gpio.promise.write(LED_GPIO, false).then(() => {
+      ready = true;
+    })
   });
 
+  this.startBlinking =  () => {
+    interval(async (iteration, stop) => {
+      if (!blinkStopFunc) {
+        blinkStopFunc = stop;
+      }
+      await this.turnLed(!ledState)
+    }, 150)
+  }
 
-  this.turnLed  = async function (mode) {
+  this.stopBlinking  = () => {
+    blinkStopFunc()
+    blinkStopFunc = null
+  }
+
+  this.turnLed  = async  (mode) => {
     if (ready) {
-     await gpio.promise.write(LED_GPIO, mode)
+      await gpio.promise.write(LED_GPIO, mode)
+      ledState = mode;
     }
   }
 

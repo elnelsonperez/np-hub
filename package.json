@@ -12,6 +12,7 @@
     "autoincrement": "^1.0.0",
     "dateformat": "^3.0.2",
     "gps": "^0.4.1",
+    "interval-promise": "^1.1.1",
     "lcdi2c": "^1.0.6",
     "minimist": "^1.2.0",
     "python-shell": "^0.4.0",
