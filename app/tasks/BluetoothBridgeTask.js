@@ -116,50 +116,88 @@ BluetoothBridgeTask.autoPulledHandler  = function(type, payload) {
  */
 BluetoothBridgeTask.newConnection = function (msg) {
   if (msg.has("mac_address")) {
-
-    // const timeoutid = setTimeout(() => {
-    //   props.applicationEvent.removeListener('ibutton.read', callback)
-    //   this.BluetoothService.sendToDevice(
-    //       {
-    //         mac_address: msg.body.mac_address,
-    //         message: new BtMessage(
-    //             {
-    //               type: "AUTH_TIMEOUT",
-    //               payload:  {}
-    //             }
-    //         )
-    //       }
-    //   )
-    // }, 15000)
-
-    const callback = code => {
-      if (props.config.ibuttons
-          && props.config.ibuttons[msg.body.mac_address]
-          && code === props.config.ibuttons[msg.body.mac_address]
-      ) {
-        //logged in
-        if (!this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
-          this.data.connectedMacAddresses.push(msg.body.mac_address)
+    if (!props.argv.noAuth) {
+      const callback = code => {
+        if (props.config.ibuttons
+            && props.config.ibuttons[msg.body.mac_address]
+        ) {
+          if (code === props.config.ibuttons[msg.body.mac_address]) {
+            //logged in
+            if (!this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
+              this.data.connectedMacAddresses.push(msg.body.mac_address)
+              this.BluetoothService.sendToDevice(
+                  {
+                    mac_address: msg.body.mac_address,
+                    message: new BtMessage(
+                        {
+                          type: "AUTH_STATUS",
+                          payload:  {
+                            status: 'SUCCESS'
+                          }
+                        }
+                    )
+                  }
+              )
+              this.IbuttonService.stopBlinking()
+              console.log("Stopblinking called")
+              props.applicationEvent.removeListener('ibutton.read', callback)
+            }
+          }
+          else {
+            this.BluetoothService.sendToDevice(
+                {
+                  mac_address: msg.body.mac_address,
+                  message: new BtMessage(
+                      {
+                        type: "AUTH_STATUS",
+                        payload:  {
+                          status: 'FAILED'
+                        }
+                      }
+                  )
+                }
+            )
+          }
+        } else {
           this.BluetoothService.sendToDevice(
               {
                 mac_address: msg.body.mac_address,
                 message: new BtMessage(
                     {
-                      type: "AUTH_SUCCESS",
-                      payload:  {}
+                      type: "AUTH_STATUS",
+                      payload:  {
+                        status: 'NOT_EXIST'
+                      }
                     }
                 )
               }
           )
-          this.IbuttonService.turnLed(false)
         }
-        // clearTimeout(timeoutid)
-        props.applicationEvent.removeListener('ibutton.read', callback)
       }
-    }
-    this.IbuttonService.turnLed(true).finally(() => {
+
+      this.IbuttonService.startBlinking()
       props.applicationEvent.on('ibutton.read', callback)
-    })
+    }
+    else {
+      if (!this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
+        this.data.connectedMacAddresses.push(msg.body.mac_address)
+      }
+      this.BluetoothService.sendToDevice(
+          {
+            mac_address: msg.body.mac_address,
+            message: new BtMessage(
+                {
+                  type: "AUTH_STATUS",
+                  payload:  {
+                    status: 'SUCCESS'
+                  }
+                }
+            )
+          }
+      )
+    }
+
+
   }
 }
 

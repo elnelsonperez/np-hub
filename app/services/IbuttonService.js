@@ -1,6 +1,6 @@
 const fs = require('fs')
 const gpio = require('rpi-gpio');
-const interval = require('interval-promise')
+
 /*
 Necesario
 
@@ -25,8 +25,8 @@ const LED_GPIO = 11
 const IbuttonService = function () {
 
   let ready = false;
-  let blinkStopFunc = null;
   let ledState = false;
+  let stopBlink = false;
 
   gpio.promise.setup(LED_GPIO, gpio.DIR_OUT).then(() => {
     gpio.promise.write(LED_GPIO, false).then(() => {
@@ -34,21 +34,22 @@ const IbuttonService = function () {
     })
   });
 
-  this.startBlinking =  () => {
-    interval(async (iteration, stop) => {
-      if (!blinkStopFunc) {
-        blinkStopFunc = stop;
-      }
-      await this.turnLed(!ledState)
-    }, 150)
+  this.startBlinking = () => {
+    if (stopBlink) {
+      stopBlink = false;
+    } else {
+      this.turnLed(!ledState).then(() => {
+        setTimeout(() => {this.startBlinking()},150)
+      })
+    }
   }
 
   this.stopBlinking  = () => {
-    blinkStopFunc()
-    blinkStopFunc = null
+    stopBlink = true;
+    this.turnLed(false)
   }
 
-  this.turnLed  = async  (mode) => {
+  this.turnLed  = async (mode) => {
     if (ready) {
       await gpio.promise.write(LED_GPIO, mode)
       ledState = mode;

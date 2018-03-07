@@ -45,12 +45,13 @@ Application = function () {
     lcd: false
   }
 
-  this.initialize = ({defaultModule = 'boot', verbose = false, bridgeDebug = false, noLocations = false}) => {
-
+  this.initialize = ({defaultModule = 'boot', verbose = false, bridgeDebug = false, noLocations = false ,
+                       noAuth = false}) => {
     props.argv = {
       verbose,
       bridgeDebug,
-      noLocations
+      noLocations,
+      noAuth
     };
 
     this.currentModuleDomain = defaultModule;

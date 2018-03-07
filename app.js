@@ -9,6 +9,7 @@ app.initialize({
   verbose: !!argv.verbose,
   bridgeDebug: !!argv.bridgeDebug,
   noLocations: !!argv.noLocations,
+  noAuth: !!argv.noAuth,
 });
 
 process.on('unhandledRejection', (reason, p) => {
