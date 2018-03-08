@@ -17,7 +17,7 @@ const BluetoothService = require("./services/BluetoothService/BluetoothService")
 const reset = require('./../lib/functions').reset;
 const SCREEN_REFRESH_DELAY = 500;
 const INPUT_DELAY = 150;
-
+const interval = require('interval-promise')
 const props = { //These are available to all modules and tasks
   applicationEvent: null,
   config:  {
@@ -138,22 +138,24 @@ Application = function () {
 
   this.runTasks = function () {
     for (let task of Object.keys(this.tasks)) { //Para cada task
-      if (this.tasks[task].autoload) { //Si el task quiere cargarse automaticamente
-        this.tasks[task].run(); //Correr el task la primera vez
-      }
-      if (this.tasks[task].every) { //Si el task tiene un "every"
-        setInterval(() => {
-          if (this.tasks[task].ready === true) {
-            if (props.argv.verbose) {
-              console.log("-> Running '"+this.tasks[task].name+"'\n")
+      const runtask = () => {
+        if (this.tasks[task].every) { //Si el task tiene un "every"
+          interval(async () => {
+            if (this.tasks[task].ready) {
+              if (props.argv.verbose) {
+                console.log("-> Running '"+this.tasks[task].name+"'\n")
+              }
+              await this.tasks[task].run()
             }
-
-            this.tasks[task].run.bind(this.tasks[task])()
-          }
-        }, this.tasks[task].every) //Correr cada "every" milisegundos
+          }, this.tasks[task].every)
+        }
       }
 
-
+      if (this.tasks[task].autoload) { //Si el task quiere cargarse automaticamente
+        this.tasks[task].run().then(() => {runtask()}); //Correr el task la primera vez
+      } else {
+        runtask()
+      }
     }
   }
 

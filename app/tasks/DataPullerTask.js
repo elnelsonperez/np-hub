@@ -4,7 +4,7 @@ const props = require('./../App').props
 const DataPullerTask = new Task (
     {
       name: 'DataPullerTask',
-      every: 4000,
+      every: 1000,
       inject: ["MensajeService","BluetoothService", "IncidenciaService"],
       autoload: false,
       ready: false
@@ -18,12 +18,11 @@ DataPullerTask.initialize = function () {
 }
 
 DataPullerTask.run = function () {
-  if (this.ready) {
+  return new Promise(res => {
     const bridgeData = this.siblingTasks.BluetoothBridgeTask.data;
     if (Object.keys(bridgeData.connectedMacAddresses).length > 0) {
       console.log ("==================> lastPulledMessageDate", bridgeData.pullingData.lastPulledMessageDate)
       console.log ("==================> lastPulledIncidenciaDate", bridgeData.pullingData.lastPulledIncidenciaDate)
-      this.ready = false;
       this.pullMensajes(bridgeData.pullingData.lastPulledMessageDate)
           .catch(e => {
             console.log(e)
@@ -34,11 +33,13 @@ DataPullerTask.run = function () {
                   console.log(e)
                 })
                 .finally(() => {
-                  this.ready = true;
+                  res()
                 })
           })
+    } else {
+      res()
     }
-  }
+  })
 }
 
 DataPullerTask.pullMensajes = function (lastDate, paginateUrl = null) {

@@ -13,7 +13,8 @@ const HardwareLoader = new Task (
       name: 'HardwareLoader',
       inject: ['GprsService', 'BluetoothService','ConfigService'],
       every: null,
-      autoload: false
+      autoload: false,
+      ready: false
     }
 );
 HardwareLoader.initialize = async function () {

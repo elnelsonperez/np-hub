@@ -17,20 +17,16 @@ IbuttonReaderTask.initialize = function () {
   })
 }
 
-IbuttonReaderTask.run = function () {
-  this.ready = false;
-  this.IbuttonService.read()
-      .then(code => {
-        if (code !== null) {
-          props.applicationEvent.emit('ibutton.read', code)
-        }
-      })
-      .catch(e => {
-        console.log(e)
-      })
-      .finally(() => {
-        this.ready = true
-      })
+IbuttonReaderTask.run = async function () {
+  try {
+    const code = await this.IbuttonService.read()
+    if (code !== null) {
+      props.applicationEvent.emit('ibutton.read', code)
+    }
+  } catch (e) {
+    console.log(e)
+  }
+
 }
 
 module.exports = IbuttonReaderTask;
