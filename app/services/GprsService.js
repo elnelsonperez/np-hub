@@ -390,4 +390,4 @@ GprsService = function (SequentialSerialManager) {
 };
 
 util.inherits(GprsService,events.EventEmitter)
-module.exports.GprsService = GprsService;
+module.exports = GprsService;

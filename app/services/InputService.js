@@ -102,4 +102,4 @@ InputService.PIN_STATUS_IDDLE = 1;
 
 util.inherits(InputService, EventEmitter)
 
-module.exports.InputService = InputService;
+module.exports = InputService;

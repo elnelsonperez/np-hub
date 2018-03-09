@@ -1,24 +1,30 @@
-const line = require('./core/Line.js');
-const getSerial = require('./../lib/systeminfo').getSerial
-const fs = require('fs');
-const Lcdlib = require('../lib/LcdController');
-const SequentialSerialManager = require('../lib/SequentialSerialManager').SequentialSerialManager;
-const GprsService =  require('./services/GprsService').GprsService;
 const EventEmitter = require('events').EventEmitter
+const fs = require('fs');
+
+const line = require('./core/Line.js');
+const Lcdlib = require('../lib/LcdController');
+
+const SequentialSerialManager = require('../lib/SequentialSerialManager');
+const GprsService =  require('./services/GprsService');
 const IbuttonService = require('./services/IbuttonService')
 const ConfigService = require('./services/ConfigService')
 const MensajeService = require('./services/MensajeService')
 const IncidenciaService = require('./services/IncidenciaService')
 const RequestSenderService = require('./services/RequestSenderService')
-const InputService = require('./services/InputService').InputService
+const BridgeService = require('./services/BridgeService')
+const InputService = require('./services/InputService')
 const HardwareLoaderService = require('./services/HardwareLoaderService')
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
 const BluetoothService = require("./services/BluetoothService/BluetoothService")
+
+const interval = require('interval-promise')
 const reset = require('./../lib/functions').reset;
+const getSerial = require('./../lib/systeminfo').getSerial
+
 const SCREEN_REFRESH_DELAY = 500;
 const INPUT_DELAY = 150;
-const interval = require('interval-promise')
+
 const props = { //These are available to all modules and tasks
   applicationEvent: null,
   config:  {
@@ -29,7 +35,14 @@ const props = { //These are available to all modules and tasks
   },
   input: null,
   serialNumber: null, //Pi serial number,
-  argv: null
+  argv: null,
+  bridge: {
+    connectedMacAddresses: [],
+    pullingData : {
+      lastPulledMessageDate: null,
+      lastPulledIncidenciaDate: null
+    }
+  }
 };
 
 Application = function () {
@@ -101,10 +114,18 @@ Application = function () {
 
     this.injectable.MensajeService = new MensajeService(this.injectable.RequestSenderService)
     this.injectable.IncidenciaService = new IncidenciaService(this.injectable.RequestSenderService)
+
     this.injectable.HardwareLoaderService = new HardwareLoaderService({
       GprsService:  this.injectable.GprsService,
       ConfigService: this.injectable.ConfigService,
       BluetoothService: this.injectable.BluetoothService,
+    })
+
+    this.injectable.BridgeService = new BridgeService({
+      BluetoothService: this.injectable.BluetoothService,
+      MensajeService: this.injectable.MensajeService,
+      IncidenciaService: this.injectable.IncidenciaService,
+      IbuttonService: this.injectable.IbuttonService
     })
 
     if (lcdEnabled)
@@ -117,6 +138,7 @@ Application = function () {
     })
 
     this.injectable.HardwareLoaderService.load().then(() => {
+      this.injectable.BridgeService.start()
       //Loads tasks
       this.loadTasks(__dirname+'/tasks');
 
@@ -133,6 +155,7 @@ Application = function () {
       }
       else {
         this.runTasks();
+
         //Input
         props.input.monitorRegisteredPins()
       }
@@ -158,9 +181,11 @@ Application = function () {
 
       if (this.tasks[task].autoload) { //Si el task quiere cargarse automaticamente
         this.tasks[task].run().then(() => {runtask()}); //Correr el task la primera vez
-      } else {
+      }
+      else {
         runtask()
       }
+
     }
   }
 

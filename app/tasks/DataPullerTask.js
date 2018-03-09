@@ -19,7 +19,7 @@ DataPullerTask.initialize = function () {
 
 DataPullerTask.run = function () {
   return new Promise(res => {
-    const bridgeData = this.siblingTasks.BluetoothBridgeTask.data;
+    const bridgeData = props.bridge
     if (Object.keys(bridgeData.connectedMacAddresses).length > 0) {
       console.log ("==================> lastPulledMessageDate", bridgeData.pullingData.lastPulledMessageDate)
       console.log ("==================> lastPulledIncidenciaDate", bridgeData.pullingData.lastPulledIncidenciaDate)
@@ -53,7 +53,7 @@ DataPullerTask.pullMensajes = function (lastDate, paginateUrl = null) {
         props.applicationEvent.emit("autopulledMessages", pagination.data)
       }
 
-      if (Object.keys(this.siblingTasks.BluetoothBridgeTask.data.connectedMacAddresses).length > 0 &&
+      if (Object.keys(props.bridge.connectedMacAddresses).length > 0 &&
           pagination &&
           pagination.next_page_url !== null) {
         this.pullMensajes(lastDate, pagination.next_page_url).finally(() => {
