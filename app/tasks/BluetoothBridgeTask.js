@@ -116,7 +116,9 @@ BluetoothBridgeTask.autoPulledHandler  = function(type, payload) {
 BluetoothBridgeTask.newConnection = function (msg) {
   if (msg.has("mac_address")) {
     if (!props.argv.noAuth) {
-      const callback = code => {
+
+      this.IbuttonService.startBlinking()
+      this.IbuttonService.readOnlyValid().then(code => {
         if (props.config.ibuttons
             && props.config.ibuttons[msg.body.mac_address]
         ) {
@@ -138,10 +140,9 @@ BluetoothBridgeTask.newConnection = function (msg) {
                   }
               )
               this.IbuttonService.stopBlinking()
-              props.applicationEvent.removeListener('ibutton.read', callback)
             }
           }
-          else {
+          else { //Invalid ibutton para la mac address conectada
             this.BluetoothService.sendToDevice(
                 {
                   mac_address: msg.body.mac_address,
@@ -156,7 +157,7 @@ BluetoothBridgeTask.newConnection = function (msg) {
                 }
             )
           }
-        } else {
+        } else { //No hay ibutton para la mac address conectada
           this.BluetoothService.sendToDevice(
               {
                 mac_address: msg.body.mac_address,
@@ -171,12 +172,10 @@ BluetoothBridgeTask.newConnection = function (msg) {
               }
           )
         }
-      }
+      })
 
-      this.IbuttonService.startBlinking()
-      props.applicationEvent.on('ibutton.read', callback)
     }
-    else {
+    else { //Auth directo bypass
       if (!this.data.connectedMacAddresses.includes(msg.body.mac_address)) {
         this.data.connectedMacAddresses.push(msg.body.mac_address)
       }
@@ -194,8 +193,6 @@ BluetoothBridgeTask.newConnection = function (msg) {
           }
       )
     }
-
-
   }
 }
 

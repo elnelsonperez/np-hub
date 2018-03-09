@@ -1,6 +1,6 @@
 const fs = require('fs')
 const gpio = require('rpi-gpio');
-
+const interval = require('interval-promise')
 /*
 Necesario
 
@@ -79,6 +79,19 @@ const IbuttonService = function () {
       });
     });
   }
+
+  this.readOnlyValid = function () {
+    return new Promise(res => {
+      interval(async (iteration, stop) => {
+        const result = this.read()
+        if (result !== null) {
+          stop()
+          res(result)
+        }
+      }, 500)
+    })
+  }
+
 }
 
 module.exports = IbuttonService;
