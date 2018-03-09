@@ -11,6 +11,7 @@ const MensajeService = require('./services/MensajeService')
 const IncidenciaService = require('./services/IncidenciaService')
 const RequestSenderService = require('./services/RequestSenderService')
 const InputService = require('./services/InputService').InputService
+const HardwareLoaderService = require('./services/HardwareLoaderService')
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
 const BluetoothService = require("./services/BluetoothService/BluetoothService")
@@ -93,7 +94,6 @@ Application = function () {
         this.injectable.RequestQueueService,
         this.injectable.RequestProcessorService,
     )
-
     this.injectable.ConfigService = new ConfigService(
         this.injectable.RequestSenderService,
         "http://nppms.us/api/hub_config"
@@ -101,38 +101,43 @@ Application = function () {
 
     this.injectable.MensajeService = new MensajeService(this.injectable.RequestSenderService)
     this.injectable.IncidenciaService = new IncidenciaService(this.injectable.RequestSenderService)
-
-    props.applicationEvent.once('config.ready', config => {
-      console.log("======== CONFIG LOADED ==========")
-      props.config = config
-      // this.injectable.MensajeService.getMensajes({today: true}).then(a => {
-      //   console.log("getMensajes Response =====================>", a)
-      // })
+    this.injectable.HardwareLoaderService = new HardwareLoaderService({
+      GprsService:  this.injectable.GprsService,
+      ConfigService: this.injectable.ConfigService,
+      BluetoothService: this.injectable.BluetoothService,
     })
 
     if (lcdEnabled)
       this.printBootingMessage();
 
-    //Loads tasks
-    this.loadTasks(__dirname+'/tasks');
+    //Hardware loader
+    props.applicationEvent.once('config.ready', config => {
+      console.log("======== CONFIG LOADED ==========")
+      props.config = config
+    })
 
+    this.injectable.HardwareLoaderService.load().then(() => {
+      //Loads tasks
+      this.loadTasks(__dirname+'/tasks');
 
-    if (lcdEnabled) {
-      this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
-            //Print to screen.
-            this.lcdPrintLoop()
-            this.runTasks();
-            //Input
-            props.input.monitorRegisteredPins()
-          }
-      );
-    }
-    else {
-      this.runTasks();
-      //Input
-      props.input.monitorRegisteredPins()
-    }
+      //Init rest
+      if (lcdEnabled) {
+        this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
+              //Print to screen.
+              this.lcdPrintLoop()
+              this.runTasks();
+              //Input
+              props.input.monitorRegisteredPins()
+            }
+        );
+      }
+      else {
+        this.runTasks();
+        //Input
+        props.input.monitorRegisteredPins()
+      }
 
+    })
 
   }
 
