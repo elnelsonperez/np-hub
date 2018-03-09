@@ -11,13 +11,14 @@ const MensajeService = require('./services/MensajeService')
 const IncidenciaService = require('./services/IncidenciaService')
 const RequestSenderService = require('./services/RequestSenderService')
 const InputService = require('./services/InputService').InputService
+const HardwareLoaderService = require('./services/HardwareLoaderService')
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
 const BluetoothService = require("./services/BluetoothService/BluetoothService")
 const reset = require('./../lib/functions').reset;
 const SCREEN_REFRESH_DELAY = 500;
 const INPUT_DELAY = 150;
-
+const interval = require('interval-promise')
 const props = { //These are available to all modules and tasks
   applicationEvent: null,
   config:  {
@@ -93,7 +94,6 @@ Application = function () {
         this.injectable.RequestQueueService,
         this.injectable.RequestProcessorService,
     )
-
     this.injectable.ConfigService = new ConfigService(
         this.injectable.RequestSenderService,
         "http://nppms.us/api/hub_config"
@@ -101,59 +101,66 @@ Application = function () {
 
     this.injectable.MensajeService = new MensajeService(this.injectable.RequestSenderService)
     this.injectable.IncidenciaService = new IncidenciaService(this.injectable.RequestSenderService)
-
-    props.applicationEvent.once('config.ready', config => {
-      console.log("======== CONFIG LOADED ==========")
-      props.config = config
-      // this.injectable.MensajeService.getMensajes({today: true}).then(a => {
-      //   console.log("getMensajes Response =====================>", a)
-      // })
+    this.injectable.HardwareLoaderService = new HardwareLoaderService({
+      GprsService:  this.injectable.GprsService,
+      ConfigService: this.injectable.ConfigService,
+      BluetoothService: this.injectable.BluetoothService,
     })
 
     if (lcdEnabled)
       this.printBootingMessage();
 
-    //Loads tasks
-    this.loadTasks(__dirname+'/tasks');
+    //Hardware loader
+    props.applicationEvent.once('config.ready', config => {
+      console.log("======== CONFIG LOADED ==========")
+      props.config = config
+    })
 
+    this.injectable.HardwareLoaderService.load().then(() => {
+      //Loads tasks
+      this.loadTasks(__dirname+'/tasks');
 
-    if (lcdEnabled) {
-      this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
-            //Print to screen.
-            this.lcdPrintLoop()
-            this.runTasks();
-            //Input
-            props.input.monitorRegisteredPins()
-          }
-      );
-    }
-    else {
-      this.runTasks();
-      //Input
-      props.input.monitorRegisteredPins()
-    }
+      //Init rest
+      if (lcdEnabled) {
+        this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
+              //Print to screen.
+              this.lcdPrintLoop()
+              this.runTasks();
+              //Input
+              props.input.monitorRegisteredPins()
+            }
+        );
+      }
+      else {
+        this.runTasks();
+        //Input
+        props.input.monitorRegisteredPins()
+      }
 
+    })
 
   }
 
   this.runTasks = function () {
     for (let task of Object.keys(this.tasks)) { //Para cada task
-      if (this.tasks[task].autoload) { //Si el task quiere cargarse automaticamente
-        this.tasks[task].run(); //Correr el task la primera vez
-      }
-      if (this.tasks[task].every) { //Si el task tiene un "every"
-        setInterval(() => {
-          if (this.tasks[task].ready === true) {
-            if (props.argv.verbose) {
-              console.log("-> Running '"+this.tasks[task].name+"'\n")
+      const runtask = () => {
+        if (this.tasks[task].every) { //Si el task tiene un "every"
+          interval(async () => {
+            if (this.tasks[task].ready) {
+              if (props.argv.verbose) {
+                console.log("-> Running '"+this.tasks[task].name+"'\n")
+              }
+              await this.tasks[task].run()
             }
-
-            this.tasks[task].run.bind(this.tasks[task])()
-          }
-        }, this.tasks[task].every) //Correr cada "every" milisegundos
+          }, this.tasks[task].every)
+        }
       }
 
-
+      if (this.tasks[task].autoload) { //Si el task quiere cargarse automaticamente
+        this.tasks[task].run().then(() => {runtask()}); //Correr el task la primera vez
+      } else {
+        runtask()
+      }
     }
   }
 

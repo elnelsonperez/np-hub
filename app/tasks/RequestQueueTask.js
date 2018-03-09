@@ -22,13 +22,10 @@ RequestQueueTask.doPending = async function () {
     // console.log("============================= RESPONSE PENDING REQUEST",resp)
     if (resp && resp.doFailed === true) {
       await this.doFailed()
-    } else {
-      this.ready = true;
     }
   }
   catch (e) {
     console.log(e.message)
-    this.ready = true;
   }
 
 }
@@ -39,13 +36,10 @@ RequestQueueTask.doFailed = async function () {
     // console.log("============================= RESPONSE FAILED REQUEST",resp)
     if (resp && resp.doPending === true) {
       await this.doPending()
-    } else {
-      this.ready = true;
     }
   }
   catch (e) {
     console.log(e.message)
-    this.ready = true;
   }
 
 }
@@ -56,11 +50,8 @@ RequestQueueTask.initialize = function () {
   })
 }
 
-RequestQueueTask.run = function () {
-  if (this.ready === true) {
-    this.ready = false
-    this.doPending()
-  }
+RequestQueueTask.run = async function () {
+  await this.doPending()
 }
 
 module.exports = RequestQueueTask;

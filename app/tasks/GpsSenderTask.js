@@ -24,8 +24,7 @@ GpsSenderTask.initialize = function () {
 }
 
 GpsSenderTask.run = function () {
-  if (this.ready === true) {
-    this.ready = false
+  return new Promise(res => {
     const eventName = "locationSent"
     this.siblingTasks.GpsTask.getNextLocations(1).then((locs) => {
       this.RequestQueueService.addRequest({
@@ -37,9 +36,9 @@ GpsSenderTask.run = function () {
         priority: RequestQueueService.PRIORITY_MEDIUM,
         event_name: eventName
       })
-      this.ready = true;
+      res()
     })
-  }
+  })
 }
 
 module.exports = GpsSenderTask;

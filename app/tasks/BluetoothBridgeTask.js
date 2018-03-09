@@ -14,7 +14,6 @@ const BluetoothBridgeTask = new Task (
       //Only needs to be initialized
       every: null,
       autoload: false,
-      ready: false,
       data: {
         connectedMacAddresses: [],
         pullingData : {
@@ -139,7 +138,6 @@ BluetoothBridgeTask.newConnection = function (msg) {
                   }
               )
               this.IbuttonService.stopBlinking()
-              console.log("Stopblinking called")
               props.applicationEvent.removeListener('ibutton.read', callback)
             }
           }
@@ -434,8 +432,8 @@ BluetoothBridgeTask.awaitingConnection = function (msg) {
 
 }
 
-BluetoothBridgeTask.run = function () {
-  this.ready = false;
+BluetoothBridgeTask.run = async function () {
+
 }
 
 module.exports = BluetoothBridgeTask;
