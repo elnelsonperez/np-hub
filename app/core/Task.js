@@ -4,7 +4,7 @@ const reset = require('./../../lib/functions').reset;
 const Task = function ({errorTreshold = 10, name, every = null, data, ready = true,inject =[], autoload = true, siblingTasks = {}}) {
     EventEmitter.call(this)
     this.name = name;
-    this.ready = ready; //Is this task ready to be re-ran
+    this.ready = ready;
     this.every = every; //How often should de Application run this task
     this.data = data;
     this.autoload = autoload;

@@ -75,7 +75,7 @@ GpsTask.initialize = function (debug = false) {
   }
 }
 
-GpsTask.run = function () {
+GpsTask.run = async function () {
   if (this.data.rawLocations.length > 0) {
     for (let i=0;i<this.data.rawLocations.length; i++) {
       this.pushOrRejectLocation(this.data.rawLocations.shift())
