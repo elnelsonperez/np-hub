@@ -1,10 +1,10 @@
 const Task  = require('../core/Task').Task
-const props = require('./../App').props
+const props = require('./../shared/props')
 
 const DataPullerTask = new Task (
     {
       name: 'DataPullerTask',
-      every: 1000,
+      every: 500,
       inject: ["MensajeService","BluetoothService", "IncidenciaService"],
       autoload: false,
       ready: false

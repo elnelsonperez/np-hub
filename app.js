@@ -1,5 +1,5 @@
 const Application = require('./app/App').Application;
-const props = require('./app/App').props;
+const props = require('./app/shared/props')
 const BtMessage = require('./app/services/BluetoothService/BtMessage')
 app = new Application();
 app.disabledFunctionality.lcd = true;

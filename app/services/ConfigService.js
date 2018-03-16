@@ -1,19 +1,18 @@
 const util = require('util')
 const EventEmitter = require('events').EventEmitter
-const QueueService = require("./RequestQueueService")
 /**
- *
  * @param {RequestSenderService} RequestSenderService
+ * @param {RequestQueueService} QueueService
  * @param configEndpoint
  * @constructor
  */
-const ConfigService = function (RequestSenderService, configEndpoint) {
+const ConfigService = function (RequestSenderService, QueueService, configEndpoint) {
   this.eventName = "CONFIG_REQUEST"
 
   this.getDeviceConfiguration = async function () {
     let configuration = null
     try {
-      console.log("Requesting Device Configuration");
+      QueueService.clearRequestsByEventName(this.eventName)
       const response  = await RequestSenderService.requestWithResponse({
         url: configEndpoint,
         method: "POST",

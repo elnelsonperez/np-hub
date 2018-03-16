@@ -1,5 +1,5 @@
 const ApplicationModule  = require('../../core/Module').ApplicationModule
-const props = require('./../../App').props
+const props = require('./../../shared/props')
 
 const appModule = new ApplicationModule (
     {

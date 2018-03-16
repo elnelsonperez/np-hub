@@ -167,6 +167,20 @@ const RequestQueueService = function () {
     })
   }
 
+  this.clearRequestsByEventName = (ename) => {
+    return new Promise((res,rej) => {
+      try {
+        db.run(
+            `DELETE FROM ${this.table} where event_name = '${ename}'`, function () {
+              res()
+            })
+      }
+      catch (e) {
+        rej(e)
+      }
+    })
+  }
+
   this.getAllRequests = () => {
     return new Promise((res, rej) => {
       try {

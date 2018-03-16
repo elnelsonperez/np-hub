@@ -1,6 +1,6 @@
 const delay = require('../../lib/functions').delay;
 const reset = require('../../lib/functions').reset;
-const props = require('./../App').props
+const props = require('./../shared/props')
 
 /**
  *
@@ -9,13 +9,14 @@ const props = require('./../App').props
  * @param {ConfigService} ConfigService
  * @constructor
  */
+
 const HardwareLoaderService = function ({GprsService, BluetoothService, ConfigService}) {
 
   this.GprsService = GprsService;
   this.BluetoothService = BluetoothService;
   this.ConfigService = ConfigService;
-
   this.load = async () => {
+
     let fail = false;
     this.GprsService.on('networkError', () => {
       this.initializeGprs().then(r => {
@@ -29,18 +30,18 @@ const HardwareLoaderService = function ({GprsService, BluetoothService, ConfigSe
     })
 
     try {
+      this.initializeBluetooth()
+    } catch (e) {
+      console.log(e)
+      props.applicationEvent.emit('hardwareLoader.message', "Bluetooh Fail")
+    }
+
+    try {
       await this.initializeGprs()
     } catch (e) {
       console.log(e)
       fail = true;
       props.applicationEvent.emit('hardwareLoader.message', "Gprs Fail")
-    }
-
-    try {
-      this.initializeBluetooth()
-    } catch (e) {
-      console.log(e)
-      props.applicationEvent.emit('hardwareLoader.message', "Bluetooh Fail")
     }
 
     if (fail === false) {
@@ -94,9 +95,10 @@ const HardwareLoaderService = function ({GprsService, BluetoothService, ConfigSe
       try {
         done = await this.GprsService.initialize();
         console.log(" ==================> GPRS INITIALIZE RETURN: ", done);
-        if (done === false)
+        if (done === false) {
           props.applicationEvent.emit('hardwareLoader.message', "Fail. Reintentando")
-        await delay(4000);
+          await delay(4000);
+        }
       } catch (e) {console.log(e)}
       counter++
     }

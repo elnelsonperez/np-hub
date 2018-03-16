@@ -17,7 +17,7 @@ const HardwareLoaderService = require('./services/HardwareLoaderService')
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
 const BluetoothService = require("./services/BluetoothService/BluetoothService")
-
+const props = require('./shared/props')
 const interval = require('interval-promise')
 const reset = require('./../lib/functions').reset;
 const getSerial = require('./../lib/systeminfo').getSerial
@@ -25,25 +25,6 @@ const getSerial = require('./../lib/systeminfo').getSerial
 const SCREEN_REFRESH_DELAY = 500;
 const INPUT_DELAY = 150;
 
-const props = { //These are available to all modules and tasks
-  applicationEvent: null,
-  config:  {
-    distanceBetweenLocations: undefined,
-    timeoutSendLocation: undefined,
-    allowedMacAddresses: undefined,
-    ibuttons: undefined
-  },
-  input: null,
-  serialNumber: null, //Pi serial number,
-  argv: null,
-  bridge: {
-    connectedMacAddresses: [],
-    pullingData : {
-      lastPulledMessageDate: null,
-      lastPulledIncidenciaDate: null
-    }
-  }
-};
 
 Application = function () {
   this.screen = null //4 Line objects basically
@@ -67,6 +48,7 @@ Application = function () {
       noLocations,
       noAuth
     };
+
 
     this.currentModuleDomain = defaultModule;
     const lcdEnabled = this.disabledFunctionality.lcd === false
@@ -109,6 +91,7 @@ Application = function () {
     )
     this.injectable.ConfigService = new ConfigService(
         this.injectable.RequestSenderService,
+        this.injectable.RequestQueueService,
         "http://nppms.us/api/hub_config"
     )
 
@@ -131,35 +114,35 @@ Application = function () {
     if (lcdEnabled)
       this.printBootingMessage();
 
-    //Hardware loader
+
     props.applicationEvent.once('config.ready', config => {
       console.log("======== CONFIG LOADED ==========")
       props.config = config
     })
 
-    this.injectable.HardwareLoaderService.load().then(() => {
+    //Loads tasks
+    this.loadTasks(__dirname+'/tasks');
+
+    //Init rest
+    if (lcdEnabled) {
+      this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
+            //Print to screen.
+            this.lcdPrintLoop()
+            this.runTasks();
+            //Input
+            props.input.monitorRegisteredPins()
+          }
+      );
+    }
+    else {
+      this.runTasks();
+      //Input
+      props.input.monitorRegisteredPins()
+    }
+
+    //Hardware loader
+    this.injectable.HardwareLoaderService.load(props).then(() => {
       this.injectable.BridgeService.start()
-      //Loads tasks
-      this.loadTasks(__dirname+'/tasks');
-
-      //Init rest
-      if (lcdEnabled) {
-        this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
-              //Print to screen.
-              this.lcdPrintLoop()
-              this.runTasks();
-              //Input
-              props.input.monitorRegisteredPins()
-            }
-        );
-      }
-      else {
-        this.runTasks();
-
-        //Input
-        props.input.monitorRegisteredPins()
-      }
-
     })
 
   }
@@ -349,4 +332,3 @@ Promise.prototype.finally = function(cb) {
 };
 
 module.exports.Application = Application;
-module.exports.props = props;

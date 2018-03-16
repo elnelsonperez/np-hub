@@ -1,7 +1,7 @@
 const Task  = require('../core/Task').Task
 const FixedQueue = require('./../../lib/Queue').FixedQueue
 const SerialPort = require('serialport');
-const props = require('./../App').props
+const props = require('./../shared/props')
 const GPS = require('gps');
 const dateFormat = require('dateformat');
 

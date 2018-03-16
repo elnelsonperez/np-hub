@@ -1,4 +1,4 @@
-const props = require('./../App').props
+const props = require('./../shared/props')
 const BtMessage  = require('./../services/BluetoothService/BtMessage')
 const dateformat = require('dateformat')
 

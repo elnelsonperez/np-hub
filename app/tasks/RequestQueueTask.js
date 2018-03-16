@@ -1,5 +1,5 @@
 const Task  = require('../core/Task').Task
-const props = require('./../App').props
+const props = require('./../shared/props')
 
 /**
  * Se encarga de periodicamente mandar a procesar los requests pendientes
@@ -12,7 +12,7 @@ const RequestQueueTask = new Task (
       inject: ['RequestProcessorService','GprsService'],
       autoload: false,
       ready: false,
-      every: 1000
+      every: 500
     }
 );
 
