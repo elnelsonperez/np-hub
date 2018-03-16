@@ -8,6 +8,7 @@ const SequentialSerialManager = require('../lib/SequentialSerialManager');
 const GprsService =  require('./services/GprsService');
 const IbuttonService = require('./services/IbuttonService')
 const ConfigService = require('./services/ConfigService')
+const StatsService = require('./services/StatsService')
 const MensajeService = require('./services/MensajeService')
 const IncidenciaService = require('./services/IncidenciaService')
 const RequestSenderService = require('./services/RequestSenderService')
@@ -104,11 +105,14 @@ Application = function () {
       BluetoothService: this.injectable.BluetoothService,
     })
 
+    this.injectable.StatsService = new StatsService(this.injectable.RequestSenderService)
+
     this.injectable.BridgeService = new BridgeService({
       BluetoothService: this.injectable.BluetoothService,
       MensajeService: this.injectable.MensajeService,
       IncidenciaService: this.injectable.IncidenciaService,
-      IbuttonService: this.injectable.IbuttonService
+      IbuttonService: this.injectable.IbuttonService,
+      StatsService: this.injectable.StatsService
     })
 
     if (lcdEnabled)

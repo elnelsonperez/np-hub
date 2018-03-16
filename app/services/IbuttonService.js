@@ -83,7 +83,7 @@ const IbuttonService = function () {
   this.readOnlyValid = function () {
     return new Promise(res => {
       interval(async (iteration, stop) => {
-        const result = this.read()
+        const result = await this.read()
         if (result !== null) {
           stop()
           res(result)

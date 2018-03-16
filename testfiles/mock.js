@@ -2,6 +2,72 @@ const service = require("./../app/services/BluetoothService/BluetoothService")
 const BtMessage = require("./../app/services/BluetoothService/BtMessage")
 const Bluetooth = new service({debug: true})
 Bluetooth.initialize({allowedMacAddresses: ["80:65:6D:90:43:F7"]})
+
+const stats = {
+  "count_by_type": [
+    {
+      "nombre": "Tiroteo",
+      "cantidad": 2
+    },
+    {
+      "nombre": "Vandalismo",
+      "cantidad": 2
+    },
+    {
+      "nombre": "Delitos contra la familia",
+      "cantidad": 2
+    },
+    {
+      "nombre": "Vagabundeo",
+      "cantidad": 1
+    }
+  ],
+  "count_by_hour": [
+    {
+      "hora": 22,
+      "cantidad": 3
+    },
+    {
+      "hora": 17,
+      "cantidad": 2
+    },
+    {
+      "hora": 16,
+      "cantidad": 2
+    },
+    {
+      "hora": 8,
+      "cantidad": 2
+    }
+  ],
+  "count_by_day": [
+    {
+      "dia": "Domingo",
+      "cantidad": 4
+    },
+    {
+      "dia": "Lunes",
+      "cantidad": 3
+    },
+    {
+      "dia": "Miércoles",
+      "cantidad": 3
+    },
+    {
+      "dia": "Jueves",
+      "cantidad": 2
+    },
+    {
+      "dia": "Viernes",
+      "cantidad": 2
+    },
+    {
+      "dia": "Martes",
+      "cantidad": 1
+    }
+  ]
+}
+
 Bluetooth.on("EVENT", (e) => {
   if (e.name === "NEW_CONNECTION") {
     Bluetooth.getConnectedDevices().then(a => {
@@ -42,20 +108,48 @@ Bluetooth.on("EVENT", (e) => {
             )
           }
       )
-      setTimeout(() => {
 
-        Bluetooth.sendToDevice(
-            {
-              mac_address: "80:65:6D:90:43:F7",
-              message: new BtMessage(
-                  {
-                    type: "NEW_SERVER_INCIDENCIAS",
-                    payload: [{"distancia": "2.2km","tiempo": "00:04:20", "id":4,"creada_por":1,"destacamento_id":1,"sector_id":71,"prioridad_id":4,"estado_id":3,"tipo_id":2,"fecha_incidencia":"2018-02-23 18:42:34","detalle_incidente":"Sint quo tenetur rem minima vero sunt at consequatur qui eius eum eveniet libero neque eaque reprehenderit aut.","detalle_ubicacion":"2894 Norbert Plaza Apt. 813","ubicacion":{"type":"Point","coordinates":[-70.704077035189,19.463506965434]},"detalle_solucion":null,"ubicacion_texto":"Hamill Square","nombre_civil":"Felton Abernathy","telefono_civil":"809-051-5733","personas_involucradas":1,"creado_en":"2018-02-25 19:04:06","actualizado_en":"2018-02-25 20:30:35","pivot":{"unidad_id":1,"incidencia_id":4,"creado_en":"2018-02-25 20:30:35","actualizado_en":"2018-02-25 20:30:35"},"tipo":{"id":2,"nombre":"Accidente de Transito"},"prioridad":{"id":4,"nombre":"Baja","orden":1},"sector":{"id":71,"nombre":"La Lotería"},"estado":{"id":3,"nombre":"Asignada"},"creador":{"id":1,"oficial_id":1,"oficial":{"id":1,"nombre":"Nelson","apellido":"Perez Lora"}}}]
+      Bluetooth.sendToDevice(
+          {
+            mac_address: "80:65:6D:90:43:F7",
+            message: new BtMessage(
+                {
+                  type: "SECTOR_STATS",
+                  payload: stats
+                }
+            )
+          }
+      )
+
+
+      // setTimeout(() => {
+
+      //   Bluetooth.sendToDevice(
+      //       {
+      //         mac_address: "80:65:6D:90:43:F7",
+      //         message: new BtMessage(
+      //             {
+      //               type: "NEW_SERVER_INCIDENCIAS",
+      //               payload: [{"distancia": "2.2km","tiempo": "00:04:20", "id":4,"creada_por":1,"destacamento_id":1,"sector_id":71,"prioridad_id":4,"estado_id":3,"tipo_id":2,"fecha_incidencia":"2018-02-23 18:42:34","detalle_incidente":"Sint quo tenetur rem minima vero sunt at consequatur qui eius eum eveniet libero neque eaque reprehenderit aut.","detalle_ubicacion":"2894 Norbert Plaza Apt. 813","ubicacion":{"type":"Point","coordinates":[-70.704077035189,19.463506965434]},"detalle_solucion":null,"ubicacion_texto":"Hamill Square","nombre_civil":"Felton Abernathy","telefono_civil":"809-051-5733","personas_involucradas":1,"creado_en":"2018-02-25 19:04:06","actualizado_en":"2018-02-25 20:30:35","pivot":{"unidad_id":1,"incidencia_id":4,"creado_en":"2018-02-25 20:30:35","actualizado_en":"2018-02-25 20:30:35"},"tipo":{"id":2,"nombre":"Accidente de Transito"},"prioridad":{"id":4,"nombre":"Baja","orden":1},"sector":{"id":71,"nombre":"La Lotería"},"estado":{"id":3,"nombre":"Asignada"},"creador":{"id":1,"oficial_id":1,"oficial":{"id":1,"nombre":"Nelson","apellido":"Perez Lora"}}}]
+      //             }
+      //         )
+      //       }
+      //   )
+      // },1000)
+
+      Bluetooth.sendToDevice(
+          {
+            mac_address: "80:65:6D:90:43:F7",
+            message: new BtMessage(
+                {
+                  type: "AUTH_STATUS",
+                  payload:  {
+                    status: 'SUCCESS'
                   }
-              )
-            }
-        )
-      },1000)
+                }
+            )
+          }
+      )
 
     })
   }

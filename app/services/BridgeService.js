@@ -6,6 +6,7 @@ const dateformat = require('dateformat')
  *
  * @param {BluetoothService} BluetoothService
  * @param {MensajeService} MensajeService
+ * @param {StatsService} StatsService
  * @param {IncidenciaService} IncidenciaService
  * @param {IbuttonService} IbuttonService
  * @constructor
@@ -15,13 +16,15 @@ const BridgeService = function (
       BluetoothService,
       MensajeService,
       IncidenciaService,
-      IbuttonService
+      IbuttonService,
+      StatsService
     }
 ) {
   this.BluetoothService = BluetoothService;
   this.MensajeService = MensajeService;
   this.IncidenciaService = IncidenciaService;
   this.IbuttonService = IbuttonService;
+  this.StatsService = StatsService;
 
   this.start = () => {
 
@@ -70,14 +73,33 @@ const BridgeService = function (
       if (!props.argv.noAuth) {
 
         this.IbuttonService.startBlinking()
-        this.IbuttonService.readOnlyValid().then(code => {
-          if (props.config.ibuttons
-              && props.config.ibuttons[msg.body.mac_address]
-          ) {
-            if (code === props.config.ibuttons[msg.body.mac_address]) {
-              //logged in
-              if (!props.bridge.connectedMacAddresses.includes(msg.body.mac_address)) {
-                props.bridge.connectedMacAddresses.push(msg.body.mac_address)
+
+        const login = () => {
+          this.IbuttonService.readOnlyValid().then(code => {
+            if (props.config.ibuttons
+                && props.config.ibuttons[msg.body.mac_address]
+            ) {
+              if (code === props.config.ibuttons[msg.body.mac_address]) {
+                //logged in
+                if (!props.bridge.connectedMacAddresses.includes(msg.body.mac_address)) {
+                  props.bridge.connectedMacAddresses.push(msg.body.mac_address)
+                  this.BluetoothService.sendToDevice(
+                      {
+                        mac_address: msg.body.mac_address,
+                        message: new BtMessage(
+                            {
+                              type: "AUTH_STATUS",
+                              payload:  {
+                                status: 'SUCCESS'
+                              }
+                            }
+                        )
+                      }
+                  )
+                  this.IbuttonService.stopBlinking()
+                }
+              }
+              else { //Invalid ibutton para la mac address conectada
                 this.BluetoothService.sendToDevice(
                     {
                       mac_address: msg.body.mac_address,
@@ -85,16 +107,15 @@ const BridgeService = function (
                           {
                             type: "AUTH_STATUS",
                             payload:  {
-                              status: 'SUCCESS'
+                              status: 'FAILED'
                             }
                           }
                       )
                     }
                 )
-                this.IbuttonService.stopBlinking()
+                login()
               }
-            }
-            else { //Invalid ibutton para la mac address conectada
+            } else { //No hay ibutton para la mac address conectada
               this.BluetoothService.sendToDevice(
                   {
                     mac_address: msg.body.mac_address,
@@ -102,30 +123,18 @@ const BridgeService = function (
                         {
                           type: "AUTH_STATUS",
                           payload:  {
-                            status: 'FAILED'
+                            status: 'NOT_EXIST'
                           }
                         }
                     )
                   }
               )
+              login()
             }
-          } else { //No hay ibutton para la mac address conectada
-            this.BluetoothService.sendToDevice(
-                {
-                  mac_address: msg.body.mac_address,
-                  message: new BtMessage(
-                      {
-                        type: "AUTH_STATUS",
-                        payload:  {
-                          status: 'NOT_EXIST'
-                        }
-                      }
-                  )
-                }
-            )
-          }
-        })
+          })
+        }
 
+        login()
       }
       else { //Auth directo bypass
         if (!props.bridge.connectedMacAddresses.includes(msg.body.mac_address)) {
@@ -236,6 +245,51 @@ const BridgeService = function (
         )
       }
     })
+  }
+
+  this.action_GET_SECTOR_STATS = (msg) => {
+    const action = msg.body.data;
+    if (action.payload
+        && action.payload.sector_id) {
+      this.StatsService.getStats({sector_id: action.payload.sector_id}).then(r => {
+        if (r !== null) {
+          this.BluetoothService.sendToDevice(
+              {
+                mac_address: msg.body.mac_address,
+                message: new BtMessage(
+                    {
+                      type: "GET_SECTOR_STATS_RESPONSE",
+                      payload: {
+                        stats: r,
+                        status: "OK",
+                        callPayload: null
+                      }
+                    }
+                )
+              }
+          )
+        }
+        else {
+          this.BluetoothService.sendToDevice(
+              {
+                mac_address: msg.body.mac_address,
+                message: new BtMessage(
+                    {
+                      type: "GET_SECTOR_STATS_RESPONSE",
+                      payload: {
+                        stats: r,
+                        status: "FAILED",
+                        callPayload: action.payload
+                      }
+                    }
+                )
+              }
+          )
+        }
+
+      })
+    }
+
   }
 
   this.action_SEND_MESSAGE_TO_SERVER = (msg) => {
