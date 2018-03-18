@@ -17,10 +17,9 @@ const GpsTask = new Task (
       data: {
         selectedLocations: new FixedQueue(100),
         rawLocations: new FixedQueue(100),
-        lastLocationDate: new Date(),
-        locationCallbackRegistered: false
+        lastLocationDate: new Date()
       },
-      every: 5000,
+      every: 4000,
       ready: false,
       autoload: false
     }
@@ -88,9 +87,9 @@ GpsTask.pushOrRejectLocation = function(location) {
   if (this.data.lastLocation) {
     const prevloc = this.data.lastLocation;
     const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
-    if (props.argv.verbose) {
-      console.log("[NEW LOC] D.A.: "+ distance+"\n")
-    }
+    // if (props.argv.verbose) {
+    console.log("[NEW LOC] D.A.: "+ distance+"\n")
+    // }
     if (distance > props.config.distanceBetweenLocations) {
       this.pushALocation(location)
     } else {
@@ -107,12 +106,6 @@ GpsTask.pushOrRejectLocation = function(location) {
   }
 }
 
-GpsTask.pushALocation = function (location) {
-  this.data.selectedLocations.push(location)
-  this.data.lastLocation = location;
-  this.emit('newLocation', this.data.selectedLocations.length)
-  this.data.lastLocationDate = new Date();
-}
 
 GpsTask.distanceBetween =  function (lat1, lon1, lat2, lon2) {
   const p = 0.017453292519943295;
@@ -123,29 +116,29 @@ GpsTask.distanceBetween =  function (lat1, lon1, lat2, lon2) {
   return 12742000 * Math.asin(Math.sqrt(a));
 }
 
-GpsTask.getNextLocations = async function (amount = 1) { //
+
+GpsTask.pushALocation = function (location) {
+  this.data.selectedLocations.push(location)
+  this.data.lastLocation = location;
+  this.emit('newLocation', this.data.selectedLocations.length)
+  this.data.lastLocationDate = new Date();
+}
+
+GpsTask.getNextLocations = async function () { //
   return new Promise((res) => {
-    const returnResult = () =>  {
-      const result = this.data.selectedLocations.splice(0, amount)
-      if (result.length > 0) {
-        res(result)
-      }
+    if (this.data.selectedLocations > 0) {
+      res(this.data.selectedLocations.splice(0, this.data.selectedLocations.length))
     }
-    if (this.data.selectedLocations.length >= amount) {
-      returnResult()
-    }
-    if (!this.data.locationCallbackRegistered) {
-      this.data.locationCallbackRegistered = true;
+    else {
       const callback = (length) => {
-        if (length >= amount) {
+        if (length > 0) {
           this.removeListener('newLocation', callback)
           this.data.locationCallbackRegistered = false;
-          returnResult()
+          res(this.data.selectedLocations.splice(0, this.data.selectedLocations.length))
         }
       };
       this.on('newLocation', callback)
     }
-
   })
 }
 
