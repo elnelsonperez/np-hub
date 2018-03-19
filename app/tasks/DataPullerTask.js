@@ -21,8 +21,8 @@ DataPullerTask.run = function () {
   return new Promise(res => {
     const bridgeData = props.bridge
     if (Object.keys(bridgeData.connectedMacAddresses).length > 0) {
-      console.log ("==================> lastPulledMessageDate", bridgeData.pullingData.lastPulledMessageDate)
-      console.log ("==================> lastPulledIncidenciaDate", bridgeData.pullingData.lastPulledIncidenciaDate)
+      // console.log ("==================> lastPulledMessageDate", bridgeData.pullingData.lastPulledMessageDate)
+      // console.log ("==================> lastPulledIncidenciaDate", bridgeData.pullingData.lastPulledIncidenciaDate)
       this.pullMensajes(bridgeData.pullingData.lastPulledMessageDate)
           .catch(e => {
             console.log(e)

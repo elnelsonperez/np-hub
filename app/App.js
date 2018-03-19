@@ -21,6 +21,7 @@ const BluetoothService = require("./services/BluetoothService/BluetoothService")
 const props = require('./shared/props')
 const interval = require('interval-promise')
 const reset = require('./../lib/functions').reset;
+const shutdown = require('./../lib/functions').shutdown;
 const getSerial = require('./../lib/systeminfo').getSerial
 
 const SCREEN_REFRESH_DELAY = 500;
@@ -121,6 +122,13 @@ Application = function () {
 
     props.applicationEvent.once('config.ready', config => {
       console.log("======== CONFIG LOADED ==========")
+      this.checkIfDisabled(config)
+      props.config = config
+    })
+
+    props.applicationEvent.on("config.update", config => {
+      this.checkIfDisabled(config)
+      
       props.config = config
     })
 
@@ -149,6 +157,13 @@ Application = function () {
       this.injectable.BridgeService.start()
     })
 
+  }
+
+
+  this.checkIfDisabled = function (config) {
+    if (config && config.enabled === false ) {
+      shutdown()
+    }
   }
 
   this.runTasks = function () {
