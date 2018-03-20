@@ -128,7 +128,7 @@ Application = function () {
 
     props.applicationEvent.on("config.update", config => {
       this.checkIfDisabled(config)
-      
+
       props.config = config
     })
 
@@ -162,7 +162,8 @@ Application = function () {
 
   this.checkIfDisabled = function (config) {
     if (config && config.enabled === false ) {
-      shutdown()
+      console.log("******************* WOULD SHUTDOWN **************************")
+      // shutdown()
     }
   }
 
