@@ -1,31 +1,75 @@
 const Application = require('./app/App').Application;
 const props = require('./app/shared/props')
-const BtMessage = require('./app/services/BluetoothService/BtMessage')
+
+const SequentialSerialManager = require('./lib/SequentialSerialManager');
+const GprsService =  require('./app/services/GprsService');
+const IbuttonService = require('./app/services/IbuttonService')
+const ConfigService = require('./app/services/ConfigService')
+const StatsService = require('./app/services/StatsService')
+const MensajeService = require('./app/services/MensajeService')
+const IncidenciaService = require('./app/services/IncidenciaService')
+const RequestSenderService = require('./app/services/RequestSenderService')
+const BridgeService = require('./app/services/BridgeService')
+const HardwareLoaderService = require('./app/services/HardwareLoaderService')
+const RequestQueueService = require("./app/services/RequestQueueService")
+const RequestProcessorService = require("./app/services/RequestProcessorService")
+const BluetoothService = require("./app/services/BluetoothService/BluetoothService")
+
+const instances = {}
+instances.SequentialSerialManager = new SequentialSerialManager(true);
+instances.GprsService = new GprsService(instances.SequentialSerialManager);
+instances.BluetoothService = new BluetoothService({debug: true})
+instances.IbuttonService = new IbuttonService({});
+instances.RequestQueueService = new RequestQueueService()
+instances.RequestProcessorService = new RequestProcessorService (
+  instances.RequestQueueService,
+  instances.GprsService
+)
+instances.RequestSenderService = new RequestSenderService(
+  instances.RequestQueueService,
+  instances.RequestProcessorService,
+)
+instances.ConfigService = new ConfigService(
+  instances.RequestSenderService,
+  instances.RequestQueueService,
+  "http://nppms.us/api/hub_config"
+)
+instances.MensajeService = new MensajeService(instances.RequestSenderService)
+instances.IncidenciaService = new IncidenciaService(instances.RequestSenderService)
+instances.HardwareLoaderService = new HardwareLoaderService({
+  GprsService:  instances.GprsService,
+  ConfigService: instances.ConfigService,
+  BluetoothService: instances.BluetoothService,
+})
+instances.StatsService = new StatsService(instances.RequestSenderService)
+instances.BridgeService = new BridgeService({
+  BluetoothService: instances.BluetoothService,
+  MensajeService: instances.MensajeService,
+  IncidenciaService: instances.IncidenciaService,
+  IbuttonService: instances.IbuttonService,
+  StatsService: instances.StatsService
+})
+
 app = new Application();
-app.disabledFunctionality.lcd = true;
 
-const argv = require('minimist')(process.argv.slice(2));
-  app.initialize({
-    verbose: !!argv.verbose,
-    bridgeDebug: !!argv.bridgeDebug,
-    noLocations: !!argv.noLocations,
-    noAuth: !!argv.noAuth,
-  });
+app.initialize (
+  {
+    disabledFunctionality: {
+      lcd: true
+    },
+    inputPins:  {
+      pins: [
+        {
+          type: InputService.TYPE_PUSH_BUTTON,
+          number: 33,
+          name: 'showAuth'
+        }
+      ]
+    },
+    services: instances
+  }
+);
 
-  process.on('unhandledRejection', (reason, p) => {
-    console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
-  });
 
-  props.applicationEvent.on('boot.ready', function () {
-    setTimeout(() => {
-      // app.switchModuleDomain('default')
-      console.log(" ==== BOOT READY ====\n")
-    }, 1500)
-  })
 
-  process.on('SIGINT', function() {
-    console.log('======================\nReceived shut down signal\n========================\n')
-    app.injectable.BluetoothService.shell.childProcess.kill();
-    process.exit();
-  });
 

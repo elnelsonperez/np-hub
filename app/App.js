@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const line = require('./core/Line.js');
 const Lcdlib = require('../lib/LcdController');
+const InputManager = require('./core/InputManager')
 
 const SequentialSerialManager = require('../lib/SequentialSerialManager');
 const GprsService =  require('./services/GprsService');
@@ -13,7 +14,6 @@ const MensajeService = require('./services/MensajeService')
 const IncidenciaService = require('./services/IncidenciaService')
 const RequestSenderService = require('./services/RequestSenderService')
 const BridgeService = require('./services/BridgeService')
-const InputService = require('./services/InputService')
 const HardwareLoaderService = require('./services/HardwareLoaderService')
 const RequestQueueService = require("./services/RequestQueueService")
 const RequestProcessorService = require("./services/RequestProcessorService")
@@ -23,10 +23,7 @@ const interval = require('interval-promise')
 const reset = require('./../lib/functions').reset;
 const shutdown = require('./../lib/functions').shutdown;
 const getSerial = require('./../lib/systeminfo').getSerial
-
-const SCREEN_REFRESH_DELAY = 500;
-const INPUT_DELAY = 150;
-
+const minimist = require('minimist');
 
 Application = function () {
   this.screen = null //4 Line objects basically
@@ -34,91 +31,45 @@ Application = function () {
   this.timer = null //Lcd update timer
   this.modules = {} //Module list
   this.tasks = {} //Task list
-  this.injectable = {} //Which libraries are injectable to modules or tasks
+  this.injectable = {} //Which services are injectable to modules or tasks
 
   this.screenConfigs = null;
-  this.currentModuleDomain = null;
-  this.disabledFunctionality = {
-    lcd: false
-  }
+  this.disabledFunctionality = {}
+  this.screenRefreshDelay = 500;
 
-  this.initialize = ({defaultModule = 'boot', verbose = false, bridgeDebug = false, noLocations = false ,
-                       noAuth = false}) => {
-    props.argv = {
-      verbose,
-      bridgeDebug,
-      noLocations,
-      noAuth
-    };
-
-
-    this.currentModuleDomain = defaultModule;
-    const lcdEnabled = this.disabledFunctionality.lcd === false
-    const inputService = new InputService(INPUT_DELAY);
-    inputService.registerInputPins(
-        {
-          pins: [
-            {
-              type: InputService.TYPE_PUSH_BUTTON,
-              number: 33,
-              name: 'showAuth'
-            }
-          ]
-        }
-    )
-    inputService.initializeRegisteredPins();
-    props.input = inputService
-
+  this.initialize = (
+    {
+      defaultModule = 'boot',
+      disabledFunctionality = {lcd: false},
+      inputPins= {},
+      inputDelay = 150,
+      screenRefreshDelay = 500,
+      services = {}
+    }
+  ) => {
     props.applicationEvent = new EventEmitter()
+
+    this.screenRefreshDelay = screenRefreshDelay
+    this.disabledFunctionality = disabledFunctionality
+
+    props.argv = this.parseArguments()
+
+    const InputManager = new InputManager({delay: inputDelay});
+    InputManager.registerInputPins(inputPins)
+    InputManager.initializeRegisteredPins().then(()=> {
+      props.input = InputManager
+    });
 
     props.serialNumber = getSerial();
     this.setDefaultApplicationProperties();
 
     this.lcd = new Lcdlib.LcdController(1, 0x3f, 20, 4);
     this.lcd.customChar();
-
-    const Seq = new SequentialSerialManager(true);
-    this.injectable.SequentialSerialManager = Seq;
-    this.injectable.GprsService = new GprsService(Seq);
-    this.injectable.BluetoothService = new BluetoothService({debug: true})
-    this.injectable.IbuttonService = new IbuttonService({});
-    this.injectable.RequestQueueService = new RequestQueueService()
-    this.injectable.RequestProcessorService = new RequestProcessorService (
-        this.injectable.RequestQueueService,
-        this.injectable.GprsService
-    )
-    this.injectable.RequestSenderService = new RequestSenderService(
-        this.injectable.RequestQueueService,
-        this.injectable.RequestProcessorService,
-    )
-    this.injectable.ConfigService = new ConfigService(
-        this.injectable.RequestSenderService,
-        this.injectable.RequestQueueService,
-        "http://nppms.us/api/hub_config"
-    )
-
-    this.injectable.MensajeService = new MensajeService(this.injectable.RequestSenderService)
-    this.injectable.IncidenciaService = new IncidenciaService(this.injectable.RequestSenderService)
-
-    this.injectable.HardwareLoaderService = new HardwareLoaderService({
-      GprsService:  this.injectable.GprsService,
-      ConfigService: this.injectable.ConfigService,
-      BluetoothService: this.injectable.BluetoothService,
-    })
-
-    this.injectable.StatsService = new StatsService(this.injectable.RequestSenderService)
-
-    this.injectable.BridgeService = new BridgeService({
-      BluetoothService: this.injectable.BluetoothService,
-      MensajeService: this.injectable.MensajeService,
-      IncidenciaService: this.injectable.IncidenciaService,
-      IbuttonService: this.injectable.IbuttonService,
-      StatsService: this.injectable.StatsService
-    })
-
+    const lcdEnabled = this.disabledFunctionality.lcd === false
     if (lcdEnabled)
       this.printBootingMessage();
 
+    this.injectable = services;
 
     props.applicationEvent.once('config.ready', config => {
       console.log("======== CONFIG LOADED ==========")
@@ -128,7 +79,6 @@ Application = function () {
 
     props.applicationEvent.on("config.update", config => {
       this.checkIfDisabled(config)
-
       props.config = config
     })
 
@@ -138,12 +88,12 @@ Application = function () {
     //Init rest
     if (lcdEnabled) {
       this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
-            //Print to screen.
-            this.lcdPrintLoop()
-            this.runTasks();
-            //Input
-            props.input.monitorRegisteredPins()
-          }
+          //Print to screen.
+          this.lcdPrintLoop()
+          this.runTasks();
+          //Input
+          props.input.monitorRegisteredPins()
+        }
       );
     }
     else {
@@ -159,6 +109,15 @@ Application = function () {
 
   }
 
+  this.parseArguments = function () {
+    const argv = minimist(process.argv.slice(2));
+    return {
+      verbose: !!argv.verbose,
+      bridgeDebug: !!argv.bridgeDebug,
+      noLocations: !!argv.noLocations,
+      noAuth: !!argv.noAuth
+    };
+  }
 
   this.checkIfDisabled = function (config) {
     if (config && config.enabled === false ) {
@@ -233,8 +192,6 @@ Application = function () {
     for (let module of Object.keys(this.modules)) {
       this.modules[module].removeAllListeners()
     }
-
-    this.currentModuleDomain = folder;
     //load modules
     this.loadModules(__dirname+'/modules/'+folder);
     // this.lcd.stopScroll() //Only one scroll at a time.
@@ -310,7 +267,7 @@ Application = function () {
   this.printSingleLine  = (line, number) => {
     if (!this.screen['line'+number].scrolling){
       if (this.screenConfigs && this.screenConfigs.linesNotCentered &&
-          this.screenConfigs.linesNotCentered.includes(parseInt(number))) {
+        this.screenConfigs.linesNotCentered.includes(parseInt(number))) {
         this.lcd.println(line, number, false);
       } else {
         this.lcd.println(line, number, true);
@@ -335,7 +292,7 @@ Application = function () {
       Object.keys(contents).forEach((key) => {
         this.printSingleLine(contents[key], key);
       })
-    }, SCREEN_REFRESH_DELAY)
+    }, this.screenRefreshDelay)
   }
 
   this.printBootingMessage = () => {
@@ -350,5 +307,18 @@ Promise.prototype.finally = function(cb) {
   const fin = () => Promise.resolve(cb()).then(res)
   return this.then(fin, fin);
 };
+
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+});
+
+props.applicationEvent.on('boot.ready', function () {
+  console.log(" ==== BOOT READY ====\n")
+})
+
+process.on('SIGINT', function() {
+  app.injectable.BluetoothService.shell.childProcess.kill();
+  process.exit();
+});
 
 module.exports.Application = Application;

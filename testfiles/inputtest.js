@@ -1,4 +1,4 @@
-const InputHandler = require('../app/services/InputService').InputHandler;
+const InputHandler = require('../app/core/InputManager').InputHandler;
 
 const inputHandler = new InputHandler(150);
 inputHandler.registerInputPins(
