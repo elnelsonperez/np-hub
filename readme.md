@@ -1,26 +1,93 @@
 #NP PMS - Tracking Module Software
-Este software es el que corre en los equipos de rastreo de nuestro (Nathaly R. Persia
-y Nelson Perez) proyecto de grado.
+Este software es el que corre en los Hubs del sistema NP PMS.
+Desarrollado por Nelson Pérez y Nathaly Persia como proyecto de grado. 2017-2018
 
->El NP Police Management System pretende mejorar el sistema de patrulla policial de la ciudad de Santiago desarrollando un nuevo sistema de rastreo, gestión, y monitoreo policial. El enfoque de este sistema es que pueda ser implementado en las principales unidades de vigilancia; vehículos de cuatro ruedas o unidades policiales a pie, en un esquema que, conociendo la posición, estado, y personal a bordo de la unidad,  permita el efectivo despliegue de unidades policiacas en las zonas que más lo necesiten. 
+>El objetivo general del NP PMS es Desarrollar un sistema de 
+rastreo posicional para la Policía Nacional Dominicana que permita el
+efectivo despliegue de unidades de patrullaje, administrado 
+desde los destacamentos. 
 
-Decidimos diseñar esta aplicacion de manera que fuera facilmente customizable al
-momento de hacer mejoras o ajustes al proyecto en fases mas avanzadas de su desarrollo.
+*Todos los ejemplos que se den luego de este punto asumen que tienes Ubuntu 16.04 como entorno
+de desarrollo*
 
-##Componentes
+##Componentes físicos
 Este proyecto esta hecho para correrse en una Raspberry PI 3.
-Es necesario tener instalado Node.js v8 en adelante y NPM, que viene incluido con Node.
-Los esquemas de circuito relevantes con los que funciona esta proyecto son los siguientes.
+Los esquemas de circuito relevantes son los siguientes.
 
 >To do
 
+####Configuración en la Pi
+######Notas
+* Recomendamos que la Pi corra [Raspbian Stretch Lite](https://www.raspberrypi.org/downloads/raspbian/).
+* Esta version de Raspbian no tiene interface desktop, lo que la hace muy rapida. [Este articulo](https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0)indica como conectarse a la Pi luego de descargar raspbian. 
+* Es recomendable configurar una IP estatica para no tener que encontrar la IP asignada a la pi
+cada vez que bootea y se conecta a la red. Para ello, se puede seguir la seccion **dhcpcd method**
+ de [este tutorial](https://raspberrypi.stackexchange.com/questions/37920/how-do-i-set-up-networking-wifi-static-ip-address/74428#74428)
+
+*El siguiente paso es totalmente opcional, pero muy recomendado y te ahorrara mucho tiempo luego.*
+
+Yo recomendaria utilizar algun metodo para copiar automaticamente los cambios hechos en el proyecto
+desde tu PC hacia la Pi. Esto hace el proceso muy rapido porque toda la programacion puede ser 
+realizada desde tu PC y al guardar el proyecto localmente, automaticamente se copia a la Pi.
+
+En nuestro caso, utilizamos [lsyncd](https://www.digitalocean.com/community/tutorials/how-to-mirror-local-and-remote-directories-on-a-vps-with-lsyncd).
+Y adjunto dejo una configuracion de ejemplo para copiar los cambios hechos al proyecto
+desde la pc hasta la Pi, por SSH (Modificar IPs y rutas).
+
+```text
+-- /etc/lsyncd/lsyncd.conf.lua
+
+settings{
+        logfile = "/var/log/lsyncd/lsyncd.log",
+        statusFile = "/var/log/lsyncd/lsyncd.status",
+        statusIntervall = 1,
+}
+
+sync{
+        default.rsyncssh,
+        source = "/home/nel/nphub",
+        targetdir = "/home/pi/nphub",
+        host = "pi@192.168.1.153",
+        delay           = 1,
+        exclude = {"node_modules",".idea",".git"},
+        rsync={rsh="/usr/bin/ssh  -o StrictHostKeyChecking=no"}
+}
+```
+
+Para que esta configuracion funcione, es necesario copiar el SSH Key del usuario Root de tu maquina
+a la Pi. Al hacer esto, no es necesario introducir passwords al conectarse por SSH con la Pi.
+Si no entiendes estos conceptos, [mira este articulo.](https://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md).
+
+######Bluetooth
+El NP Hub utiliza el bluetooth de la Pi para comunicarse con el smartphone.
+Para poder utilizar el bluetooth de la manera que queremos, es necesario seguir 
+las instrucciones siguientes. (Comandos a correr en la Pi)
+
+Primero actualiza tu pi.
+```bash
+sudo apt-get update && sudo apt-get upgrade
+```
+
+Arreglar un problema del bluetooth con la Pi.
+```text
+sudo sed -i 's|^ExecStart=/usr/lib/bluetooth/bluetoothd$|ExecStart=/usr/lib/bluetooth/bluetoothd --noplugin=sap|' /lib/systemd/system/bluetooth.service
+```
+
+Agregar usuario pi al grupo bluetooth,
+```bash
+sudo adduser pi bluetooth
+sudo reboot
+```
+
+Instalar librerias necesarias.
+```bash
+sudo apt-get install libbluetooth-dev
+sudo apt-get install python-dev
+sudo pip install PyBluez
+```
+
 ##Arquitectura del software
 La ideas principales son las siguientes:
-
-* Cada recuadro, o grupo de recuadros por linea de la pantalla de 20x4 que utiliza el 
-proyecto, es un string retornado de algun bloque de codigo que se ejecuta cada cierto tiempo.
-Estos bloques de codigo que procesan  informaciones y la presentan como un output en forma de texto seran llamados **Modulos**,
-y la pantalla estará compuesta por varios de ellos. 
 
 * Hay tareas que tienen que realizarse continuamente (como la recoleccion de localizaciones GPS)
 que no necesitan tener una salida directa a la pantalla. Estos tipos 
