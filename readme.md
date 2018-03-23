@@ -158,6 +158,7 @@ Hay tareas que tienen que realizarse continuamente (como la recoleccion de local
 Estos tipos de *background processes* son llamados **Tasks** en el contexto de esta aplicacion.
 
 Entre las cosas que puede hacer un **Task** estan:
+
  + Decidir cada cuando tiempo desea ser corrida por el motor de la aplicacion luego de la ultima
   vez que se corrio la tarea.
  + Utilizar cuantos Servicios sean necesarios.
