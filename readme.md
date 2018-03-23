@@ -7,6 +7,9 @@ rastreo posicional para la Policía Nacional Dominicana que permita el
 efectivo despliegue de unidades de patrullaje, administrado 
 desde los destacamentos. 
 
+La aplicacion esta desarrollada en Javascript con NodeJS, a excepcion de el manejo de bluetooth, que se
+hace con la libreria PyBluez de Python.
+
 *Todos los ejemplos que se den luego de este punto asumen que tienes Ubuntu 16.04 como entorno
 de desarrollo*
 
@@ -18,12 +21,64 @@ Los esquemas de circuito relevantes son los siguientes.
 
 ####Configuración en la Pi
 ######Notas
-* Recomendamos que la Pi corra [Raspbian Stretch Lite](https://www.raspberrypi.org/downloads/raspbian/).
+* Recomendamos que la Pi corra [Raspbian Stretch Lite March 2018](https://www.raspberrypi.org/downloads/raspbian/).
 * Esta version de Raspbian no tiene interface desktop, lo que la hace muy rapida. [Este articulo](https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0)indica como conectarse a la Pi luego de descargar raspbian. 
 * Es recomendable configurar una IP estatica para no tener que encontrar la IP asignada a la pi
 cada vez que bootea y se conecta a la red. Para ello, se puede seguir la seccion **dhcpcd method**
  de [este tutorial](https://raspberrypi.stackexchange.com/questions/37920/how-do-i-set-up-networking-wifi-static-ip-address/74428#74428)
 
+######Bluetooth en Raspbian Stretch
+El NP Hub utiliza el bluetooth de la Pi para comunicarse con el smartphone.
+Para poder utilizar el bluetooth de la manera que queremos, es necesario seguir 
+las instrucciones siguientes. (Comandos a correr en la Pi)
+
+Conectate a la Pi por SSH. Si no has cambiado el default password, es 'raspberry'
+```bash
+ssh pi@[IP DE LA PI]
+```
+
+Actualizar.
+```bash
+sudo apt-get update && sudo apt-get upgrade
+```
+
+Arreglar un problema del bluetooth con Raspbian Stretch.
+```text
+sudo sed -i 's|^ExecStart=/usr/lib/bluetooth/bluetoothd$|ExecStart=/usr/lib/bluetooth/bluetoothd --noplugin=sap|' /lib/systemd/system/bluetooth.service
+sudo service bluetooth restart
+sudo systemctl daemon-reload
+```
+
+Agregar usuario pi al grupo bluetooth.
+```bash
+sudo adduser pi bluetooth
+sudo reboot
+```
+
+Instalar librerias necesarias.
+```bash
+sudo apt-get install libbluetooth-dev python-dev python-pip -y
+sudo pip install PyBluez
+```
+
+En este punto el bluetooth deberia estar funcionando correctamente.
+Compruebalo haciendo :
+```bash
+pi@raspberrypi:~ $ bluetoothctl
+[NEW] Controller B8:27:EB:02:33:C2 raspberrypi [default] <--- Todo bien.
+[bluetooth]# 
+```
+
+######Instalando NodeJs y NPM
+```bash
+curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+######Git (Opcional)
+```bash
+sudo apt-get install git -y
+```
 ######Lsyncd (Opcional)
 *El siguiente paso es totalmente opcional, pero muy recomendado y te ahorrara mucho tiempo luego.*
 
@@ -59,33 +114,6 @@ Para que esta configuracion funcione, es necesario copiar el SSH Key del usuario
 a la Pi. Al hacer esto, no es necesario introducir passwords al conectarse por SSH con la Pi.
 Si no entiendes estos conceptos, [mira este articulo.](https://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md).
 
-######Bluetooth en Raspbian Stretch
-El NP Hub utiliza el bluetooth de la Pi para comunicarse con el smartphone.
-Para poder utilizar el bluetooth de la manera que queremos, es necesario seguir 
-las instrucciones siguientes. (Comandos a correr en la Pi)
-
-Primero actualiza tu pi.
-```bash
-sudo apt-get update && sudo apt-get upgrade
-```
-
-Arreglar un problema del bluetooth con la Pi.
-```text
-sudo sed -i 's|^ExecStart=/usr/lib/bluetooth/bluetoothd$|ExecStart=/usr/lib/bluetooth/bluetoothd --noplugin=sap|' /lib/systemd/system/bluetooth.service
-```
-
-Agregar usuario pi al grupo bluetooth,
-```bash
-sudo adduser pi bluetooth
-sudo reboot
-```
-
-Instalar librerias necesarias.
-```bash
-sudo apt-get install libbluetooth-dev
-sudo apt-get install python-dev
-sudo pip install PyBluez
-```
 
 ##Arquitectura del software
 La ideas principales son las siguientes:
