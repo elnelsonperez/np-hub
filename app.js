@@ -59,11 +59,11 @@ app.initialize (
     },
     inputPins:  {
       pins: [
-        {
-          type: InputManager.TYPE_PUSH_BUTTON,
-          number: 33,
-          name: 'showAuth'
-        }
+        // {
+        //   type: InputManager.TYPE_PUSH_BUTTON,
+        //   number: 33,
+        //   name: 'showAuth'
+        // }
       ]
     },
     services: instances
