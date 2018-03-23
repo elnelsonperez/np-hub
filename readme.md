@@ -24,6 +24,7 @@ Los esquemas de circuito relevantes son los siguientes.
 cada vez que bootea y se conecta a la red. Para ello, se puede seguir la seccion **dhcpcd method**
  de [este tutorial](https://raspberrypi.stackexchange.com/questions/37920/how-do-i-set-up-networking-wifi-static-ip-address/74428#74428)
 
+######Lsyncd (Opcional)
 *El siguiente paso es totalmente opcional, pero muy recomendado y te ahorrara mucho tiempo luego.*
 
 Yo recomendaria utilizar algun metodo para copiar automaticamente los cambios hechos en el proyecto
@@ -58,7 +59,7 @@ Para que esta configuracion funcione, es necesario copiar el SSH Key del usuario
 a la Pi. Al hacer esto, no es necesario introducir passwords al conectarse por SSH con la Pi.
 Si no entiendes estos conceptos, [mira este articulo.](https://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md).
 
-######Bluetooth
+######Bluetooth en Raspbian Stretch
 El NP Hub utiliza el bluetooth de la Pi para comunicarse con el smartphone.
 Para poder utilizar el bluetooth de la manera que queremos, es necesario seguir 
 las instrucciones siguientes. (Comandos a correr en la Pi)
