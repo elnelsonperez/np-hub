@@ -1,8 +1,7 @@
-const Application = require('./app/App').Application;
+const Application = require('./app/App').Application
 
-const SequentialSerialManager = require('./lib/SequentialSerialManager');
-const GprsService =  require('./app/services/GprsService');
-const InputManager =  require('./app/core/InputManager');
+const SequentialSerialManager = require('./lib/SequentialSerialManager')
+const GprsService =  require('./app/services/GprsService')
 const IbuttonService = require('./app/services/IbuttonService')
 const ConfigService = require('./app/services/ConfigService')
 const StatsService = require('./app/services/StatsService')
@@ -16,8 +15,8 @@ const RequestProcessorService = require("./app/services/RequestProcessorService"
 const BluetoothService = require("./app/services/BluetoothService/BluetoothService")
 
 const instances = {}
-instances.SequentialSerialManager = new SequentialSerialManager(true);
-instances.GprsService = new GprsService(instances.SequentialSerialManager);
+instances.SequentialSerialManager = new SequentialSerialManager(true)
+instances.GprsService = new GprsService(instances.SequentialSerialManager)
 instances.BluetoothService = new BluetoothService({debug: true})
 instances.IbuttonService = new IbuttonService({});
 instances.RequestQueueService = new RequestQueueService()

@@ -64,6 +64,7 @@ Instalar librerias necesarias.
 ```bash
 sudo apt-get install libbluetooth-dev python-dev python-pip -y
 sudo pip install PyBluez
+sudo pip install pexpect
 ```
 
 En este punto el bluetooth deberia estar funcionando correctamente.
