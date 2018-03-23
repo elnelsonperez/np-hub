@@ -1,0 +1,98 @@
+
+Hasta aqui llegue 22/03/18
+---
+
+  ...
+  Un objeto llamado **Application** se encarga de inicializar y/o cargar tasks, modulos y librerias al momento del boot.
+  Deja las Tasks corriendo en el background y ejecuta un *application loop* mientras la aplicacion este viva.
+
+  El application loop simplemente maneja el input del usuario para tomar las acciones pertinentes, y ejecuta la funcion
+  *getProccesedLine* para printear o "renderizar" cada output a cada linea de la pantalla con la libreria que maneja la LCD.
+
+ El objetivo de esta estrategie es crear una especie de *engine* que no necesite ser tocado en el desarrollo del proyecto,
+ y que todo pueda ser manejado agregando mas pantallas (directorios de Modulos) o Tasks segun se requieran nuevas funcionalidades.
+
+##Estructura de directorios
+La carpeta *lib* contiene todos los archivos que funcionan como librerias para la aplicacion.
+
+El directorio *storage* es para almacenamiento. Ya sea de la base de datos local o cualquier otro recurso que requiera
+ser almacenado.
+
+El directorio *app/* contiene los ficheros para las entidades principales, **Modulos**, **Tasks**, y **Lines**.
+
+La carpeta *modules* tiene subdirectorios que representan una pantalla. Para cambiar de pantalla en la aplicacion,
+basta con cargar los modulos de un directorio adyacente.
+
+La carpeta *tasks* contiene todos los procesos de fondo que va a correr en la aplicacion.
+
+##Crear nuevos Modulos de la pantalla
+Es tan sencillo como crear un nuevo directorio en la carpeta `modules` y extender el objeto `appModule`.
+Por ejemplo un modulo para mostrar el nivel de bateria en la esquina superior izquierda de la pantalla:
+
+```javascript
+batteryModule.jsule.js
+const ApplicationModule  = require('../../core/module').ApplicationModule
+
+const appModule = new ApplicationModule (
+    {
+        name : 'battery',
+        start : 0,
+        end : 4,
+        line : 1
+    }
+);
+
+//This is the function that the Line object calls to get the string to print.
+appModule.controller = function () {
+//Here you would somehow fetch the battery level.
+    return this.outputView(3); //Constant battery level for demo.
+}
+
+appModule.outputView = function (level) {
+    let res = ""
+    if (level === 1) {
+        res = 'Bat 1'
+    }
+    if (level === 2) {
+        res = 'Bat 2'
+    }
+    if (level === 3) {
+        res = 'Bat 3'
+    }
+    return res;
+}
+
+module.exports = appModule;
+```
+Luego, con `Application.initialize(demo)` podemos inicializar la aplicacion con los
+modulos del directorio 'demo' como pantalla por defecto, y cambiar pantallas con
+`Application.switchModuleDomain(name)`.
+
+##Crear nuevos Tasks
+De la misma forma que los modulos, extendiendo el objeto base **Task**, y definiendo un metodo`run` que sera ejecutado por
+la aplicacion cada `Task.every` milisegundos.
+
+```javascript
+const Task  = require('./../core/task').Task
+
+const ConsoleLogger = new Task (
+    {
+        name: 'GpsSenderTask',
+        every: 10000, // Wil run every 10 seconds
+    }
+);
+
+GpsSenderTask.run = function () {
+    this.emit('ConsoleLoggerRan') //Anyone waiting for me to do something? Emit event.
+    console.log('Task has been ran.')
+}
+
+module.exports = GpsSenderTask;
+```
+
+
+##So, how in the WORLD do I even run this? - Como correrlo.
+1. Necesitas tener los componentes armados arriba en la configuracion presentada.
+2. `git clone ` the repository.
+3. `npm install` or `yarn` para instalar las dependencias.
+4. Correr con `node app.js`.
