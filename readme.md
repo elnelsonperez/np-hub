@@ -158,11 +158,11 @@ Hay tareas que tienen que realizarse continuamente (como la recoleccion de local
 Estos tipos de *background processes* son llamados **Tasks** en el contexto de esta aplicacion.
 
 Entre las cosas que puede hacer un **Task** estan:
-  - Decidir cada cuando tiempo desea ser corrida por el motor de la aplicacion luego de la ultima
+* Decidir cada cuando tiempo desea ser corrida por el motor de la aplicacion luego de la ultima
   vez que se corrio la tarea.
-  - Utilizar cuantos Servicios sean necesarios.
-  - Disparar eventos que sean escuchados de manera asincrona en otra seccion de la aplicacion.
-  - Almacenar data que persiste en cada iteracion del task.
+* Utilizar cuantos Servicios sean necesarios.
+* Disparar eventos que sean escuchados de manera asincrona en otra seccion de la aplicacion.
+* Almacenar data que persiste en cada iteracion del task.
   
 Cada **Task** necesariamente tiene que contar con una funcion `run` que retorne una [Promesa o Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 Esta funcion sera la que el motor de la aplicacion llamara periodicamente para correr la tarea.
@@ -170,6 +170,11 @@ Esta funcion sera la que el motor de la aplicacion llamara periodicamente para c
 Tambien puede contener una funcion `initialize` si necesita inicializar algo antes de que
 el motor comience a correr la tarea (ejecutando `run`) de manera periodica. 
  
+Tomando el ejemplo de recolectar localizaciones GPS, es necesario recalcar que el task
+no sabe _como_ obtener localizaciones GPS; esta responsabilidad es delegada a un Servicio.
+Sin embargo, la tarea si sabe _cuando_ utilizar el servidio y que hacer con el resultado que devuelva. 
+ 
+  
 Hasta aqui llegue 22/03/18
 ---
   
