@@ -1,4 +1,4 @@
-#NP PMS - Tracking Module Software
+#NP PMS - NP HUB Software
 Este software es el que corre en los Hubs del sistema NP PMS.
 Desarrollado por Nelson Pérez y Nathaly Persia como proyecto de grado. 2017-2018
 
