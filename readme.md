@@ -10,8 +10,11 @@ desde los destacamentos. 
 La aplicacion esta desarrollada en Javascript con NodeJS, a excepcion de el manejo de bluetooth, que se
 hace con la libreria PyBluez de Python.
 
-*Todos los ejemplos que se den luego de este punto asumen que tienes Ubuntu 16.04 como entorno
-de desarrollo*
+######Recomendaciones previas
+Es indispensable que conozcas lo que son [Callbacks](https://codeburst.io/javascript-what-the-heck-is-a-callback-aba4da2deced?gi=c209d2e9c41b),
+[Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) y 
+[Async/Await](https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9)
+en Javascript para entender el flujo de la aplicacion.
 
 ##Componentes físicos
 Este proyecto esta hecho para correrse en una Raspberry PI 3.
@@ -20,14 +23,16 @@ Los esquemas de circuito relevantes son los siguientes.
 >To do
 
 ####Configuración en la Pi
-######Notas
+*Este documento asume que tienes conocimientos basicos de Linux*
+
+#####Notas
 * Recomendamos que la Pi corra [Raspbian Stretch Lite March 2018](https://www.raspberrypi.org/downloads/raspbian/).
-* Esta version de Raspbian no tiene interface desktop, lo que la hace muy rapida. [Este articulo](https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0)indica como conectarse a la Pi luego de descargar raspbian. 
+* Esta version de Raspbian no tiene interface desktop, lo que la hace muy rapida. [Este articulo](https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0) indica como conectarse a la Pi luego de descargar raspbian. 
 * Es recomendable configurar una IP estatica para no tener que encontrar la IP asignada a la pi
 cada vez que bootea y se conecta a la red. Para ello, se puede seguir la seccion **dhcpcd method**
  de [este tutorial](https://raspberrypi.stackexchange.com/questions/37920/how-do-i-set-up-networking-wifi-static-ip-address/74428#74428)
 
-######Bluetooth en Raspbian Stretch
+#####Bluetooth en Raspbian Stretch
 El NP Hub utiliza el bluetooth de la Pi para comunicarse con el smartphone.
 Para poder utilizar el bluetooth de la manera que queremos, es necesario seguir 
 las instrucciones siguientes. (Comandos a correr en la Pi)
@@ -68,18 +73,37 @@ pi@raspberrypi:~ $ bluetoothctl
 [NEW] Controller B8:27:EB:02:33:C2 raspberrypi [default] <--- Todo bien.
 [bluetooth]# 
 ```
+#####Ibuttons y protocolo 1Wire con la pi
 
-######Instalando NodeJs y NPM
+Agregar lo siguiente antes de *exit 0* en el archivo `/etc/rc.local` (editar con sudo)
+```text
+sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves
+sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_remove
+sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_search
+```
+Esto se asegurara de que los permisos para trabajar con el protocolo 1Wire sean establecidos 
+cuando la Pi bootee.
+
+Es necesario editar el siguiente archivo para hacer que las lecturas con 1Wire sean mas rapidas:
+```bash
+sudo nano /etc/modprobe.d/w1.conf
+```
+Y agregar:
+```text
+options wire timeout=1 slave_ttl=1
+```
+
+#####Instalando NodeJs y NPM
 ```bash
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-######Git (Opcional)
+#####Git (Opcional)
 ```bash
 sudo apt-get install git -y
 ```
-######Lsyncd (Opcional)
+#####Lsyncd (Opcional)
 *El siguiente paso es totalmente opcional, pero muy recomendado y te ahorrara mucho tiempo luego.*
 
 Yo recomendaria utilizar algun metodo para copiar automaticamente los cambios hechos en el proyecto
@@ -115,25 +139,41 @@ a la Pi. Al hacer esto, no es necesario introducir passwords al conectarse por S
 Si no entiendes estos conceptos, [mira este articulo.](https://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md).
 
 
+**En este punto la pi deberia estar lista para correr el proyecto.** 
 ##Arquitectura del software
+Desde el inicio fue prioridad que los componentes de esta aplicacion fueran faciles de modificar 
+o extender, por lo que el codigo esta separado segun su funcionalidad y el tipo de operacion
+que realiza cuando la aplicacion esta corriendo.
+
 La ideas principales son las siguientes:
 
-* Hay tareas que tienen que realizarse continuamente (como la recoleccion de localizaciones GPS)
-que no necesitan tener una salida directa a la pantalla. Estos tipos 
-de *background processes* son llamados **Tasks**.
+######Services
+El lugar donde se agrupan funciones que sirven para un proposito especifico, como por ejemplo,
+enviar un mensaje o leer del iButton reader, es llamado **Servicio** o **Service**.
+Un Service puede ser llamado de cualquier parte en la aplicacion, y su proposito principal es 
+**agrupar funcionalidad**.
 
-* La pantalla 20x4 esta definida por cuatro objetos **Line**. Cada uno de ellos poseyendo un metodo (*getProcessedLine*) que,
-al ser llamado, ejectuta todos los modulos pertenecientes a esa linea y retorna el string completo a renderizar en 
-pantalla por la libreria que controla la LCD.
+######Tasks
+Hay tareas que tienen que realizarse continuamente (como la recoleccion de localizaciones GPS). 
+Estos tipos de *background processes* son llamados **Tasks** en el contexto de esta aplicacion.
 
-* Es responsabilidad del Modulo indicar en que espacio de la pantalla quiere que este su output, 
-y es responsabilidad del objeto Line de ejecutar cada modulo que haya solicitado estar en esa linea.
-
-* Cada modulo tiene la posibilidad de escuchar eventos de otros modulos que hayan sido cargados.
-Esto crea una red de modulos no acoplados, pero comunicados unos con otros, que agrega flexibilidad al sistema.
+Entre las cosas que puede hacer un **Task** estan:
+  - Decidir cada cuando tiempo desea ser corrida por el motor de la aplicacion luego de la ultima
+  vez que se corrio la tarea.
+  - Utilizar cuantos Servicios sean necesarios.
+  - Disparar eventos que sean escuchados de manera asincrona en otra seccion de la aplicacion.
+  - Almacenar data que persiste en cada iteracion del task.
   
-La aplicacion funciona siguiendo un paradigma que se asemeja al
- [IoC](https://es.wikipedia.org/wiki/Inversi%C3%B3n_de_control).
+Cada **Task** necesariamente tiene que contar con una funcion `run` que retorne una [Promesa o Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+Esta funcion sera la que el motor de la aplicacion llamara periodicamente para correr la tarea.
+
+Tambien puede contener una funcion `initialize` si necesita inicializar algo antes de que
+el motor comience a correr la tarea (ejecutando `run`) de manera periodica. 
+ 
+Hasta aqui llegue 22/03/18
+---
+  
+  ...
   Un objeto llamado **Application** se encarga de inicializar y/o cargar tasks, modulos y librerias al momento del boot.
   Deja las Tasks corriendo en el background y ejecuta un *application loop* mientras la aplicacion este viva.
  
