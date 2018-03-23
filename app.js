@@ -1,8 +1,8 @@
 const Application = require('./app/App').Application;
-const props = require('./app/shared/props')
 
 const SequentialSerialManager = require('./lib/SequentialSerialManager');
 const GprsService =  require('./app/services/GprsService');
+const InputManager =  require('./app/core/InputManager');
 const IbuttonService = require('./app/services/IbuttonService')
 const ConfigService = require('./app/services/ConfigService')
 const StatsService = require('./app/services/StatsService')
@@ -60,7 +60,7 @@ app.initialize (
     inputPins:  {
       pins: [
         {
-          type: InputService.TYPE_PUSH_BUTTON,
+          type: InputManager.TYPE_PUSH_BUTTON,
           number: 33,
           name: 'showAuth'
         }

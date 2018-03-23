@@ -40,7 +40,7 @@ Application = function () {
   this.initialize = (
     {
       defaultModule = 'boot',
-      disabledFunctionality = {lcd: false},
+      disabledFunctionality = { lcd: false },
       inputPins= {},
       inputDelay = 150,
       screenRefreshDelay = 500,
@@ -87,7 +87,7 @@ Application = function () {
 
     //Init rest
     if (lcdEnabled) {
-      this.loadModules(__dirname+'/modules/'+defaultModule).then(() => {
+      this.loadModules(__dirname+'/modules/' + defaultModule).then(() => {
           //Print to screen.
           this.lcdPrintLoop()
           this.runTasks();
@@ -103,7 +103,7 @@ Application = function () {
     }
 
     //Hardware loader
-    this.injectable.HardwareLoaderService.load(props).then(() => {
+    this.injectable.HardwareLoaderService.load().then(() => {
       this.injectable.BridgeService.start()
     })
 
