@@ -20,7 +20,7 @@ en Javascript para entender el flujo de la aplicacion.
 Este proyecto esta hecho para correrse en una Raspberry PI 3.
 Los esquemas de circuito relevantes son los siguientes.
 
->To do
+![Diagrama 1](images/diagram1.png)
 
 ####Configuración en la Pi
 *Este documento asume que tienes conocimientos basicos de Linux*
