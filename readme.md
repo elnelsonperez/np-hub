@@ -19,7 +19,7 @@ Es indispensable que conozcas lo que son [Callbacks](https://codeburst.io/javasc
 [Async/Await](https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9)
 en Javascript para entender el flujo de la aplicacion.
 
-######Notas sobre LCD
+######Notas sobre archivos no utilizados
 Existen unos archivos en `app/modules`, `app/core` y `lib` relacionados a una pantalla LCD 20x4 que inicialmente 
 era parte del proyecto. En esta version la pantalla LCD no se esta utilizando, por lo que cualquier bloque de codigo
 que haga referencia a la LCD puede ser ignorado, a menos que quieras utilizarla. En ese caso, escribenos y agregaremos
@@ -35,6 +35,7 @@ la LCD y el directorio `modules` a este readme.
 
 ####Configuración en la Pi
 *Este documento asume que tienes conocimientos basicos de Linux*
+En esta seccion se explica como hacer el setup inicial con la Pi para correr el proyecto.
 
 #####Notas
 * Recomendamos que la Pi corra [Raspbian Stretch Lite March 2018](https://www.raspberrypi.org/downloads/raspbian/).
@@ -124,6 +125,7 @@ sudo apt-get update && sudo apt-get install yarn -y
 O sigue [las instrucciones oficiales de Yarn para Debian.](https://yarnpkg.com/lang/en/docs/install/#linux)
 
 #####Git (Opcional)
+Supongo que vas a instalar el proyecto haciendo un pull desde Git. Para eso, necesitas git en la Pi.
 ```bash
 sudo apt-get install git -y
 ```
@@ -165,7 +167,7 @@ Si no entiendes estos conceptos, [mira este articulo.](https://www.raspberrypi.o
 
 **En este punto la pi deberia estar lista para correr el proyecto.** 
 
-##Como correr
+##Ya instale todo, ¿y ahora?
 * Primero, luego de tener los archivos del proyecto en la Pi, tenemos que instalar las dependencias del
 proyecto. 
 Ubicate en el directorio del proyecto y corre `yarn`.
@@ -175,6 +177,26 @@ Ubicate en el directorio del proyecto y corre `yarn`.
     * `--noLocations`: No enviar localizaciones GPS.
     * `--verbose`: Que aparezca cuando se corre cada Task en la consola.
     * `--hideGprs`: Ocultar output del GPRS en consola.
+    
+######¿Que es lo que sucede cuando el programa corre?
+Se ejecutan las siguientes operaciones.
+
+1. Se inicializan los modulos GPRS y Bluetooth.
+2. El GPRS hace una solicitud inicial a `nppms.us/status` para confirmar dos cosas
+    * El modulo GPRS esta funcionando.
+    * El modulo GPRS realmente tiene conexion a Internet.
+3. Se descargan las configuraciones para este hub desde el servidor.
+El servidor sabe que configuraciones entregar porque cada Hub registrado se asocia a un
+serial de la Pi.
+4. El Bluetooth se pone disponible para recibir conexiones de la App movil y se envian las localizaciones 
+obtenidas por el GPS, si hay alguna disponible para enviar.
+    
+En este punto, la app podra conectarse al Hub. Luego de conectarse, periodicamente se hacen solicitudes al servidor
+para traer incidentes, configuraciones nuevas, o nuevos mensajes.
+
+Si necesitas mas detalles del "orden" en el que corre el codigo,
+inicia desde `app.js`, el punto de entrada a la aplicacion, a leer los comentarios del codigo.
+Cada seccion indica cuando corre. 
 
 ##Arquitectura del software
 Desde el inicio fue prioridad que los componentes de esta aplicacion fueran faciles de modificar 
