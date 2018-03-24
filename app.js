@@ -15,7 +15,7 @@ const RequestProcessorService = require("./app/services/RequestProcessorService"
 const BluetoothService = require("./app/services/BluetoothService/BluetoothService")
 
 const instances = {}
-instances.SequentialSerialManager = new SequentialSerialManager(true)
+instances.SequentialSerialManager = new SequentialSerialManager()
 instances.GprsService = new GprsService(instances.SequentialSerialManager)
 instances.BluetoothService = new BluetoothService({debug: true})
 instances.IbuttonService = new IbuttonService({});

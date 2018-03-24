@@ -7,6 +7,9 @@ rastreo posicional para la Policía Nacional Dominicana que permita el
 efectivo despliegue de unidades de patrullaje, administrado 
 desde los destacamentos. 
 
+>PMS Hub: Artefacto que se coloca en el vehículo policíaco y permite la obtención
+ de información geo posicional, autenticación de policías  y conexión a Internet mediante un modulo GPRS.
+
 La aplicacion esta desarrollada en Javascript con NodeJS, a excepcion de el manejo de bluetooth, que se
 hace con la libreria PyBluez de Python.
 
@@ -16,9 +19,17 @@ Es indispensable que conozcas lo que son [Callbacks](https://codeburst.io/javasc
 [Async/Await](https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9)
 en Javascript para entender el flujo de la aplicacion.
 
+######Notas sobre LCD
+Existen unos archivos en `app/modules`, `app/core` y `lib` relacionados a una pantalla LCD 20x4 que inicialmente 
+era parte del proyecto. En esta version la pantalla LCD no se esta utilizando, por lo que cualquier bloque de codigo
+que haga referencia a la LCD puede ser ignorado, a menos que quieras utilizarla. En ese caso, escribenos y agregaremos
+la LCD y el directorio `modules` a este readme.
+
 ##Componentes físicos
-Este proyecto esta hecho para correrse en una Raspberry PI 3.
-Los esquemas de circuito relevantes son los siguientes.
+* Raspberry Pi 3 Model B V1.2 2015
+* Modulo GPRS SIMCOM 800c Shield 
+* Modulo GPS U-blox 6M
+* [Ibutton Reader DS9092](https://www.ebay.com/sch/i.html?_odkw=ibutton+reader&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.XDS+9092+ibutton+reader.TRS1&_nkw=DS+9092+ibutton+reader&_sacat=0)
 
 ![Diagrama 1](images/diagram1.png)
 
@@ -100,6 +111,18 @@ curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
+#####Instalar Yarn
+Yarn hace la instalacion de dependencias (librerias requeridas para que el proyecto funcione) mas rapida que NPM.
+Si te interesa leer sobre porque usar Yarn en ves de NPM, checa [esto.](https://www.keycdn.com/blog/npm-vs-yarn/)
+
+```bash
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt-get update && sudo apt-get install yarn -y
+```
+
+O sigue [las instrucciones oficiales de Yarn para Debian.](https://yarnpkg.com/lang/en/docs/install/#linux)
+
 #####Git (Opcional)
 ```bash
 sudo apt-get install git -y
@@ -113,8 +136,9 @@ realizada desde tu PC y al guardar el proyecto localmente, automaticamente se co
 
 En nuestro caso, utilizamos [lsyncd](https://www.digitalocean.com/community/tutorials/how-to-mirror-local-and-remote-directories-on-a-vps-with-lsyncd).
 Y adjunto dejo una configuracion de ejemplo para copiar los cambios hechos al proyecto
-desde la pc hasta la Pi, por SSH (Modificar IPs y rutas).
+desde la pc hasta la Pi, por SSH.
 
+ _Modificar IPs y rutas a la siguiente configucacion_
 ```text
 -- /etc/lsyncd/lsyncd.conf.lua
 
@@ -139,8 +163,19 @@ Para que esta configuracion funcione, es necesario copiar el SSH Key del usuario
 a la Pi. Al hacer esto, no es necesario introducir passwords al conectarse por SSH con la Pi.
 Si no entiendes estos conceptos, [mira este articulo.](https://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md).
 
-
 **En este punto la pi deberia estar lista para correr el proyecto.** 
+
+##Como correr
+* Primero, luego de tener los archivos del proyecto en la Pi, tenemos que instalar las dependencias del
+proyecto. 
+Ubicate en el directorio del proyecto y corre `yarn`.
+* Cuando las dependencias terminen de ser instaladas, el proyecto se corre desde al archivo `app.js`, haciendo
+`node app.js`.
+* Puedes correrlo con cualquiera de los siguientes parametros adicionales: (Por ej: `node app.js --noAuth`)
+    * `--noLocations`: No enviar localizaciones GPS.
+    * `--verbose`: Que aparezca cuando se corre cada Task en la consola.
+    * `--hideGprs`: Ocultar output del GPRS en consola.
+
 ##Arquitectura del software
 Desde el inicio fue prioridad que los componentes de esta aplicacion fueran faciles de modificar 
 o extender, por lo que el codigo esta separado segun su funcionalidad y el tipo de operacion
@@ -175,4 +210,5 @@ el motor comience a correr la tarea (ejecutando `run`) de manera periodica.
 Tomando el ejemplo de recolectar localizaciones GPS, es necesario recalcar que el task
 no sabe _como_ obtener localizaciones GPS; esta responsabilidad es delegada a un Servicio.
 Sin embargo, la tarea si sabe _cuando_ utilizar el servicio y que hacer con el resultado que devuelva. 
+ 
  

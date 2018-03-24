@@ -5,25 +5,14 @@ const line = require('./core/Line.js');
 const Lcdlib = require('../lib/LcdController');
 const InputManager = require('./core/InputManager')
 
-const SequentialSerialManager = require('../lib/SequentialSerialManager');
-const GprsService =  require('./services/GprsService');
-const IbuttonService = require('./services/IbuttonService')
-const ConfigService = require('./services/ConfigService')
-const StatsService = require('./services/StatsService')
-const MensajeService = require('./services/MensajeService')
-const IncidenciaService = require('./services/IncidenciaService')
-const RequestSenderService = require('./services/RequestSenderService')
-const BridgeService = require('./services/BridgeService')
-const HardwareLoaderService = require('./services/HardwareLoaderService')
-const RequestQueueService = require("./services/RequestQueueService")
-const RequestProcessorService = require("./services/RequestProcessorService")
-const BluetoothService = require("./services/BluetoothService/BluetoothService")
 const props = require('./shared/props')
 const interval = require('interval-promise')
-const reset = require('./../lib/functions').reset;
-const shutdown = require('./../lib/functions').shutdown;
+
 const getSerial = require('./../lib/systeminfo').getSerial
 const minimist = require('minimist');
+
+const reset = require('./../lib/functions').reset;
+const shutdown = require('./../lib/functions').shutdown;
 
 Application = function () {
   this.screen = null //4 Line objects basically
@@ -115,14 +104,14 @@ Application = function () {
       verbose: !!argv.verbose,
       bridgeDebug: !!argv.bridgeDebug,
       noLocations: !!argv.noLocations,
-      noAuth: !!argv.noAuth
+      noAuth: !!argv.noAuth,
+      hideGprs: !!argv.hideGprs
     };
   }
 
   this.checkIfDisabled = function (config) {
     if (config && config.enabled === false ) {
-      console.log("******************* WOULD SHUTDOWN **************************")
-      // shutdown()
+      shutdown()
     }
   }
 
