@@ -1,6 +1,12 @@
 #NP PMS - NP HUB Software
 Este software es el que corre en los Hubs del sistema NP PMS.
-Desarrollado por Nelson Pérez y Nathaly Persia como proyecto de grado. 2017-2018
+Desarrollado por Nelson Pérez y Nathaly Persia como proyecto de grado. 2017-2018.
+`Documentacion por Nelson Pérez.`
+
+La aplicacion esta desarrollada en Javascript con NodeJS, a excepcion de el manejo de bluetooth, que se
+hace con la libreria PyBluez de Python.
+
+**Tanto el codigo como la documentacion estan en Spanglish. Si no sabes ingles, lo sentimos.**
 
 >El objetivo general del NP PMS es Desarrollar un sistema de 
 rastreo posicional para la Policía Nacional Dominicana que permita el
@@ -9,15 +15,15 @@ desde los destacamentos. 
 
 >PMS Hub: Artefacto que se coloca en el vehículo policíaco y permite la obtención
  de información geo posicional, autenticación de policías  y conexión a Internet mediante un modulo GPRS.
-
-La aplicacion esta desarrollada en Javascript con NodeJS, a excepcion de el manejo de bluetooth, que se
-hace con la libreria PyBluez de Python.
-
+ 
 ######Recomendaciones previas
 Es indispensable que conozcas lo que son [Callbacks](https://codeburst.io/javascript-what-the-heck-is-a-callback-aba4da2deced?gi=c209d2e9c41b),
 [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) y 
 [Async/Await](https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9)
-en Javascript para entender el flujo de la aplicacion.
+en Javascript para entender el flujo de la aplicacion, ya que la mayoria de las operaciones son asincronas y pueden 
+llegar a ser confusas.
+
+[Los modulos en NodeJS](https://www.w3schools.com/nodejs/nodejs_modules.asp) tambien son importantes.
 
 ######Notas sobre archivos no utilizados
 Existen unos archivos en `app/modules`, `app/core` y `lib` relacionados a una pantalla LCD 20x4 que inicialmente 
@@ -35,8 +41,8 @@ la LCD y el directorio `modules` a este readme.
 
 ####Configuración en la Pi
 *Este documento asume que tienes conocimientos basicos de Linux*
-En esta seccion se explica como hacer el setup inicial con la Pi para correr el proyecto.
 
+En esta seccion se explica como hacer el setup inicial con la Pi para correr el proyecto.
 #####Notas
 * Recomendamos que la Pi corra [Raspbian Stretch Lite March 2018](https://www.raspberrypi.org/downloads/raspbian/).
 * Esta version de Raspbian no tiene interface desktop, lo que la hace muy rapida. [Este articulo](https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0) indica como conectarse a la Pi luego de descargar raspbian. 
@@ -54,7 +60,7 @@ Conectate a la Pi por SSH. Si no has cambiado el default password, es 'raspberry
 ssh pi@[IP DE LA PI]
 ```
 
-Actualizar.
+Actualizar el software de la Pi.
 ```bash
 sudo apt-get update && sudo apt-get upgrade
 ```
@@ -198,7 +204,7 @@ Si necesitas mas detalles del "orden" en el que corre el codigo,
 inicia desde `app.js`, el punto de entrada a la aplicacion, a leer los comentarios del codigo.
 Cada seccion indica cuando corre. 
 
-##Arquitectura del software
+##Diseño del software
 Desde el inicio fue prioridad que los componentes de esta aplicacion fueran faciles de modificar 
 o extender, por lo que el codigo esta separado segun su funcionalidad y el tipo de operacion
 que realiza cuando la aplicacion esta corriendo.
@@ -210,6 +216,9 @@ El lugar donde se agrupan funciones que sirven para un proposito especifico, com
 enviar un mensaje o leer del iButton reader, es llamado **Servicio** o **Service**.
 Un Service puede ser llamado de cualquier parte en la aplicacion, y su proposito principal es 
 **agrupar funcionalidad**.
+
+Los servicios residen el el directorio `app/services` y encima de cada uno de los servicios actuales 
+se documenta para que sirve.
 
 ######Tasks
 Hay tareas que tienen que realizarse continuamente (como la recoleccion de localizaciones GPS). 
@@ -233,4 +242,13 @@ Tomando el ejemplo de recolectar localizaciones GPS, es necesario recalcar que e
 no sabe _como_ obtener localizaciones GPS; esta responsabilidad es delegada a un Servicio.
 Sin embargo, la tarea si sabe _cuando_ utilizar el servicio y que hacer con el resultado que devuelva. 
  
+Los Tasks o Tareas residen el el directorio `app/tasks` y encima de cada uno de las tareas actuales 
+se documenta para que sirve cada una.
  
+######Modulos
+Relacionado a la pantalla LCD. Si vas a utilizar la pantalla, envianos un mensaje para agregar esta seccion de documentacion.
+
+######Props
+Tanto las Tasks como los Services, y otras secciones de la aplicacion, deben tener acceso a las configuraciones 
+globales que determinan como la aplicacion funciona. El lugar para poner variables globales que todo modulo de la aplicacion pueda
+importar, es en el objeto `props`, ubicado en `app/shared/props`.
