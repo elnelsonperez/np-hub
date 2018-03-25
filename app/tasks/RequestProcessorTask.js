@@ -6,9 +6,9 @@ const props = require('./../shared/props')
  * en el queue;
  * @type {Task}
  */
-const RequestQueueTask = new Task (
+const RequestProcessorTask = new Task (
     {
-      name: 'RequestQueueTask',
+      name: 'RequestProcessorTask',
       inject: ['RequestProcessorService','GprsService'],
       autoload: false,
       ready: false,
@@ -16,7 +16,7 @@ const RequestQueueTask = new Task (
     }
 );
 
-RequestQueueTask.doPending = async function () {
+RequestProcessorTask.doPending = async function () {
   try {
     const resp = await this.RequestProcessorService.processNextPendingRequest()
     // console.log("============================= RESPONSE PENDING REQUEST",resp)
@@ -30,7 +30,7 @@ RequestQueueTask.doPending = async function () {
 
 }
 
-RequestQueueTask.doFailed = async function () {
+RequestProcessorTask.doFailed = async function () {
   try {
     const resp = await this.RequestProcessorService.processNextFailedRequest()
     // console.log("============================= RESPONSE FAILED REQUEST",resp)
@@ -44,14 +44,14 @@ RequestQueueTask.doFailed = async function () {
 
 }
 
-RequestQueueTask.initialize = function () {
+RequestProcessorTask.initialize = function () {
   props.applicationEvent.on("boot.ready", () => {
     this.ready = true;
   })
 }
 
-RequestQueueTask.run = async function () {
+RequestProcessorTask.run = async function () {
   await this.doPending()
 }
 
-module.exports = RequestQueueTask;
+module.exports = RequestProcessorTask;

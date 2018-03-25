@@ -254,3 +254,103 @@ importar, es en el objeto `props`, ubicado en `app/shared/props`.
 No confundir con modulos de nodejs. El termino **Modulo** en el contexto de la aplicacion esta 
 relacionado a la pantalla LCD (Terrible nombre, lo sabemos). Si vas a utilizar la pantalla, 
 envianos un mensaje para agregar esta seccion de documentacion.
+
+##Guias
+#####Crear un nuevo task
+Solo hay que crear un nuevo archivo en `app/tasks`, y puedes partir de la siguiente estructura base.
+
+```javascript
+const Task  = require('./../core/Task').Task
+const props = require('./../shared/props')
+
+const ExampleTask = new Task (
+    {
+      name: 'ExampleTask',
+      every: 1000, //Run every second after each successful 'run'
+      inject: ['ExampleService'],
+      ready: true
+    }
+);
+
+ExampleTask.initialize = function () {
+  //this.ExampleService is available here because on the 'inject' above.
+  console.log("Initializing")
+}
+
+ExampleTask.run =  function () {
+  return new Promise(res => {
+    setTimeout(() => {
+      console.log('This is an example task')
+      res() //Finish task
+    },5000)
+  })
+}
+
+module.exports = ExampleTask;
+```
+#####Crear un nuevo servicio
+Solo hay que crear un nuevo archivo en `app/services`. Los servicios no tienen una estructura mandatoria,
+puede ser cualquier objeto que pueda ser exportado.
+
+#####Enviar mensajes utilizando el Bluetooth
+Este trabajo lo hace el BluetoothService luego de ser inicializado.
+```javascript
+//Desde el contexto de un task que ya halla importado BluetoothService y BtMessage.
+this.BluetoothService.sendToDevice(
+    {
+      mac_address: "XX:XX:XX:XX",
+      message: new BtMessage(
+          {
+            type: "TEST_MENSAJE",
+            payload:  "Hola"
+          }
+      )
+    }
+)
+```
+Al ejecutar ese ejemplo, la aplicacion movil recibiria un JSON con
+```text
+{"type": "TEST_MENSAJE","payload":  "Hola"}
+```
+en su contenido.
+
+##¿Como se hacen las solicitudes/requests a Internet?
+Las solicitudes en la aplicacion se realizan utilizando una cola o queue, por lo que 
+es necesario agregarla a la cola y luego procesarla.
+
+```javascript
+//Agregando un request a la cola utilizando el RequestQueueService.
+RequestQueueService.addRequest(
+    {
+        url: "http://google.com",
+        method: "GET",
+        priority: RequestQueueService.PRIORITY_MOST,
+        event_name: "TEST_REQUEST",
+        payload: {
+          mensaje: "Hola",
+          otraCosa: "Que tal?"
+        }
+    }
+)
+```
+Luego de que la solicitud es agregada a la col (que no es mas que una tabla en la base de datos), 
+es necesario procesarla. Esto lo hace la funcion `processNextPendingRequest` del `RequestProcessorService`.
+
+Si por algun motivo el requests fallo, se puede reintentar llamando el metodo `processNextFailedRequest`,
+que reintenta solicitudes viejas fallidas siempre y cuando no existan solicitudes pendientes por procesar.
+
+Cuando la aplicacion esta corriendo normalmente, el `RequestProcessorTasks` se encarga de periodicamente llamar
+`processNextPendingRequest` y `processNextFailedRequest` de manera que continuamente se esten procesando todas las
+solicitudes a hacer al servidor.
+
+Cada vez que una solicitud se completa, se levanta un evento con el nombre indicado en el campo `event_name` de
+la cola/tabla, lo que hace que sea sencillo conocer cuando un request se completo o fallo por algun motivo,
+en cualquier parte de la aplicacion que pueda escuchar los eventos emitidos por el `RequestProcessorService`.
+
+
+
+RequestProcessorService
+RequestProcessorTask
+
+
+

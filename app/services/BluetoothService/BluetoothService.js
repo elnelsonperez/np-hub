@@ -17,6 +17,13 @@ const BluetoothService = function ({debug = false}){
   this.idCounter = 1;
   this.parser = new Parser()
 
+  /**
+   * Inicializa el bluetooth. Se puede especificar las mac addresses a las cuales el bluetooth
+   * les permitira conectarse al hub.
+   * @param allowedMacAddresses
+   * @param autoPair
+   * @param discoverable
+   */
   this.initialize = ({
                        allowedMacAddresses = [],
                        autoPair = true,
