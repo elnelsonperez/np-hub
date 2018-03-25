@@ -39,7 +39,7 @@ la LCD y el directorio `modules` a este readme.
 
 ![Diagrama 1](images/diagram1.png)
 
-####Configuración en la Pi
+##Configuración en la Pi
 *Este documento asume que tienes conocimientos basicos de Linux*
 
 En esta seccion se explica como hacer el setup inicial con la Pi para correr el proyecto.
