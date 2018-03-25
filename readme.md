@@ -348,9 +348,3 @@ la cola/tabla, lo que hace que sea sencillo conocer cuando un request se complet
 en cualquier parte de la aplicacion que pueda escuchar los eventos emitidos por el `RequestProcessorService`.
 
 
-
-RequestProcessorService
-RequestProcessorTask
-
-
-
