@@ -32,9 +32,9 @@ que haga referencia a la LCD puede ser ignorado, a menos que quieras utilizarla.
 la LCD y el directorio `modules` a este readme.
 
 ##Componentes físicos
-* Raspberry Pi 3 Model B V1.2 2015
-* Modulo GPRS SIMCOM 800c Shield 
-* Modulo GPS U-blox 6M
+* [Raspberry Pi 3 Model B V1.2 2015](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
+* [Modulo GPRS SIMCOM 800c Shield](http://simcomm2m.com/En/module/detail.aspx?id=74)
+* [Modulo GPS U-blox 6M](https://www.u-blox.com/en/product/neo-6-series)
 * [Ibutton Reader DS9092](https://www.ebay.com/sch/i.html?_odkw=ibutton+reader&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.XDS+9092+ibutton+reader.TRS1&_nkw=DS+9092+ibutton+reader&_sacat=0)
 
 ![Diagrama 1](images/diagram1.png)
