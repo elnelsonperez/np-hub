@@ -205,10 +205,7 @@ inicia desde `app.js`, el punto de entrada a la aplicacion, a leer los comentari
 Cada seccion indica cuando corre. 
 
 ##Diseño del software
-Desde el inicio fue prioridad que los componentes de esta aplicacion fueran faciles de modificar 
-o extender, por lo que el codigo esta separado segun su funcionalidad y el tipo de operacion
-que realiza cuando la aplicacion esta corriendo.
-
+El codigo esta separado segun su funcionalidad y el tipo de operacionque realiza cuando la aplicacion esta corriendo.
 La ideas principales son las siguientes:
 
 ######Services
@@ -333,7 +330,7 @@ RequestQueueService.addRequest(
     }
 )
 ```
-Luego de que la solicitud es agregada a la col (que no es mas que una tabla en la base de datos), 
+Luego de que la solicitud es agregada a la cola (que no es mas que una tabla en la base de datos), 
 es necesario procesarla. Esto lo hace la funcion `processNextPendingRequest` del `RequestProcessorService`.
 
 Si por algun motivo el requests fallo, se puede reintentar llamando el metodo `processNextFailedRequest`,
