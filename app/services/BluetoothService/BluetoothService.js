@@ -3,6 +3,15 @@ const EventEmitter = require('events').EventEmitter
 const PythonShell = require('python-shell');
 const Parser = require ("./messageParser")
 const BtMessage = require("./BtMessage")
+
+/**
+ * Este servicio se encarga de recibir los mensajes recibidos por el Bluetooth a travez
+ * del main.py, que maneja el bluetooth a mas bajo nivel utilizando una libreria de python.
+ * El servicio al ser inicializado corre en un nuevo thread el main.py, y se comunica con python a travez
+ * del stdin y stdout.
+ * @param debug
+ * @constructor
+ */
 const BluetoothService = function ({debug = false}){
 
   this.idCounter = 1;
@@ -124,7 +133,6 @@ const BluetoothService = function ({debug = false}){
       this.on("EVENT", callback)
     })
   }
-
 
 }
 

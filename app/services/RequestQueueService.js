@@ -1,10 +1,26 @@
 const Database = require("./../core/Database")
 
+/**
+ * Este servicio tiene la responsabilidad de realizar cualquier operacion en la
+ * base de datos que tenga que ver con las solicitues HTTP.
+ * @constructor
+ */
 const RequestQueueService = function () {
   this.table = "queue"
   const db = Database.conn
+
+  /**
+   * Agrega una solicitud a la cola de requests.
+   * @param url
+   * @param method POST o GET
+   * @param payload Data enviar
+   * @param priority prioridad
+   * @param event_name Nombre del evento que se va a disparar cuando el request se complete
+   * @param auto_discard Marcar request como auto-descartable. (Lo utiliza el RequestProcessorService)
+   * @return {Promise<any>}
+   */
   this.addRequest = (
-      {url, method, payload = {}, priority = RequestQueueService.PRIORITY_LOW, event_name = null,auto_discard =false}
+      {url, method, payload = {}, priority = RequestQueueService.PRIORITY_LOW, event_name = null, auto_discard = false}
   ) => {
     return new Promise((res,rej) => {
       try {
@@ -151,7 +167,6 @@ const RequestQueueService = function () {
       }
     })
   }
-
 
   this.clearRequests = () => {
     return new Promise((res,rej) => {

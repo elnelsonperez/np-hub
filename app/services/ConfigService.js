@@ -1,6 +1,7 @@
 const util = require('util')
 const EventEmitter = require('events').EventEmitter
 /**
+ * Se encarga de traer las configuraciones del servidor.
  * @param {RequestSenderService} RequestSenderService
  * @param {RequestQueueService} QueueService
  * @param configEndpoint

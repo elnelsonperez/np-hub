@@ -3,6 +3,7 @@ const EventEmitter = require('events').EventEmitter
 const QueueService = require("./RequestQueueService")
 
 /**
+ * Se encarga de descargar estadisticas del sector asignado utilizando el RequestSenderService.
  * @param {RequestSenderService} RequestSenderService
  */
 const StatsService = function (RequestSenderService) {

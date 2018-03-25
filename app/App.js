@@ -14,23 +14,39 @@ const minimist = require('minimist');
 const reset = require('./../lib/functions').reset;
 const shutdown = require('./../lib/functions').shutdown;
 
+/**
+ * Engine de la aplicacion.
+ * Hace todos los setup iniciales necesarios y se encarga de correr las tasks
+ * periodicamente.
+ * @constructor
+ */
 Application = function () {
   this.screen = null //4 Line objects basically
   this.lcd = null //Lcd library
   this.timer = null //Lcd update timer
-  this.modules = {} //Module list
+  this.modules = {} //LCD Module list
   this.tasks = {} //Task list
-  this.injectable = {} //Which services are injectable to modules or tasks
-
-  this.screenConfigs = null;
+  this.injectable = {} //Services which are injectable to modules or tasks
+  
+  this.screenConfigs = null; 
   this.disabledFunctionality = {}
   this.screenRefreshDelay = 500;
 
+  /**
+   * Inicializador de la app.
+   * @param defaultModule Relacionado con las LCDs. Ignore.
+   * @param disabledFunctionality Simplemente utilizado para desactivar partes de la app.
+   * Por ahora solo desactiva la LCD.
+   * @param inputPins Pines a registrar en el InputManager
+   * @param inputDelay Cada cuanto checar el estado de los inputs registrados
+   * @param screenRefreshDelay Cada cuanto refrescar la LCD. Ingore.
+   * @param services Servicios de la aplicacion
+   */
   this.initialize = (
     {
-      defaultModule = 'boot',
-      disabledFunctionality = { lcd: false },
-      inputPins= {},
+      defaultModule = 'boot', 
+      disabledFunctionality = { lcd: false }, 
+      inputPins = {},
       inputDelay = 150,
       screenRefreshDelay = 500,
       services = {}
@@ -41,7 +57,7 @@ Application = function () {
     this.screenRefreshDelay = screenRefreshDelay
     this.disabledFunctionality = disabledFunctionality
 
-    props.argv = this.parseArguments()
+    props.argv = this.parseArguments() 
 
     const InputManager = new InputManager({delay: inputDelay});
     InputManager.registerInputPins(inputPins)
@@ -50,7 +66,7 @@ Application = function () {
     });
 
     props.serialNumber = getSerial();
-    this.setDefaultApplicationProperties();
+    this.setDefaultLcdProperties();
 
     this.lcd = new Lcdlib.LcdController(1, 0x3f, 20, 4);
     this.lcd.customChar();
@@ -71,33 +87,37 @@ Application = function () {
       props.config = config
     })
 
-    //Loads tasks
+    //Loads tasks from tasks directory
     this.loadTasks(__dirname+'/tasks');
 
-    //Init rest
+    //Init lcd modules, if lcd enabled.
     if (lcdEnabled) {
       this.loadModules(__dirname+'/modules/' + defaultModule).then(() => {
           //Print to screen.
           this.lcdPrintLoop()
           this.runTasks();
-          //Input
+          //Input monitoring
           props.input.monitorRegisteredPins()
         }
       );
     }
     else {
       this.runTasks();
-      //Input
+      //Input monitoring
       props.input.monitorRegisteredPins()
     }
 
-    //Hardware loader
+    //Cargar bluetooth y gprs, luego, iniciar bridge service para interactuar con app movil.
     this.injectable.HardwareLoaderService.load().then(() => {
       this.injectable.BridgeService.start()
     })
 
   }
 
+  /**
+   * Parsea los argumentos pasados a la app al correrla.
+   * @return {{verbose: boolean, bridgeDebug: boolean, noLocations: boolean, noAuth: boolean, hideGprs: boolean}}
+   */
   this.parseArguments = function () {
     const argv = minimist(process.argv.slice(2));
     return {
@@ -109,18 +129,25 @@ Application = function () {
     };
   }
 
+  /**
+   * Verifica si la aplicacion ha sido desactivada remotamente.
+   * @param config
+   */
   this.checkIfDisabled = function (config) {
     if (config && config.enabled === false ) {
       shutdown()
     }
   }
 
+  /**
+   * Se encarga de correr todos los tasks en el directorio de Tasks.
+   */
   this.runTasks = function () {
     for (let task of Object.keys(this.tasks)) { //Para cada task
       const runtask = () => {
         if (this.tasks[task].every) { //Si el task tiene un "every"
-          interval(async () => {
-            if (this.tasks[task].ready) {
+          interval(async () => { //Correr su funcion 'run' cada every milisegundos.
+            if (this.tasks[task].ready) { //Siempre y cuando el task este 'ready' para ser corrida.
               if (props.argv.verbose) {
                 console.log("-> Running '"+this.tasks[task].name+"'\n")
               }
@@ -129,20 +156,18 @@ Application = function () {
           }, this.tasks[task].every)
         }
       }
-
       if (this.tasks[task].autoload) { //Si el task quiere cargarse automaticamente
         this.tasks[task].run().then(() => {runtask()}); //Correr el task la primera vez
       }
       else {
         runtask()
       }
-
     }
   }
 
   /**
    * Loads and initializes tasks
-   * @param dir
+   * @param dir Directorio donde residen las Tasks
    */
   this.loadTasks = function (dir) {
     fs.readdirSync(dir).forEach(file => {
@@ -160,15 +185,13 @@ Application = function () {
         }
       }
     });
-
     for (let key of Object.keys(this.tasks)) {
       this.tasks[key].siblingTasks = this.tasks;
     }
-
   }
 
   /**
-   * Changes directory of loaded modules. Changes screen
+   * Changes directory of loaded modules. Changes screen.
    * @param folder
    */
   this.switchModuleDomain =  (folder) => {
@@ -176,7 +199,7 @@ Application = function () {
       clearInterval(this.timer);
 
     this.lcd.stopScroll()
-    this.setDefaultApplicationProperties();
+    this.setDefaultLcdProperties();
 
     for (let module of Object.keys(this.modules)) {
       this.modules[module].removeAllListeners()
@@ -187,7 +210,11 @@ Application = function () {
     this.lcdPrintLoop()
   }
 
-  this.setDefaultApplicationProperties = () => {
+
+  //De aqui en adelante son metodos de la LCD. Ya no se usan.. Por ahora.
+  //Esto deberia estar en otro lado dedicado a la LCD, pero bueh.
+
+  this.setDefaultLcdProperties = () => {
     this.screen = {
       line1: new line(),
       line2: new line(),
@@ -200,7 +227,7 @@ Application = function () {
 
   this.loadModules = async (dir, clearModules = false) => {
     if (clearModules === true) {
-      this.setDefaultApplicationProperties();
+      this.setDefaultLcdProperties();
     }
 
     fs.readdirSync(dir).forEach(file => {
@@ -291,20 +318,34 @@ Application = function () {
 
 };
 
+/**
+ * Agregando finally al prototipo de las promesas.
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally
+ */
+
 Promise.prototype.finally = function(cb) {
   const res = () => this
   const fin = () => Promise.resolve(cb()).then(res)
   return this.then(fin, fin);
 };
 
+/**
+ * Cualquier error no manejado en la aplicacion sera logueado en vez de explotar la app.
+ */
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
 
+/**
+ * Simplemente para saber cuando la app ha terminado el proceso de 'booteo'
+ */
 props.applicationEvent.on('boot.ready', function () {
   console.log(" ==== BOOT READY ====\n")
 })
 
+/**
+ * Asegurarse que cuando se cierre la aplicacion, el proceso de Python que maneja el bluetooth tambien muera.
+ */
 process.on('SIGINT', function() {
   app.injectable.BluetoothService.shell.childProcess.kill();
   process.exit();

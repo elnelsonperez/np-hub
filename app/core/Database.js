@@ -1,3 +1,9 @@
+/**
+ * Este file exporta una instancia al driver de la base de datos de Sqlite usada para
+ * almacenar cosas localmente.
+ * Por ahora solo crea la tabla utilizada por el RequestsQueueService.
+ */
+
 const Sqlite = require('sqlite3').verbose()
 let instance = null
 class Database {

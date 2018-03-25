@@ -2,6 +2,7 @@ const util = require('util')
 const EventEmitter = require('events').EventEmitter
 const QueueService = require("./RequestQueueService")
 /**
+ * Se encarga de descargar y enviar incidentes al servidor utilizando el RequestSenderService.
  * @param {RequestSenderService} RequestSenderService
  */
 const IncidenciaService = function (RequestSenderService) {

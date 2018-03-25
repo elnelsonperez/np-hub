@@ -3,19 +3,36 @@ const EventEmitter = require('events').EventEmitter
 const gpio = require('rpi-gpio');
 
 /**
- * This object Handles Pi Input
+ * Este objeto monitorea botones conectados por GPIO.
+ * Existe para que se pueda asociar un nombre a cada Pin de lectura
+ * y poder escuchar por los eventos de PRESSED y UNPRESSED de cada pin registrado.
+ *
+ * Ejemplo, para un pin
+ * {
+ *   type: InputManager.TYPE_PUSH_BUTTON
+ *   number: 12,
+ *   name: 'BOTON1'
+ * }
+ *
+ * Cada vez que se active el pin 12 se disparara el evento 'INPUT:BOTON1:PRESSED'
+ * Cuando se suelte, 'INPUT:BOTON1:UNPRESSED'
+ *
+ * Util para saber cuando se activa un pin escuchando los eventos emitidos por el InputManager.
  */
-const InputService = function ({delay = 200}) {
+
+const InputManager = function ({delay = 200}) {
 
     let inputPins = []
 
     this.registerInputPins = function ({pins}) {
 
         /**
-         * pins
+         * Registra los pines del GPIO a ser monitoreados.
+         * Recibe un array de pins, que deben de contener la siguiente estructura:
          * {
          *   type: InputHandler::Type
-         *   number: Integer
+         *   number: Integer,
+         *   name: String
          * }
          */
 
@@ -96,10 +113,10 @@ const InputService = function ({delay = 200}) {
 
 }
 
-InputService.TYPE_PUSH_BUTTON = 0
-InputService.PIN_STATUS_PRESSED = 0;
-InputService.PIN_STATUS_IDDLE = 1;
+InputManager.TYPE_PUSH_BUTTON = 0
+InputManager.PIN_STATUS_PRESSED = 0;
+InputManager.PIN_STATUS_IDDLE = 1;
 
-util.inherits(InputService, EventEmitter)
+util.inherits(InputManager, EventEmitter)
 
-module.exports = InputService;
+module.exports = InputManager;

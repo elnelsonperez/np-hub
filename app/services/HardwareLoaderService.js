@@ -3,7 +3,7 @@ const reset = require('../../lib/functions').reset;
 const props = require('./../shared/props')
 
 /**
- *
+ * Se encarga de inicializar el BluetoothService, Gprs y mandar a buscar las configuraciones iniciales al server.
  * @param {GprsService} GprsService
  * @param {BluetoothService} BluetoothService
  * @param {ConfigService} ConfigService

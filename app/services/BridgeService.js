@@ -3,7 +3,8 @@ const BtMessage  = require('./../services/BluetoothService/BtMessage')
 const dateformat = require('dateformat')
 
 /**
- *
+ * Este servicio se encarga de coordinar las operaciones que se realizan entre la aplicacion movil
+ * y el Hub.
  * @param {BluetoothService} BluetoothService
  * @param {MensajeService} MensajeService
  * @param {StatsService} StatsService
@@ -156,7 +157,6 @@ const BridgeService = function (
       }
     }
   }
-
 
   /**
    *

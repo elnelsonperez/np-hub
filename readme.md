@@ -245,10 +245,12 @@ Sin embargo, la tarea si sabe _cuando_ utilizar el servicio y que hacer con el r
 Los Tasks o Tareas residen el el directorio `app/tasks` y encima de cada uno de las tareas actuales 
 se documenta para que sirve cada una.
  
-######Modulos
-Relacionado a la pantalla LCD. Si vas a utilizar la pantalla, envianos un mensaje para agregar esta seccion de documentacion.
-
 ######Props
 Tanto las Tasks como los Services, y otras secciones de la aplicacion, deben tener acceso a las configuraciones 
 globales que determinan como la aplicacion funciona. El lugar para poner variables globales que todo modulo de la aplicacion pueda
 importar, es en el objeto `props`, ubicado en `app/shared/props`.
+
+######Modulos
+No confundir con modulos de nodejs. El termino **Modulo** en el contexto de la aplicacion esta 
+relacionado a la pantalla LCD (Terrible nombre, lo sabemos). Si vas a utilizar la pantalla, 
+envianos un mensaje para agregar esta seccion de documentacion.

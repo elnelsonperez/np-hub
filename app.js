@@ -1,3 +1,9 @@
+/*
+Puerta de entrada a la aplicacion.
+Desde aqui se inicia el 'engine' del Hub.
+Ademas, se instancian los servicios y se le pasan al engine.
+ */
+
 const Application = require('./app/App').Application
 
 const SequentialSerialManager = require('./lib/SequentialSerialManager')

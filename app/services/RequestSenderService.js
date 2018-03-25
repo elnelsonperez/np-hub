@@ -7,6 +7,10 @@ const QueueService = require("./RequestQueueService")
  */
 const RequestSenderService = function (RequestQueueService, RequestProcessorService) {
 
+  /**
+   * Simplemente utiliza el RequestProcessorService para hacer una solicitud/request y lanzar un error si la
+   * respuesta de dicho request no se responde luego de un timeout especificado.
+   */
   this.requestWithResponse = (
       {url, method, payload, priority = QueueService.PRIORITY_LOW, event_name = null, timeout= 15000}) => {
     let timeoutId = null;

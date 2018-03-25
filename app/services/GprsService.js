@@ -34,6 +34,13 @@ function IsJsonString(str) {
 
 events.EventEmitter.call(this);
 
+/**
+ * Este servicio es el que interactua con el modulo Gprs.
+ * Se encarga de correr los comandos necesarios en secuencia para conectar el Gprs a la red y hacer
+ * solicitudes GET y POST utilizando el modulo Gprs.
+ * @param SequentialSerialManager
+ * @constructor
+ */
 GprsService = function (SequentialSerialManager) {
 
   this.mandatoryErrors = 0;
@@ -69,6 +76,10 @@ GprsService = function (SequentialSerialManager) {
     })
   };
 
+  /**
+   * Corre la secuencia necesaria para conectar el modulo a la red y obtener internet.
+   * @return {Promise<boolean>}
+   */
   this.initialize = async () => {
 
     SequentialSerialManager.on('specialMessage', msg => {
@@ -146,8 +157,6 @@ GprsService = function (SequentialSerialManager) {
     return false;
 
   };
-
-
 
   this.executeSapbr = async () => {
     return await this.mandatoryCommand(

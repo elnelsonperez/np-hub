@@ -2,8 +2,13 @@ const util = require('util')
 const EventEmitter = require('events').EventEmitter
 const RequestQueueService = require("./../services/RequestQueueService")
 const getSerial = require('./../../lib/systeminfo').getSerial
+
 /**
- *
+ * Saca el proximo request a enviar de la base de datos usando el RequestQueueService
+ * y utiliza el GprsService para enviar dicho request al servidor.
+ * Dispara un evento con el nombre especificado en el 'event_name' de la solicitud guardada en la db cuando
+ * la solicitud se completa.
+ * Ademas, intenta procesar solicitudes viejas fallidas siempre y cuando su 'retry_counter' sea menos a tres.
  * @param {RequestQueueService} QueueService
  * @param {GprsService} GprsService
  * @constructor

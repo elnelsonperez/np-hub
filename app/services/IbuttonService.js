@@ -1,27 +1,15 @@
 const fs = require('fs')
 const gpio = require('rpi-gpio');
 const interval = require('interval-promise')
-/*
-Necesario
-
-modprobe wire timeout=1 slave_ttl=3
-modprobe w1-gpio
-modprobe w1-smem
-
-sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_slaves
-sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_remove
-sudo chmod a+w /sys/devices/w1_bus_master1/w1_master_search
-
-To speed the reading time Edit this file as Sudo
-/etc/modprobe.d/w1.conf
-And add:
-options wire timeout=1 slave_ttl=3
-*/
 
 const READ_FILE = '/sys/devices/w1_bus_master1/w1_master_slaves'
 const REMOVE_FILE = '/sys/devices/w1_bus_master1/w1_master_remove'
 const LED_GPIO = 11
 
+/**
+ * Se encarga de manejar el lector de iButtons.
+ * @constructor
+ */
 const IbuttonService = function () {
 
   let ready = false;
