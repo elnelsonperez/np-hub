@@ -1,7 +1,9 @@
 #NP PMS - NP HUB Software
 Este software es el que corre en los Hubs del sistema NP PMS.
 Desarrollado por Nelson Pérez y Nathaly Persia como proyecto de grado. 2017-2018.
-`Documentacion por Nelson Pérez.`
+`Para solicitar documentacion adicional sobre algo, enviame un email a 
+me@nelsonperez.net
+`
 
 La aplicacion esta desarrollada en Javascript con NodeJS, a excepcion de el manejo de bluetooth, que se
 hace con la libreria PyBluez de Python.
@@ -17,13 +19,14 @@ desde los destacamentos. 
  de información geo posicional, autenticación de policías  y conexión a Internet mediante un modulo GPRS.
  
 ######Recomendaciones previas
-Es indispensable que conozcas lo que son [Callbacks](https://codeburst.io/javascript-what-the-heck-is-a-callback-aba4da2deced?gi=c209d2e9c41b),
+- Es indispensable que conozcas lo que son [Callbacks](https://codeburst.io/javascript-what-the-heck-is-a-callback-aba4da2deced?gi=c209d2e9c41b),
 [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) y 
 [Async/Await](https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9)
 en Javascript para entender el flujo de la aplicacion, ya que la mayoria de las operaciones son asincronas y pueden 
 llegar a ser confusas.
-
-[Los modulos en NodeJS](https://www.w3schools.com/nodejs/nodejs_modules.asp) tambien son importantes.
+- [Getting started with Node](https://codeburst.io/getting-started-with-node-js-a-beginners-guide-b03e25bca71b)
+- [Los modulos en NodeJS](https://www.w3schools.com/nodejs/nodejs_modules.asp) tambien son importantes.
+- [Eventos en Nodejs](https://www.w3schools.com/nodejs/nodejs_events.asp) y el EventEmitter class.
 
 ######Notas sobre archivos no utilizados
 Existen unos archivos en `app/modules`, `app/core` y `lib` relacionados a una pantalla LCD 20x4 que inicialmente 
@@ -289,7 +292,7 @@ module.exports = ExampleTask;
 Solo hay que crear un nuevo archivo en `app/services`. Los servicios no tienen una estructura mandatoria,
 puede ser cualquier objeto que pueda ser exportado.
 
-#####Enviar mensajes utilizando el Bluetooth
+##Enviar mensajes utilizando el Bluetooth
 Este trabajo lo hace el BluetoothService luego de ser inicializado.
 ```javascript
 //Desde el contexto de un task que ya halla importado BluetoothService y BtMessage.
