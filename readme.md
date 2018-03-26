@@ -5,10 +5,8 @@ Desarrollado por Nelson Pérez y Nathaly Persia como proyecto de grado. 2017-201
 me@nelsonperez.net
 `
 
-La aplicacion esta desarrollada en Javascript con NodeJS, a excepcion de el manejo de bluetooth, que se
+La aplicacion esta desarrollada en Javascript con NodeJS, a excepcion del manejo de bluetooth, que se
 hace con la libreria PyBluez de Python.
-
-**Tanto el codigo como la documentacion estan en Spanglish. Si no sabes ingles, lo sentimos.**
 
 >El objetivo general del NP PMS es Desarrollar un sistema de 
 rastreo posicional para la Policía Nacional Dominicana que permita el
@@ -33,6 +31,8 @@ Existen unos archivos en `app/modules`, `app/core` y `lib` relacionados a una pa
 era parte del proyecto. En esta version la pantalla LCD no se esta utilizando, por lo que cualquier bloque de codigo
 que haga referencia a la LCD puede ser ignorado, a menos que quieras utilizarla. En ese caso, escribenos y agregaremos
 la LCD y el directorio `modules` a este readme.
+
+**Tanto el codigo como la documentacion estan en Spanglish. Si no sabes ingles, lo sentimos.**
 
 ##Componentes físicos
 * [Raspberry Pi 3 Model B V1.2 2015](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
