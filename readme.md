@@ -1,4 +1,4 @@
-#NP PMS - NP HUB Software
+# NP PMS - NP HUB Software
 Este software es el que se corre en los Hubs del sistema NP PMS.
 Desarrollado por Nelson Pérez y Nathaly Persia como proyecto de grado. 2017-2018.
 `Para solicitar documentacion adicional sobre algo, enviame un email a 
@@ -16,7 +16,7 @@ desde los destacamentos. 
 >PMS Hub: Artefacto que se coloca en el vehículo policíaco y permite la obtención
  de información geo posicional, autenticación de policías  y conexión a Internet mediante un modulo GPRS.
  
-######Recomendaciones previas
+###### Recomendaciones previas
 - Es indispensable que conozcas lo que son [Callbacks](https://codeburst.io/javascript-what-the-heck-is-a-callback-aba4da2deced?gi=c209d2e9c41b),
 [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) y 
 [Async/Await](https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9)
@@ -26,7 +26,7 @@ llegar a ser confusas.
 - [Los módulos en NodeJS](https://www.w3schools.com/nodejs/nodejs_modules.asp) tambien son importantes.
 - [Eventos en Nodejs](https://www.w3schools.com/nodejs/nodejs_events.asp) y el EventEmitter class.
 
-######Notas sobre archivos no utilizados
+###### Notas sobre archivos no utilizados
 Existen unos archivos en `app/modules`, `app/core` y `lib` relacionados a una pantalla LCD 20x4 que inicialmente 
 era parte del proyecto. En esta versión la pantalla LCD no se esta utilizando, por lo que cualquier bloque de codigo
 que haga referencia a la LCD puede ser ignorado, a menos que quieras utilizarla. En ese caso, escríbenos y agregaremos
@@ -34,7 +34,7 @@ la LCD y el directorio `modules` a este readme.
 
 **Tanto el código como la documentación estan en Spanglish. Si no sabes inglés, lo sentimos.**
 
-##Componentes físicos
+## Componentes físicos
 * [Raspberry Pi 3 Model B V1.2 2015](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
 * [Módulo GPRS SIMCOM 800c Shield](http://simcomm2m.com/En/module/detail.aspx?id=74)
 * [Módulo GPS U-blox 6M](https://www.u-blox.com/en/product/neo-6-series)
@@ -42,18 +42,18 @@ la LCD y el directorio `modules` a este readme.
 
 ![Diagrama 1](images/diagram1.png)
 
-##Configuración en la Pi
+## Configuración en la Pi
 *Este documento asume que tienes conocimientos básicos de Linux*
 
 En esta sección se explica como hacer el setup inicial con la Pi para correr el proyecto.
-#####Notas
+##### Notas
 * Recomendamos que la Pi corra [Raspbian Stretch Lite March 2018](https://www.raspberrypi.org/downloads/raspbian/).
 * Esta versión de Raspbian no tiene interface desktop, lo que la hace muy rápida. [Este articulo](https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0) indica como conectarse a la Pi luego de descargar raspbian. 
 * Es recomendable configurar una IP estática para no tener que encontrar la IP asignada a la pi
 cada vez que bootea y se conecta a la red. Para ello, se puede seguir la sección **dhcpcd method**
  de [este tutorial](https://raspberrypi.stackexchange.com/questions/37920/how-do-i-set-up-networking-wifi-static-ip-address/74428#74428)
 
-#####Bluetooth en Raspbian Stretch
+##### Bluetooth en Raspbian Stretch
 El NP Hub utiliza el bluetooth de la Pi para comunicarse con el smartphone.
 Para poder utilizar el bluetooth de la manera que queremos, es necesario seguir 
 las instrucciones siguientes. (Comandos a correr en la Pi)
@@ -95,7 +95,7 @@ pi@raspberrypi:~ $ bluetoothctl
 [NEW] Controller B8:27:EB:02:33:C2 raspberrypi [default] <--- Todo bien.
 [bluetooth]# 
 ```
-#####Ibuttons y protocolo 1Wire con la pi
+##### Ibuttons y protocolo 1Wire con la pi
 
 Agregar lo siguiente antes de *exit 0* en el archivo `/etc/rc.local` (editar con sudo)
 ```text
@@ -115,13 +115,13 @@ Y agregar:
 options wire timeout=1 slave_ttl=1
 ```
 
-#####Instalando NodeJs y NPM
+##### Instalando NodeJs y NPM
 ```bash
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-#####Instalar Yarn
+##### Instalar Yarn
 Yarn hace la instalación de dependencias (librerías requeridas para que el proyecto funcione) más rápida que NPM.
 Si te interesa leer sobre porque usar Yarn en ves de NPM, checa [esto.](https://www.keycdn.com/blog/npm-vs-yarn/)
 
@@ -133,12 +133,12 @@ sudo apt-get update && sudo apt-get install yarn -y
 
 O sigue [las instrucciones oficiales de Yarn para Debian.](https://yarnpkg.com/lang/en/docs/install/#linux)
 
-#####Git (Opcional)
+##### Git (Opcional)
 Supongo que vas a instalar el proyecto haciendo un pull desde Git. Para eso, necesitas git en la Pi.
 ```bash
 sudo apt-get install git -y
 ```
-#####Lsyncd (Opcional)
+##### Lsyncd (Opcional)
 *El siguiente paso es totalmente opcional, pero muy recomendado y te ahorrará mucho tiempo luego.*
 
 Yo recomendaría utilizar algún método para copiar automáticamente los cambios hechos en el proyecto
@@ -176,7 +176,7 @@ Si no entiendes estos conceptos, [mira este artículo.](https://www.raspberrypi.
 
 **En este punto la pi debería estar lista para correr el proyecto.** 
 
-##Ya instalé todo, ¿y ahora?
+## Ya instalé todo, ¿y ahora?
 * Primero, luego de tener los archivos del proyecto en la Pi, tenemos que instalar las dependencias del proyecto. Ubícate en el directorio del proyecto y corre `yarn`.
 * Cuando las dependencias terminen de ser instaladas, el proyecto se corre desde al archivo `app.js`, haciendo
 `node app.js`.
@@ -185,7 +185,7 @@ Si no entiendes estos conceptos, [mira este artículo.](https://www.raspberrypi.
     * `--verbose`: Que aparezca cuando se corre cada Task en la consola.
     * `--hideGprs`: Ocultar output del GPRS en consola.
     
-######¿Qué es lo que sucede cuando el programa corre?
+###### ¿Qué es lo que sucede cuando el programa corre?
 Se ejecutan las siguientes operaciones.
 
 1. Se inicializan los módulos GPRS y Bluetooth.
@@ -205,11 +205,11 @@ Si necesitas mas detalles del "orden" en el que corre el código,
 inicia desde `app.js`, el punto de entrada a la aplicación, a leer los comentarios del código.
 Cada sección indica cuando corre. 
 
-##Diseño del software
+## Diseño del software
 El código está separado según su funcionalidad y el tipo de operación que realiza cuando la aplicación está corriendo.
 La ideas principales son las siguientes:
 
-######Services
+###### Services
 El lugar donde se agrupan funciones que sirven para un propósito específico, como por ejemplo,
 enviar un mensaje o leer del iButton reader, es llamado **Servicio** o **Service**.
 Un Service puede ser llamado de cualquier parte en la aplicación, y su propósito principal es 
@@ -218,7 +218,7 @@ Un Service puede ser llamado de cualquier parte en la aplicación, y su propósi
 Los servicios residen en el directorio `app/services` y encima de cada uno de los servicios actuales 
 se documenta para que sirve.
 
-######Tasks
+###### Tasks
 Hay tareas que tienen que realizarse continuamente (como la recolección de localizaciones GPS). 
 Estos tipos de *background processes* son llamados **Tasks** en el contexto de esta aplicación.
 
@@ -243,18 +243,18 @@ Sin embargo, la tarea sí sabe _cuando_ utilizar el servicio y que hacer con el 
 Los Tasks o Tareas residen en el directorio `app/tasks` y encima de cada uno de las tareas actuales 
 se documenta para que sirve cada una.
  
-######Props
+###### Props
 Tanto las Tasks como los Services, y otras secciones de la aplicación, deben tener acceso a las configuraciones 
 globales que determinan como la aplicación funciona. El lugar para poner variables globales que todo módulo de la aplicación pueda
 importar, es en el objeto `props`, ubicado en `app/shared/props`.
 
-######Módulos
+###### Módulos
 No confundir con módulos de nodejs. El término **Módulo** en el contexto de la aplicación está 
 relacionado a la pantalla LCD (Terrible nombre, lo sabemos). Si vas a utilizar la pantalla, 
 envianos un mensaje para agregar esta sección de documentación.
 
-##Guías
-#####Crear un nuevo task
+## Guías
+##### Crear un nuevo task
 Solo hay que crear un nuevo archivo en `app/tasks`, y puedes partir de la siguiente estructura base.
 
 ```javascript
@@ -286,11 +286,11 @@ ExampleTask.run =  function () {
 
 module.exports = ExampleTask;
 ```
-#####Crear un nuevo servicio
+##### Crear un nuevo servicio
 Solo hay que crear un nuevo archivo en `app/services`. Los servicios no tienen una estructura mandatoria,
 puede ser cualquier objeto que pueda ser exportado.
 
-##Enviar mensajes utilizando el Bluetooth
+## Enviar mensajes utilizando el Bluetooth
 Este trabajo lo hace el BluetoothService luego de ser inicializado.
 ```javascript
 //Desde el contexto de un task que ya halla importado BluetoothService y BtMessage.
@@ -312,7 +312,7 @@ Al ejecutar ese ejemplo, la aplicación móvil recibiría un JSON con
 ```
 en su contenido.
 
-##¿Como se hacen las solicitudes/requests a Internet?
+## ¿Como se hacen las solicitudes/requests a Internet?
 Las solicitudes en la aplicación se realizan utilizando una cola o queue, por lo que 
 es necesario agregarla a la cola y luego procesarla.
 
