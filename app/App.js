@@ -54,16 +54,20 @@ Application = function () {
   ) => {
     props.applicationEvent = new EventEmitter()
 
+    props.applicationEvent.on('boot.ready', function () {
+      console.log(" ==== BOOT READY ====\n")
+    })
+
     this.screenRefreshDelay = screenRefreshDelay
     this.disabledFunctionality = disabledFunctionality
 
     props.argv = this.parseArguments() 
 
-    const InputManager = new InputManager({delay: inputDelay});
-    InputManager.registerInputPins(inputPins)
-    InputManager.initializeRegisteredPins().then(()=> {
-      props.input = InputManager
-    });
+    const manager = new InputManager({delay: inputDelay});
+
+    props.input = manager
+    manager.registerInputPins(inputPins)
+    manager.initializeRegisteredPins()
 
     props.serialNumber = getSerial();
     this.setDefaultLcdProperties();
@@ -335,13 +339,6 @@ Promise.prototype.finally = function(cb) {
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
-
-/**
- * Simplemente para saber cuando la app ha terminado el proceso de 'booteo'
- */
-props.applicationEvent.on('boot.ready', function () {
-  console.log(" ==== BOOT READY ====\n")
-})
 
 /**
  * Asegurarse que cuando se cierre la aplicacion, el proceso de Python que maneja el bluetooth tambien muera.
