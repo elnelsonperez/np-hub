@@ -54,6 +54,8 @@ Ejemplo de config json:
  discoverable: true   <---- Hacer que la pi sera descubrible?
 }
 
+El archivo BluetoothService.js utiliza esta libreria ya, so es improbable que tengas que modificar este codigo directamente.
+
 '''
 
 from bluetooth import *
