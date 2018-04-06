@@ -13,6 +13,9 @@ const BtMessage = require("./BtMessage")
  * Al recibir cualquier mensaje por el STDOUT, levanta un evento con el mismo nombre del tipo de mensaje,
  * y un pythonMessage (ver directorio de BluetoothService) como payload.
  *
+ * El metodo mas utilizado de aqui es el sendMessage, que permite enviar un BtMessage
+ * (ver directorio de BluetoothService) a un dispositivo conectado.
+ *
  * @param debug
  * @constructor
  */
