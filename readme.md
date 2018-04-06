@@ -83,7 +83,7 @@ sudo reboot
 
 Instalar librerías necesarias.
 ```bash
-sudo apt-get install libbluetooth-dev python-dev python-pip -y
+sudo apt-get install libbluetooth-dev python-dev python-pip ipython -y
 sudo pip install PyBluez
 sudo pip install pexpect
 ```
@@ -254,6 +254,13 @@ relacionado a la pantalla LCD (Terrible nombre, lo sabemos). Si vas a utilizar l
 envianos un mensaje para agregar esta sección de documentación.
 
 ## Guías
+##### Funcionamiento de libreria de bluetooth
+Nodejs no utiliza el bluetooth de la pi directamente. Lo hace atravez de una libreria desarrollada por nosotros
+en python, que utiliza pyBluez. Node levanta un nuevo thread para interactual con esta libreria y se comunica con ella
+usando el STDIN y STDOUT.
+
+Detalles sobre la libreria de bluetooth puede ser encontrada al tope del fichero `app/services/BluetoothService/main.py`
+
 ##### Crear un nuevo task
 Solo hay que crear un nuevo archivo en `app/tasks`, y puedes partir de la siguiente estructura base.
 
@@ -286,11 +293,12 @@ ExampleTask.run =  function () {
 
 module.exports = ExampleTask;
 ```
+
 ##### Crear un nuevo servicio
 Solo hay que crear un nuevo archivo en `app/services`. Los servicios no tienen una estructura mandatoria,
 puede ser cualquier objeto que pueda ser exportado.
 
-## Enviar mensajes utilizando el Bluetooth
+##### Enviar mensajes utilizando el Bluetooth
 Este trabajo lo hace el BluetoothService luego de ser inicializado.
 ```javascript
 //Desde el contexto de un task que ya halla importado BluetoothService y BtMessage.
@@ -312,7 +320,7 @@ Al ejecutar ese ejemplo, la aplicación móvil recibiría un JSON con
 ```
 en su contenido.
 
-## ¿Como se hacen las solicitudes/requests a Internet?
+##### ¿Como se hacen las solicitudes/requests a Internet?
 Las solicitudes en la aplicación se realizan utilizando una cola o queue, por lo que 
 es necesario agregarla a la cola y luego procesarla.
 

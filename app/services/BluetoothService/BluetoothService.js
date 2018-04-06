@@ -9,6 +9,10 @@ const BtMessage = require("./BtMessage")
  * del main.py, que maneja el bluetooth a mas bajo nivel utilizando una libreria de python.
  * El servicio al ser inicializado corre en un nuevo thread el main.py, y se comunica con python a travez
  * del stdin y stdout.
+ *
+ * Al recibir cualquier mensaje por el STDOUT, levanta un evento con el mismo nombre del tipo de mensaje,
+ * y un pythonMessage (ver directorio de BluetoothService) como payload.
+ *
  * @param debug
  * @constructor
  */

@@ -1,3 +1,61 @@
+'''
+Esta minuscula libreria permite utilizar el bluetooth de la pi utilizando pyBluez.
+Esta diseñado para recibir instrucciones por el STDIN y escupir mensajes por el STDOUT.
+Cualquier otro lenguaje podria correr esta libreria y enviarle mensajes por el STDIN.
+
+Esta app encarga de unas cuentas tareas:
+- Crear el servidor bluetooth y publicar el service ID para que dispositivos se puedan conectar a la Pi
+- Auto aceptar solicitudes de pareo utilizando bluetoothctl dede python
+- Recibir data por bluetooth, y transmitirla por el STDOUT
+- Enviar data por bluetooth, indicada por el STDIN
+
+Los mensajes que puede recibir esta libreria tienen que tener un formato especifico:
+[Action]|[Method]|[Params]
+(Sin corchetes)
+
+La unica accion soportada por ahora es "invoke".
+Lo que hace "invoke", es permitir ejecutar una funcion de python desde otro lenguaje (en este caso, nodejs),
+y devolver el resultado por el stdout.
+
+Un ejemplo de "invoke", para ejecutar el metodo "make_discoverable" sin ningun parametro ("{}") seria el siguiente:
+
+invoke|make_discoverable|{}
+
+La libreria al recibir este comando por el stdin, ejecutara la funcion y devolvera un mensaje de tipo RETURN
+por el stdout.
+El parametro "Params" necesita ser un JSON con los parametros a pasar a la funcion que se va a ejecutar.
+Esta liberia convertira este JSON a un diccionario y lo pasara a la funcion.
+
+
+Los mensajes que esta libreria entrega por el stdout tienen el siguiente formato:
+[Type]|[Name]|[Payload]
+(Sin corchetes)
+
+Y pueden ser de cuatro tipos:
+- RETURN: Resultado de una funciona invocada con "invoke"
+- LOG: Un mensaje de log de la libreria.
+- EVENT: Un evento, por ejemplo, nueva data recibida por bluetooth.
+- EXCEPTION: Un error grave al usar la libreria
+
+Un ejemplo de un mensaje emitido por esta libreria cuando una mac no autorizada quiere conectarse por bluetooth
+es el siguiente:
+
+EVENT|UNAOTHORIZED|{mac_address: XXXXXXXXXX}
+
+Esta libreria acepta tres configuraciones que se le pueden ser pasadas como un json string como
+primer parametro al correr el script:
+
+python main.py [configs]
+
+Ejemplo de config json:
+{
+ allowedMacAddresses: [], <--- mac addressed que se pueden conectar
+ autoPair: true,   <---- Parear automaticamente?
+ discoverable: true   <---- Hacer que la pi sera descubrible?
+}
+
+'''
+
 from bluetooth import *
 import thread
 import json
@@ -5,13 +63,11 @@ import sys
 import bluetoothctl
 import time
 
-
 class Type:
     RETURN = "RETURN"
     EXCEPTION = "EXCEPTION"
     LOG = "LOG"
     EVENT = "EVENT"
-
 
 class BluetoothManager:
     connections = {}
@@ -20,9 +76,13 @@ class BluetoothManager:
     serverSock = None
 
     def __init__(self):
+        #Indica cuando crear un nuevo "server" de bluetooth
         self.createNewServerSignal = False
+        #Permite utilizar bluetoothctl desde python, para aceptar automaticamente los pair requests
         self.bluetoothctl = bluetoothctl.Bluetoothctl()
+        #Thread para leer del STDIN
         thread.start_new_thread(self.read_input, ())
+        #Thread para crear un nuevo bluetooth server
         thread.start_new_thread(self.create_server, ())
         try:
             cnf = sys.argv[1]
