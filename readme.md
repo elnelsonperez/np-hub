@@ -259,7 +259,17 @@ Nodejs no utiliza el bluetooth de la pi directamente. Lo hace atravez de una lib
 en python, que utiliza pyBluez. Node levanta un nuevo thread para interactual con esta libreria y se comunica con ella
 usando el STDIN y STDOUT.
 
-Detalles sobre la libreria de bluetooth puede ser encontrada al tope del fichero `app/services/BluetoothService/main.py`
+Detalles sobre la libreria de bluetooth puede ser encontrada al tope del fichero 
+`app/services/BluetoothService/main.py`, aunque es muy improbable que este codigo
+tenga que ser tocado, ya que el **BridgeService** en este proyecto es el que 
+se encarga de interpretar los mensajes recibidos desde el movil y determinar que hacer
+cuando un mensaje especifico llega.
+
+Para agregar mas tipos de mensajes entre el hub y la aplicacion
+la mayoria, sino todos los cambios, seran hechos en el **BridgeService** en este
+proyecto y en el **BluetoothConector** en el proyecto de la aplicacion movil.
+
+Recomendamos leer los comentarios del codigo del  **BridgeService**.
 
 ##### Crear un nuevo task
 Solo hay que crear un nuevo archivo en `app/tasks`, y puedes partir de la siguiente estructura base.

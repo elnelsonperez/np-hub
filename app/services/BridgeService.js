@@ -3,8 +3,8 @@ const BtMessage  = require('./../services/BluetoothService/BtMessage')
 const dateformat = require('dateformat')
 
 /**
- * Este servicio se encarga de coordinar las operaciones que se realizan entre la aplicacion movil
- * y el Hub.
+ * Este servicio se encarga de coordinar las operaciones que se realizan entre
+ * la aplicacion movil y el Hub.
  * @param {BluetoothService} BluetoothService
  * @param {MensajeService} MensajeService
  * @param {StatsService} StatsService
@@ -28,53 +28,73 @@ const BridgeService = function (
   this.StatsService = StatsService;
 
   this.start = () => {
-
+    /**
+     * Espera eventos de tipo EVENT de BluetoothService.js
+     */
     this.BluetoothService.on("EVENT", msg => {
+      /**
+       * Estos son todos los posibles tipos de eventos, para el tipo de mensaje
+       * EVENT que puede disparar el BlueoothService.
+       * En esta seccion se decide que pasa cuando llega un evento desde el bluetooth
+       * al hub.
+       */
       switch (msg.name) {
+          //Bluetooth listo y esperando una nueva conexion.
         case "AWAITING_NEW_CONNECTION":
           this.awaitingConnection(msg)
           break
         case "INITIALIZED":
           this.initialized(msg)
           break
+          //Bluetooth ha recibido un mensaje de un dispositivo
         case "RECEIVED":
           this.received(msg)
           break
+          //Un dispositivo se ha desconectado
         case "DISCONNECTED":
           this.disconnected(msg)
           if (props.argv.bridgeDebug) {
             console.log("CONNECTIONS ==============> ", props.bridge.connectedMacAddresses)
           }
           break
+          //Nuevo dispositivo conectado
         case "NEW_CONNECTION":
           this.newConnection(msg)
           if (props.argv.bridgeDebug) {
             console.log("CONNECTIONS ==============> ", props.bridge.connectedMacAddresses)
           }
           break
+          //Dispositivo no autorizado se ha intentado conectar
         case "UNAUTHORIZED":
           break
       }
     })
 
+
+    /**
+     * Ambas de los siguientes event listeners se ejecutan caundo se consiguen
+     * nuevos mensajes o incidencias asignadas desde el servidor.
+     * Lo que se hace es enviarlos a el o los celulares conectados.
+     */
     props.applicationEvent.on("autopulledMessages",
-        (data) => {this.autoPulledHandler('mensajes', data)})
+        (data) => {
+          this.autoPulledHandler('mensajes', data)
+        })
 
     props.applicationEvent.on("autopulledIncidencias",
-        (data) => {this.autoPulledHandler('incidencias', data)})
-
+        (data) => {
+          this.autoPulledHandler('incidencias', data)
+        })
   }
 
   /**
-   *
+   * Determina que hacer cuando se conecta un nuevo dispositivo.
    * @param {pythonMessage} msg
    */
   this.newConnection =  (msg) => {
     if (msg.has("mac_address")) {
       if (!props.argv.noAuth) {
-
         this.IbuttonService.startBlinking()
-
         const login = () => {
           this.IbuttonService.readOnlyValid().then(code => {
             if (props.config.ibuttons
@@ -159,7 +179,12 @@ const BridgeService = function (
   }
 
   /**
-   *
+   * Determina que hacer cudo se recibe un nuevo mensaje del celular.
+   * Los mensajes enviados al Hub desde el celular tienen un type y un payload.
+   * Este metodo corre la funcion action_[Type] (siendo [Type] el tipo de accion)
+   * y le pasa el BtMessage como parametro.
+   * En este objeto, GET_TODAY_MESSAGES es un tipo, GET_SECTOR_STATS es un tipo,
+   * etc.
    * @param {pythonMessage} msg
    */
   this.received = function (msg) {
@@ -229,6 +254,11 @@ const BridgeService = function (
     }
   }
 
+    /**
+     * Todas las siguientes son llamadas por la funcion received cuando
+     * el celular envia un mensaje al hub.
+     * @param msg
+     */
   this.action_GET_TODAY_MESSAGES  = (msg) => {
     this.MensajeService.getMensajes({today: true}).then(mensajes => {
       if (mensajes) {
@@ -454,7 +484,6 @@ const BridgeService = function (
     }
 
   }
-
 
   /**
    *
