@@ -4,7 +4,7 @@ const props = require('./../shared/props')
 const ConfigPullerTask = new Task (
     {
       name: 'ConfigPullerTask',
-      every: 5*60*1000,
+      every: 60000,
       inject: ["ConfigService"],
       autoload: false,
       ready: false

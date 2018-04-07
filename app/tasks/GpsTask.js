@@ -19,7 +19,7 @@ const GpsTask = new Task (
         rawLocations: new FixedQueue(100),
         lastLocationDate: new Date()
       },
-      every: 750,
+      every: 500,
       ready: false,
       autoload: false
     }
@@ -36,7 +36,7 @@ GpsTask.initialize = function (debug = false) {
       });
 
       const port = new SerialPort(file, {
-        baudRate: 115200
+        baudRate: 9600
       });
 
       port.pipe(parser);
@@ -80,6 +80,7 @@ GpsTask.run = async function () {
       this.pushOrRejectLocation(this.data.rawLocations.shift())
     }
   }
+  console.log("+++++++++++++++++++ SELECTED LOCATIONS: "+this.data.selectedLocations.length)
 }
 
 

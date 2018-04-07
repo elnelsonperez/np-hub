@@ -1,5 +1,6 @@
 const util = require('util')
 const events = require('events')
+const reset = require('./../../lib/functions').reset
 
 function ErrorCounter (maximun) {
   let scopedErrorCounter = 0;
@@ -59,8 +60,7 @@ GprsService = function (SequentialSerialManager) {
             this.mandatoryErrors++
             console.log("Mandatory error counter: ", this.mandatoryErrors)
           if (this.mandatoryErrors >= 5) {
-            console.log("========================> GPRS MANAGER WOULD RESET HERE")
-            process.exit()
+            reset()
           }
           if (fn) {
             respuesta = fn();

@@ -38,7 +38,7 @@ const Task = function ({errorTreshold = 10, name, every = null, data, ready = tr
       if (this.errorCounter >= this.errorTreshold) {
         console.log("=============> "+ this.name + " WOULD RESET PI HERE");
         process.exit()
-        // reset()
+        reset()
       }
     }
     this.errorsClear = function () {

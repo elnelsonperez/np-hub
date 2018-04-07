@@ -22,10 +22,10 @@ const HardwareLoaderService = function ({GprsService, BluetoothService, ConfigSe
       this.initializeGprs().then(r => {
         if (r !== true) {
           //Reset the shit
-          console.log("============== WOULD RESET =====================")
+          reset()
         }
       }).catch(e => {
-        console.log("============== WOULD RESET =====================")
+        reset()
       })
     })
 
@@ -49,9 +49,8 @@ const HardwareLoaderService = function ({GprsService, BluetoothService, ConfigSe
       await this.getNpHubConfiguration()
     }
     else {
-      console.log("============== WOULD RESET =====================")
       //Shit does not work. Reboot?
-      // reset()
+       reset()
     }
   }
 

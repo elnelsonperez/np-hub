@@ -10,7 +10,7 @@ const props = require('./../shared/props')
 const GpsSenderTask = new Task (
     {
       name: 'GpsSenderTask',
-      every: 500,
+      every: 600,
       inject: ['RequestQueueService', 'RequestProcessorService'],
       autoload: false,
       ready: false
