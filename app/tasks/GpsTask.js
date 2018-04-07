@@ -19,7 +19,7 @@ const GpsTask = new Task (
         rawLocations: new FixedQueue(100),
         lastLocationDate: new Date()
       },
-      every: 4000,
+      every: 750,
       ready: false,
       autoload: false
     }
@@ -36,7 +36,7 @@ GpsTask.initialize = function (debug = false) {
       });
 
       const port = new SerialPort(file, {
-        baudRate: 9600
+        baudRate: 115200
       });
 
       port.pipe(parser);
