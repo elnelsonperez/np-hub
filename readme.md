@@ -267,7 +267,8 @@ cuando un mensaje especifico llega.
 
 Para agregar mas tipos de mensajes entre el hub y la aplicacion
 la mayoria, sino todos los cambios, seran hechos en el **BridgeService** en este
-proyecto y en el **BluetoothConector** en el proyecto de la aplicacion movil.
+proyecto y en el **BluetoothConector** en el 
+[proyecto de la aplicacion movil](https://bitbucket.org/elnelsonperez/npnative).
 
 Recomendamos leer los comentarios del codigo del  **BridgeService**.
 
