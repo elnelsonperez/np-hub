@@ -1,6 +1,6 @@
 '''
 Esta minuscula libreria permite utilizar el bluetooth de la pi utilizando pyBluez.
-Esta diseñado para recibir instrucciones por el STDIN y escupir mensajes por el STDOUT.
+Esta disenado para recibir instrucciones por el STDIN y escupir mensajes por el STDOUT.
 Cualquier otro lenguaje podria correr esta libreria y enviarle mensajes por el STDIN.
 
 Esta app encarga de unas cuentas tareas:
