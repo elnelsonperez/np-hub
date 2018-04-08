@@ -4,21 +4,18 @@ const props = require('./../shared/props')
 const TimeSyncTask = new Task (
     {
       name: 'TimeSyncTask',
-      every: 2*60*60,
+      every: 20000,
       inject: ['TimeSyncService'],
       ready: true
     }
 );
 
-TimeSyncTask.run = function () { return new Promise(res => {
+TimeSyncTask.run = async function () {
   let date = this.TimeSyncService.setSystemTime()
-  while (date === null)  {
-        date = this.TimeSyncService.setSystemTime()
+  if (date !== null) {
+    props.timeSynced = true
+    console.log("||||||||||||||||| SETTING SYSTEM TIME: "+ date)
   }
-  props.timeSynced = true;
-  console.log("||||||||||||||||| SETTING SYSTEM TIME: "+ date)
-  res()
-})
 }
 
 module.exports = TimeSyncTask;

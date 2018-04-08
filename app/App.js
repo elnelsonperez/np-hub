@@ -13,7 +13,7 @@ const minimist = require('minimist');
 
 const reset = require('./../lib/functions').reset;
 const shutdown = require('./../lib/functions').shutdown;
-
+const dateFormat = require('dateformat')
 /**
  * Engine de la aplicacion.
  * Hace todos los setup iniciales necesarios y se encarga de correr las tasks
@@ -52,6 +52,11 @@ Application = function () {
       services = {}
     }
   ) => {
+    const log = console.log;
+    console.log = function(){
+      log.apply(console, ['['+dateFormat(Date.now(), "HH:MM:ss.L")+']'].concat(arguments[0]));
+    };
+
     props.applicationEvent = new EventEmitter()
 
     props.applicationEvent.on('boot.ready', function () {
@@ -91,11 +96,14 @@ Application = function () {
       props.config = config
     })
 
+    console.log("========== LOADING TASKS ============")
     //Loads tasks from tasks directory
     this.loadTasks(__dirname+'/tasks');
 
+
     //Init lcd modules, if lcd enabled.
     if (lcdEnabled) {
+      console.log("========== LOADING MODULES ============")
       this.loadModules(__dirname+'/modules/' + defaultModule).then(() => {
           //Print to screen.
           this.lcdPrintLoop()
@@ -111,6 +119,7 @@ Application = function () {
       props.input.monitorRegisteredPins()
     }
 
+    console.log("========== LOADING BLUETOOTH AND GRPS ============")
     //Cargar bluetooth y gprs, luego, iniciar bridge service para interactuar con app movil.
     this.injectable.HardwareLoaderService.load().then(() => {
       this.injectable.BridgeService.start()

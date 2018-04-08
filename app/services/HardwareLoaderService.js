@@ -93,7 +93,6 @@ const HardwareLoaderService = function ({GprsService, BluetoothService, ConfigSe
     while (done === false && counter < 5) {
       try {
         done = await this.GprsService.initialize();
-        console.log(" ==================> GPRS INITIALIZE RETURN: ", done);
         if (done === false) {
           props.applicationEvent.emit('hardwareLoader.message', "Fail. Reintentando")
           await delay(4000);

@@ -56,7 +56,8 @@ GpsTask.initialize = function (debug = false) {
         if (parsed && parsed.valid === true) {
           this.TimeSyncService.setGpsTime(parsed.time)
           if (!props.timeSynced) {
-            this.TimeSyncService.setSystemTime()
+            console.log("||||||||||||||||| SETTING SYSTEM TIME: "+
+                this.TimeSyncService.setSystemTime())
             props.timeSynced = true;
           }
         }
@@ -93,7 +94,6 @@ GpsTask.run = async function () {
       this.pushOrRejectLocation(this.data.rawLocations.shift())
     }
   }
-  console.log("+++++++++++++++++++ SELECTED LOCATIONS: "+this.data.selectedLocations.length)
 }
 
 
@@ -102,7 +102,6 @@ GpsTask.pushOrRejectLocation = function(location) {
     const prevloc = this.data.lastLocation;
     const distance = this.distanceBetween(location.lat, location.lng, prevloc.lat, prevloc.lng)
     // if (props.argv.verbose) {
-    console.log("[NEW LOC] D.A.: "+ distance+"\n")
     // }
     if (distance > props.config.distanceBetweenLocations) {
       this.pushALocation(location)
@@ -132,13 +131,14 @@ GpsTask.distanceBetween =  function (lat1, lon1, lat2, lon2) {
 
 
 GpsTask.pushALocation = function (location) {
+  console.log("[NEW LOC TO SEND] TIME OF LOC: "+ location.time)
   this.data.selectedLocations.push(location)
   this.data.lastLocation = location;
   this.emit('newLocation', this.data.selectedLocations.length)
   this.data.lastLocationDate = new Date();
 }
 
-GpsTask.getNextLocations = async function () { //
+GpsTask.getNextLocations = async function () {
   return new Promise((res) => {
     if (this.data.selectedLocations > 0) {
       res(this.data.selectedLocations.splice(0, this.data.selectedLocations.length))

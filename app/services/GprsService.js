@@ -334,7 +334,7 @@ GprsService = function (SequentialSerialManager) {
               timeout: 10000
             }
         )
-        console.log("POST PARAMS: "+params)
+        // console.log("POST PARAMS: "+params)
         await SequentialSerialManager.send({cmd: params})
       }
 
