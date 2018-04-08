@@ -54,7 +54,7 @@ Application = function () {
   ) => {
     const log = console.log;
     console.log = function(){
-      log.apply(console, ['['+dateFormat(Date.now(), "HH:MM:ss.L")+']'].concat(arguments[0]));
+      log.apply(console, ['['+dateFormat(Date.now(), "HH:MM:ss.L")+']'].concat(Object.values(arguments).join("\n")));
     };
 
     props.applicationEvent = new EventEmitter()
@@ -162,7 +162,7 @@ Application = function () {
           interval(async () => { //Correr su funcion 'run' cada every milisegundos.
             if (this.tasks[task].ready) { //Siempre y cuando el task este 'ready' para ser corrida.
               if (props.argv.verbose) {
-                console.log("-> Running '"+this.tasks[task].name+"'\n")
+              //   console.log("-> Running '"+this.tasks[task].name+"'\n")
               }
               await this.tasks[task].run()
             }

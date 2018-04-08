@@ -19,7 +19,7 @@ const GpsTask = new Task (
         rawLocations: new FixedQueue(100),
         lastLocationDate: new Date()
       },
-      every: 500,
+      every: 1000,
       ready: false,
       autoload: false,
       inject: ['TimeSyncService']

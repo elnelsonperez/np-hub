@@ -11,6 +11,7 @@
   "dependencies": {
     "autoincrement": "^1.0.0",
     "dateformat": "^3.0.2",
+    "deepmerge": "^2.1.0",
     "gps": "^0.4.1",
     "interval-promise": "^1.1.1",
     "lcdi2c": "^1.0.6",

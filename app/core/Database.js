@@ -8,6 +8,7 @@ const Sqlite = require('sqlite3').verbose()
 let instance = null
 class Database {
   constructor(){
+
     if(instance){
       return instance
     }

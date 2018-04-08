@@ -1,5 +1,5 @@
 const Database = require("./../core/Database")
-
+const dateFormat =require('dateformat')
 /**
  * Este servicio tiene la responsabilidad de realizar cualquier operacion en la
  * base de datos que tenga que ver con las solicitues HTTP.
@@ -17,20 +17,42 @@ const RequestQueueService = function () {
    * @param priority prioridad
    * @param event_name Nombre del evento que se va a disparar cuando el request se complete
    * @param auto_discard Marcar request como auto-descartable. (Lo utiliza el RequestProcessorService)
+   * @param date
    * @return {Promise<any>}
    */
   this.addRequest = (
-      {url, method, payload = {}, priority = RequestQueueService.PRIORITY_LOW, event_name = null, auto_discard = false}
+      {url, method, payload = {}, priority = RequestQueueService.PRIORITY_LOW, event_name = null,
+        auto_discard = false, date = null}
   ) => {
     return new Promise((res,rej) => {
       try {
+        let dateToInsert = dateFormat( new Date(), "yyyy-mm-dd HH:MM:ss")
+        if (date !== null) {
+          dateToInsert = date
+        }
+
         const stmt = db.prepare(
-            `INSERT INTO ${this.table}(url,method,payload,priority,event_name,auto_discard) 
-            VALUES (?,?,?,?,?,?)`, [url,method,JSON.stringify(payload),priority,event_name, auto_discard === true ? 1 : 0])
+            `INSERT INTO ${this.table}(url,method,payload,priority,event_name,auto_discard,date) 
+            VALUES (?,?,?,?,?,?,?)`, [url,method,JSON.stringify(payload),priority,event_name, auto_discard === true ? 1 : 0,dateToInsert])
         stmt.run(function () {
           res(this.lastID)
           console.log("New "+method+" | "+url+" added to queue")
         })
+      }
+      catch (e) {
+        rej(e)
+      }
+    })
+  }
+
+  this.removeFromQueue = (ids) => {
+    return new Promise((res,rej) => {
+      try {
+        db.run(
+            `DELETE FROM ${this.table} 
+            WHERE id in (${ids.join(',')})`, function () {
+              res()
+            })
       }
       catch (e) {
         rej(e)
@@ -94,7 +116,7 @@ const RequestQueueService = function () {
         db.get(`
         SELECT * FROM ${this.table} 
         WHERE status = ${status} 
-        ORDER BY date DESC`, (err, row) => {
+        ORDER BY date ASC`, (err, row) => {
           if (err)
             rej(err)
           const obj = row;
@@ -102,6 +124,25 @@ const RequestQueueService = function () {
               obj.payload = JSON.parse(row.payload)
           }
             res(obj)
+        })
+      }
+      catch (e) {
+        rej(e)
+      }
+    })
+  }
+
+  this.getPendingRequestsByEventName = (name) => {
+    return new Promise((res, rej) => {
+      try {
+        db.all(`
+        SELECT * FROM ${this.table} 
+        WHERE status = ${RequestQueueService.STATUS_PENDING}
+        AND event_name = '${name}' ORDER BY date ASC
+        `, (err, rows) => {
+          if (err)
+            rej(err)
+          res(rows)
         })
       }
       catch (e) {

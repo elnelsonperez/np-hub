@@ -2,7 +2,7 @@ const util = require('util')
 const EventEmitter = require('events').EventEmitter
 const RequestQueueService = require("./../services/RequestQueueService")
 const getSerial = require('./../../lib/systeminfo').getSerial
-
+const merge = require('deepmerge')
 /**
  * Saca el proximo request a enviar de la base de datos usando el RequestQueueService
  * y utiliza el GprsService para enviar dicho request al servidor.
@@ -20,6 +20,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
     if (!GprsService.initialized) {
       throw new Error(RequestProcessorService.GPRS_NOT_INITIALIZED)
     } else {
+      await this.mergeLocationRequests()
       let request = await QueueService.getNextRequest()
       let failedRequest = await QueueService.getNextRequest(RequestQueueService.STATUS_FAILED)
 
@@ -111,6 +112,30 @@ const RequestProcessorService =  function (QueueService, GprsService) {
       throw new Error(RequestProcessorService.GPRS_NOT_INITIALIZED)
     }
 
+  }
+
+  this.mergeLocationRequests = async () => {
+    const requests = await QueueService.getPendingRequestsByEventName("LOCATION_POST")
+     if (requests && Array.isArray(requests) && requests.length > 1) {
+       let result = {}
+       let ids = []
+       for (let r of requests) {
+         result = merge(result, JSON.parse(r.payload))
+         ids.push(r.id)
+       }
+       QueueService.addRequest({
+         url: 'http://nppms.us/api/hub_localizaciones',
+         method: RequestQueueService.METHOD_POST,
+         payload: result,
+         priority: RequestQueueService.PRIORITY_HIGH,
+         event_name: "LOCATION_POST",
+         date: requests[0].date
+       }).then(() => {
+         QueueService.removeFromQueue(ids)
+       }).catch(e => {})
+
+       console.log("-> SE EMPAQUETARON "+requests.length+" REQUESTS DE LOCS")
+     }
   }
 }
 

@@ -1,5 +1,6 @@
 const util = require('util')
 const EventEmitter = require('events').EventEmitter
+const RequestQueue = require("./RequestQueueService")
 /**
  * Se encarga de traer las configuraciones del servidor.
  * @param {RequestSenderService} RequestSenderService
@@ -17,7 +18,7 @@ const ConfigService = function (RequestSenderService, QueueService, configEndpoi
       const response  = await RequestSenderService.requestWithResponse({
         url: configEndpoint,
         method: "POST",
-        priority: QueueService.PRIORITY_MOST,
+        priority: RequestQueue.PRIORITY_MOST,
         event_name: this.eventName,
         payload: {
           force: true

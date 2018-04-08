@@ -32,8 +32,8 @@ GpsSenderTask.run = function () {
         payload: {
           locations: locs
         },
-        priority: RequestQueueService.PRIORITY_MOST,
-        event_name: "LOCATION_SENT"
+        priority: RequestQueueService.PRIORITY_HIGH,
+        event_name: "LOCATION_POST"
       })
     }).finally(() => {
       res()

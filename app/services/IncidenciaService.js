@@ -12,7 +12,7 @@ const IncidenciaService = function (RequestSenderService) {
     const response  = await RequestSenderService.requestWithResponse({
       url: "http://nppms.us/api/hub_get_incidencias",
       method: "POST",
-      priority: QueueService.PRIORITY_HIGH,
+      priority: QueueService.PRIORITY_MEDIUM,
       event_name: "INCIDENCIAS_GET",
       payload: {
         from
