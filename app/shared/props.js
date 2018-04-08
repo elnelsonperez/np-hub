@@ -16,5 +16,6 @@ module.exports = { //These are available to all modules and tasks
       lastPulledIncidenciaDate: null
     }
   },
+  timeSynced: false
 
 };

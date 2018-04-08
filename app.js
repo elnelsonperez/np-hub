@@ -19,8 +19,10 @@ const HardwareLoaderService = require('./app/services/HardwareLoaderService')
 const RequestQueueService = require("./app/services/RequestQueueService")
 const RequestProcessorService = require("./app/services/RequestProcessorService")
 const BluetoothService = require("./app/services/BluetoothService/BluetoothService")
+const TimeSyncService = require('./app/services/TimeSyncService')
 
 const instances = {}
+instances.TimeSyncService = new TimeSyncService()
 instances.SequentialSerialManager = new SequentialSerialManager()
 instances.GprsService = new GprsService(instances.SequentialSerialManager)
 instances.BluetoothService = new BluetoothService({debug: true})

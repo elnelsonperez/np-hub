@@ -21,7 +21,8 @@ const GpsTask = new Task (
       },
       every: 500,
       ready: false,
-      autoload: false
+      autoload: false,
+      inject: ['TimeSyncService']
     }
 );
 
@@ -51,18 +52,30 @@ GpsTask.initialize = function (debug = false) {
         }
       });
 
+      gps.on('ZDA', (parsed) => {
+        if (parsed && parsed.valid === true) {
+          this.TimeSyncService.setGpsTime(parsed.time)
+          if (!props.timeSynced) {
+            this.TimeSyncService.setSystemTime()
+            props.timeSynced = true;
+          }
+        }
+      });
+
       gps.on('GLL', (parsed) => {
-        if (parsed.valid === true &&
-            parsed.status === "active" &&
-            parsed.lat !== null
-            && parsed.lon !== null)
-        {
-          const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
-          this.data.rawLocations.push({
-            time: time,
-            lat: parsed.lat,
-            lng: parsed.lon
-          });
+        if (props.timeSynced) {
+          if (parsed.valid === true &&
+              parsed.status === "active" &&
+              parsed.lat !== null
+              && parsed.lon !== null)
+          {
+            const time = dateFormat(parsed.time, "yyyy-mm-dd HH:MM:ss");
+            this.data.rawLocations.push({
+              time: time,
+              lat: parsed.lat,
+              lng: parsed.lon
+            });
+          }
         }
       });
     }
