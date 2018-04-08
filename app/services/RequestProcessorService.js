@@ -38,8 +38,10 @@ const RequestProcessorService =  function (QueueService, GprsService) {
         }
 
         if (result.code.toString().startsWith("6")) {
+          console.log("Request Failed - "+request.event_name)
           throw new Error("HTTPCODE6xx")
         } else {
+          console.log("Request Completed - "+request.event_name)
           QueueService.changeStatus(request.id, RequestQueueService.STATUS_DONE)
           if (request.event_name) {
             this.emit(request.event_name, {error: null, res: result, id: request.id})
@@ -48,6 +50,7 @@ const RequestProcessorService =  function (QueueService, GprsService) {
 
       }
       catch (e) {
+        console.log("Request Failed - "+request.event_name)
         if (request.auto_discard && request.auto_discard !== 0) {
           await QueueService.changeStatus(request.id, RequestQueueService.STATUS_NEVER)
         } else {
